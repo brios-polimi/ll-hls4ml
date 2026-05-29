@@ -174,23 +174,23 @@ def plot_vocab_counts(vocab_counts: dict, figsize=(16, 10)):
     totals = df.groupby("category")["count"].sum().sort_values()
     top_instruction = (
         df[df["category"] == "instruction"]
-        .nlargest(15, "count")
+        .nlargest(20, "count")
         .sort_values("count", ascending=False)
     )
     top_variable = (
         df[df["category"] == "variable"]
-        .nlargest(10, "count")
+        .nlargest(20, "count")
         .sort_values("count", ascending=False)
     )
     top_constant = (
         df[df["category"] == "constant"]
-        .nlargest(10, "count")
+        .nlargest(20, "count")
         .sort_values("count", ascending=False)
     )
 
     fig, axes = plt.subplots(2, 2, figsize=figsize)
     ax = axes[0, 0]
-    sns.barplot(x=totals.values, y=totals.index, ax=ax, palette="muted")
+    sns.barplot(x=totals.values, y=totals.index, ax=ax, palette="muted", hue=totals.index, legend=False)
     ax.set_title("Total vocab counts by category (logscale)")
     ax.set_xlabel("Count")
     ax.set_xscale("log")
@@ -198,14 +198,14 @@ def plot_vocab_counts(vocab_counts: dict, figsize=(16, 10)):
     for container in ax.containers:
         ax.bar_label(container, fmt="%d", label_type="edge", padding=3)
 
-    sns.barplot(x="count", y="token", data=top_instruction, ax=axes[0, 1], palette="rocket")
+    sns.barplot(x="count", y="token", data=top_instruction, ax=axes[0, 1], palette="rocket", hue="token", legend=False)
     axes[0, 1].set_title("Top 15 instructions")
 
-    sns.barplot(x="count", y="token", data=top_variable, ax=axes[1, 0], palette="viridis")
+    sns.barplot(x="count", y="token", data=top_variable, ax=axes[1, 0], palette="viridis", hue="token", legend=False)
     axes[1, 0].set_title("Top variable types (logscale)")
     axes[1, 0].set_xscale("log")
 
-    sns.barplot(x="count", y="token", data=top_constant, ax=axes[1, 1], palette="cubehelix")
+    sns.barplot(x="count", y="token", data=top_constant, ax=axes[1, 1], palette="cubehelix", hue="token", legend=False)
     axes[1, 1].set_title("Top constant types (logscale)")
     axes[1, 1].set_xscale("log")
 

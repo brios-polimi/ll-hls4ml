@@ -1,5 +1,5 @@
 """PyG HeteroData dataset over preprocessed .pt files."""
-
+from collections import defaultdict
 from pathlib import Path
 
 import torch
@@ -17,13 +17,14 @@ class HeteroGraphDataset(Dataset):
         self,
         root: str | Path,
         types: list[str] | None = None,
+        max_per_type: dict[str, int] | int | None = None,
         transform=None,
     ):
         self.root = Path(root)
         self.transform = transform
-        self.paths = self._index(types)
+        self.paths = self._index(types, max_per_type)
 
-    def _index(self, types: list[str] | None) -> list[Path]:
+    def _index(self, types: list[str] | None, max_per_type: dict[str, int] | int | None) -> list[Path]:
         paths = []
         root = self.root
 
@@ -33,16 +34,34 @@ class HeteroGraphDataset(Dataset):
             else [p for p in root.iterdir() if p.is_dir()]
         )
 
+        type_counts = defaultdict(int)
+        type_sizes = defaultdict(int)
         for type_dir in sorted(type_dirs):
             if not type_dir.exists():
                 raise FileNotFoundError(f"Type directory not found: {type_dir}")
             for archive_dir in sorted(type_dir.iterdir()):
                 if not archive_dir.is_dir():
                     continue
+
+                if isinstance(max_per_type, dict):
+                    max_this_kernel = max_per_type.get(type_dir.name, None)
+                elif isinstance(max_per_type, int):
+                    max_this_kernel = max_per_type
+                else:
+                    max_this_kernel = None
+
                 for pt_file in sorted(archive_dir.glob("*.pt")):
+                    if max_this_kernel is not None and type_counts[type_dir.name] >= max_this_kernel:
+                        break
+                    type_counts[type_dir.name] += 1
                     paths.append(pt_file)
+                    type_sizes[type_dir.name] += pt_file.stat().st_size
 
         print(f"Indexed {len(paths)} graphs across {len(type_dirs)} type(s)")
+        for type_name, count in type_counts.items():
+            print(f"  {type_name}: {count}")
+            print(f"    avg size: {type_sizes[type_name] / count / 1024 / 1024 :.2f} MB")
+            print(f"    total size: {type_sizes[type_name] / 1024 / 1024 :.2f} MB")
         return paths
 
     def __len__(self) -> int:

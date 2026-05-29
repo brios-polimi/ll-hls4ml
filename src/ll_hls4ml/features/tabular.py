@@ -16,8 +16,13 @@ from ll_hls4ml.io.load_json import load_graph_json
 
 def build_feature_row(graph_path):
     """Load a graph JSON file and extract its feature vector."""
-    graph_data = load_graph_json(graph_path)
-    return extract_graph_features(graph_data)
+    try:
+        graph_data = load_graph_json(graph_path)
+        features = extract_graph_features(graph_data)
+        return features
+    except Exception as e:
+        print(f"Error loading graph {graph_path}: {e}")
+        return None
 
 
 def build_feature_dataframe(
@@ -52,6 +57,8 @@ def build_feature_dataframe(
                 total=len(graph_paths),
                 desc=f"Parsing graph files for kernel subset '{ks}'",
             ):
+                if features is None:
+                    continue
                 features["kernel_type"] = ks
                 rows.append(features)
 

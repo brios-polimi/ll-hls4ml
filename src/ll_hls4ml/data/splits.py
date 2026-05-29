@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import torch
 from torch.utils.data import Subset, random_split
+from ll_hls4ml.io.schema import LABEL_KEYS
 
 
 def random_train_val_split(dataset, val_fraction: float = 0.2, seed: int = 42):
@@ -15,17 +16,11 @@ def random_train_val_split(dataset, val_fraction: float = 0.2, seed: int = 42):
     return random_split(dataset, [n_train, n_val], generator=generator)
 
 
-def compute_target_stats(dataset, indices=None) -> tuple[torch.Tensor, torch.Tensor]:
+def compute_target_stats(dataset) -> tuple[torch.Tensor, torch.Tensor]:
     """
-    Compute mean and std of log1p(target) over dataset indices.
+    Compute mean and std of log1p(targets) over dataset
 
-    Returns (y_mean, y_std) as scalar tensors.
+    Returns tensors of shape (len(LABEL_KEYS)) for mean and std.
     """
-    ys = []
-    idxs = indices if indices is not None else range(len(dataset))
-    for i in idxs:
-        data = dataset[i]
-        if hasattr(data, "y") and data.y is not None:
-            ys.append(data.y.reshape(-1))
-    log_ys = torch.log1p(torch.cat(ys))
-    return log_ys.mean(), log_ys.std()
+    log_ys = torch.log1p(torch.stack([graph.y for graph in dataset], dim=0))
+    return log_ys.mean(dim=0), log_ys.std(dim=0)  

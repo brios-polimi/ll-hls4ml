@@ -38,7 +38,7 @@ def plot_predictions_vs_targets(
                 y_std.to(device),
             )
             all_preds.append(preds.cpu())
-            all_targets.append(batch.y.cpu())
+            all_targets.append(batch.y[::11].cpu())
 
     all_preds = torch.cat(all_preds).numpy()
     all_targets = torch.cat(all_targets).numpy()

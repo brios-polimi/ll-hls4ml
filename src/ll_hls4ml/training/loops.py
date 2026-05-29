@@ -3,23 +3,70 @@
 from __future__ import annotations
 
 from pathlib import Path
-
+import copy
+import gc
+import time
 import torch
-from scipy.stats import pearsonr
+import numpy as np
 
+from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import normalize_target
+from ll_hls4ml.training.loaders import make_loader
+from ll_hls4ml.data.splits import compute_target_stats, random_train_val_split
+from ll_hls4ml.io.schema import NODE_TYPES, LABEL_KEYS
 
 
-def train_one_epoch(model, train_loader, criterion, optimizer, device, y_mean, y_std):
+def _persist_on_cpu(value):
+    """Recursively copy tensors to CPU numpy for long-lived training results."""
+    if isinstance(value, torch.Tensor):
+        return value.detach().cpu().numpy()
+    if isinstance(value, dict):
+        return {k: _persist_on_cpu(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_persist_on_cpu(v) for v in value]
+    if isinstance(value, tuple):
+        return tuple(_persist_on_cpu(v) for v in value)
+    if isinstance(value, np.ndarray):
+        return np.copy(value)
+    return value
+
+
+def _release_cuda_memory(*objects: object) -> None:
+    """Move modules off GPU, collect, and return cached memory to the driver."""
+    for obj in objects:
+        if isinstance(obj, torch.nn.Module):
+            obj.cpu()
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.synchronize()
+        torch.cuda.empty_cache()
+
+
+def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module) -> torch.optim.Optimizer:
+    """Fresh optimizer for ``model`` with the same hyperparameters as ``template``."""
+    cls = type(template)
+    if len(template.param_groups) == 1:
+        kwargs = {k: v for k, v in template.param_groups[0].items() if k != "params"}
+        return cls(model.parameters(), **kwargs)
+    param_groups = [
+        {"params": list(model.parameters()), **{k: v for k, v in group.items() if k != "params"}}
+        for group in template.param_groups
+    ]
+    return cls(param_groups)
+
+
+def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, y_stds):
     model.train()
     running_loss = 0.0
+
+    num_targets = y_means.shape[0]
 
     for batch in train_loader:
         batch = batch.to(device)
         optimizer.zero_grad(set_to_none=True)
 
-        target = normalize_target(batch.y, y_mean.to(device), y_std.to(device))
-        pred = model(batch).squeeze(-1)
+        target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)
+        pred = model(batch)
         loss = criterion(pred, target)
         loss.backward()
         running_loss += loss.item()
@@ -28,26 +75,37 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device, y_mean, y
     return running_loss / len(train_loader)
 
 
-def validate_one_epoch(model, val_loader, criterion, device, y_mean, y_std):
+def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds):
     model.eval()
     all_preds, all_targets = [], []
     running_loss = 0.0
 
+    num_targets = y_means.shape[0]
+
     with torch.no_grad():
         for batch in val_loader:
             batch = batch.to(device)
-            target = normalize_target(batch.y, y_mean.to(device), y_std.to(device))
-            pred = model(batch).squeeze(-1)
-            loss = criterion(pred, target)
+
+            target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)   # [batch_size, num_targets]
+            pred = model(batch)                                                         # [batch_size, num_targets]
+            # MAPE loss
+            loss = torch.mean(torch.abs(pred - target) / (torch.abs(target) + 1e-8))
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()
 
-    preds = torch.cat(all_preds)
-    targets = torch.cat(all_targets)
-    r, _ = pearsonr(preds.numpy(), targets.numpy())
+    preds = torch.cat(all_preds).numpy()
+    targets = torch.cat(all_targets).numpy()
+
+    r_per_target = [
+        np.corrcoef(preds[:, i], targets[:, i])[0, 1]
+        for i in range(preds.shape[1])
+    ]
+
+    std_ratio_per_target = preds.std(axis=0) / targets.std(axis=0)
+
     epoch_loss = running_loss / len(val_loader)
-    return epoch_loss, r, preds.std(), targets.std()
+    return epoch_loss, preds, targets, r_per_target, std_ratio_per_target
 
 
 def fit(
@@ -58,14 +116,12 @@ def fit(
     criterion,
     optimizer,
     device,
-    y_mean,
-    y_std,
-    patience=0,
+    patience=50,
     evaluation_metric="val_loss",
     mode="min",
     restore_best_weights=True,
     writer=None,
-    verbose=10,
+    verbose=2,
     experiment_name="",
     checkpoint_dir: str | Path | None = None,
 ):
@@ -77,8 +133,12 @@ def fit(
     checkpoint_dir = Path(checkpoint_dir or "artifacts/checkpoints")
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = checkpoint_dir / f"{experiment_name}_model.pt"
+    backup_path = checkpoint_dir / f"{experiment_name}_backup.pt"
 
-    training_history = {"train_loss": [], "val_loss": []}
+    training_history = {"train_loss": [], "val_loss": [], "r_per_target": [], "std_ratio_per_target": []}
+
+    y_means, y_stds = compute_target_stats(train_loader.dataset)
+    y_means, y_stds = y_means.to(device), y_stds.to(device)
 
     if patience > 0:
         patience_counter = 0
@@ -86,25 +146,35 @@ def fit(
         best_epoch = 0
 
     print(f"Training {epochs} epochs...")
+    t0 = None
 
     for epoch in range(1, epochs + 1):
         train_loss = train_one_epoch(
-            model, train_loader, criterion, optimizer, device, y_mean, y_std
+            model, train_loader, criterion, optimizer, device, y_means, y_stds
         )
-        val_loss, r, preds_std, targets_std = validate_one_epoch(
-            model, val_loader, criterion, device, y_mean, y_std
+        val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
+            model, val_loader, criterion, device, y_means, y_stds
         )
 
         training_history["train_loss"].append(train_loss)
         training_history["val_loss"].append(val_loss)
+        training_history["r_per_target"].append(r_per_target)
+        training_history["std_ratio_per_target"].append(std_ratio_per_target)
 
         if verbose > 0 and (epoch % verbose == 0 or epoch == 1):
+            t1 = time.time()
             print(
                 f"Epoch {epoch:3d}/{epochs} | "
                 f"Train: Loss={train_loss:.4f} | "
-                f"Val: Loss={val_loss:.4f}, R={r:.4f}, "
-                f"pred std={preds_std:.4f}, target std={targets_std:.4f}"
+                f"Val: Loss={val_loss:.4f}, R={r_per_target:.4f}, "
+                f"pred std/target std={std_ratio_per_target:.4f}, ",
+                end="",
             )
+            if t0 is not None:
+                print(f"Time: {t1 - t0:.2f}s")
+            else:
+                print()
+            t0 = t1
 
         if patience > 0:
             current_metric = training_history[evaluation_metric][-1]
@@ -116,12 +186,18 @@ def fit(
                 best_metric = current_metric
                 best_epoch = epoch
                 torch.save(model.state_dict(), ckpt_path)
+                training_history["best_val_preds"] = _persist_on_cpu(preds)
+                training_history["best_val_targets"] = _persist_on_cpu(targets)
                 patience_counter = 0
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
                     print(f"Early stopping triggered after {epoch} epochs.")
                     break
+
+        if epoch % 10 == 0:
+            torch.save(model.state_dict(), backup_path)
+            print(f"Model saved to {backup_path}")
 
     if restore_best_weights and patience > 0 and ckpt_path.exists():
         model.load_state_dict(torch.load(ckpt_path, weights_only=True))
@@ -132,5 +208,171 @@ def fit(
 
     if patience == 0:
         torch.save(model.state_dict(), ckpt_path)
+        training_history["best_val_preds"] = _persist_on_cpu(preds)
+        training_history["best_val_targets"] = _persist_on_cpu(targets)
 
-    return model, training_history
+    return (
+        model,
+        y_means,
+        y_stds,
+        _persist_on_cpu(training_history),
+        best_metric,
+        best_epoch,
+    )
+
+
+def transductive_vs_inductive_fit(
+    original_model,
+    max_per_kernel_type: dict[str, int],
+    tensor_dir: str | Path,
+    epochs,
+    criterion,
+    optimizer,
+    device,
+    patience=50,
+    evaluation_metric="val_loss",
+    mode="min",
+    restore_best_weights=True,
+    writer=None,
+    verbose=10,
+    experiment_name="",
+    checkpoint_dir: str | Path | None = None,
+):
+    """
+    Fits N models, one for each kernel type, where that kernel type is used as the inductive set,
+    and the rest of the kernel types are used as the transductive set.
+    Validation/early stopping is done on the transductive set's MAPE (mean absolute percentage error).
+
+    Returns:
+        A dictionary of metrics, keyed by inductive kernel type, containing:
+            train_loss: Train loss (MSE)
+            val_loss: Validation loss (MAPE)
+            r_per_target: Pearson correlation coefficient per target
+            std_ratio_per_target: Ratio of predicted standard deviation to target standard deviation per target
+            best_val_preds: Best validation predictions
+            best_val_targets: Best validation targets
+            best_val_loss: Best validation loss (MAPE) during training
+            best_epoch: Best epoch during training
+            test_loss: Test loss (MAPE)
+            test_preds: Test predictions
+            test_targets: Test targets
+            y_means: Per-target means used for normalization (CPU numpy)
+            y_stds: Per-target stds used for normalization (CPU numpy)
+
+        All array/tensor fields are stored as CPU numpy arrays.
+    """
+    kernel_types = list(max_per_kernel_type.keys())
+    device_type = device.type if isinstance(device, torch.device) else str(device)
+    use_cuda = device_type.startswith("cuda") and torch.cuda.is_available()
+
+    training_histories = {}
+    for kernel_type in kernel_types:
+        model = None
+        loop_optimizer = None
+        train_loader = val_loader = test_loader = None
+        train_ds = val_ds = test_ds = train_val_ds = None
+        y_means = y_stds = None
+
+        try:
+            if use_cuda:
+                _release_cuda_memory()
+
+            train_val_ds = HeteroGraphDataset(
+                tensor_dir,
+                types=[t for t in kernel_types if t != kernel_type],
+                max_per_type={
+                    k: v for k, v in max_per_kernel_type.items() if k != kernel_type
+                },
+            )
+            test_ds = HeteroGraphDataset(
+                tensor_dir,
+                types=[kernel_type],
+                max_per_type=max_per_kernel_type[kernel_type],
+            )
+
+            train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=0.2)
+
+            train_loader = make_loader(train_ds, batch_size=4, shuffle=True)
+            val_loader = make_loader(val_ds, batch_size=4, shuffle=False)
+            test_loader = make_loader(test_ds, batch_size=4, shuffle=False)
+
+            # Count number of Out-of-Vocabulary (OOV) nodes
+            nodes_per_type = {nt: 0 for nt in NODE_TYPES}
+            oov_nodes_per_type = {nt: 0 for nt in NODE_TYPES}
+            for batch in test_loader:
+                for nt in NODE_TYPES:
+                    nodes_per_type[nt] += batch[nt].x.shape[0]
+                    oov_nodes_per_type[nt] += (batch[nt].x == 0).sum().item()
+
+            print(
+                f"Training model with \"{kernel_type}\" as inductive set:\n"
+                f"Train size: {len(train_ds)}, "
+                f"Val size: {len(val_ds)}, "
+                f"Test size: {len(test_ds)}"
+            )
+            for nt in NODE_TYPES:
+                oov_pct = oov_nodes_per_type[nt] / nodes_per_type[nt] * 100
+                print(
+                    f"  {nt}: {nodes_per_type[nt]} nodes, "
+                    f"{oov_nodes_per_type[nt]} OOV nodes ({oov_pct:.2f}%)"
+                )
+
+            model = copy.deepcopy(original_model).to(device)
+            loop_optimizer = _optimizer_for_model(optimizer, model)
+            model, y_means, y_stds, training_history, best_val_loss, best_epoch = fit(
+                model,
+                train_loader,
+                val_loader,
+                epochs,
+                criterion,
+                loop_optimizer,
+                device,
+                patience,
+                evaluation_metric,
+                mode,
+                restore_best_weights,
+                writer,
+                verbose,
+                experiment_name + f"_{kernel_type}",
+                checkpoint_dir,
+            )
+
+            print("Evaluating on test set...")
+            test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
+                model, test_loader, criterion, device, y_means, y_stds
+            )
+
+            training_histories[kernel_type] = _persist_on_cpu(
+                {
+                    **training_history,
+                    "y_means": y_means,
+                    "y_stds": y_stds,
+                    "best_val_loss": best_val_loss,
+                    "best_epoch": best_epoch,
+                    "test_loss": test_loss,
+                    "test_preds": test_preds,
+                    "test_targets": test_targets,
+                }
+            )
+
+            print(
+                f"Test loss (MAPE): {test_loss * 100:.2f}%, "
+                f"Best validation loss (MAPE): {best_val_loss * 100:.2f}%, "
+                f"Inductive-Transductive gap: {(test_loss - best_val_loss) * 100:.2f}%"
+            )
+        finally:
+            _release_cuda_memory(
+                model,
+                loop_optimizer,
+                train_loader,
+                val_loader,
+                test_loader,
+                train_ds,
+                val_ds,
+                test_ds,
+                train_val_ds,
+                y_means,
+                y_stds,
+            )
+
+    return training_histories

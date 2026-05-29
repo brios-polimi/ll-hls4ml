@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
+import orjson
 from pathlib import Path
 from typing import Any
 
 
 def load_graph_json(path: str | Path) -> dict[str, Any]:
     path = Path(path)
-    with path.open() as f:
-        return json.load(f)
+    with path.open("rb") as f:
+        return orjson.loads(f.read())

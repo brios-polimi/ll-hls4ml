@@ -31,11 +31,11 @@ LABEL_KEYS = [
     "bram",
     "uram",
     "cycles_max",
-    "cycles_min",
-    "estimated_clock",
+    #"cycles_min",
+    #"estimated_clock",
     "interval_max",
-    "interval_min",
-    "target_clock",
+    #"interval_min",
+    #"target_clock",
 ]
 
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-
+import shutil
 import torch
 import tqdm
 from torch_geometric.data import HeteroData
@@ -23,6 +23,20 @@ from ll_hls4ml.io.schema import (
     safe_int,
 )
 
+from concurrent.futures import ProcessPoolExecutor
+from functools import partial
+import os
+
+def _process_one(vocab: dict, inference_mode: bool, paths: tuple[Path, Path]) -> None:
+    graph_path, out_path = paths
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        graph_data = load_graph_json(graph_path)
+        data = _json_to_hetero(graph_data, vocab, inference_mode)
+        torch.save(data, out_path)
+    except Exception as e:
+        raise RuntimeError(f"Error processing graph {graph_path}: {e}") from e
+
 
 def create_graph_tensors(
     graph_dir: str | Path,
@@ -30,43 +44,39 @@ def create_graph_tensors(
     vocab: dict,
     kernel_subset: str | list[str] | None = None,
     max_archives: int | None = None,
-    target_labels: str | list[str] | None = None,
+    inference_mode: bool = False,
+    n_workers: int | None = None,
 ):
     """
     Walk graph_dir and convert JSON files to PyG HeteroData, mirroring structure in pt_dir.
+    Fully deletes the pt_dir before creating new tensors, so no vocab mismatch can occur.
 
     Example: graphs/exemplar/archive_1/*.json → tensors/exemplar/archive_1/*.pt
     """
     graph_dir = Path(graph_dir)
     pt_dir = Path(pt_dir)
+    if pt_dir.exists():
+        print(f"Deleting existing pt_dir {pt_dir}")
+        shutil.rmtree(pt_dir)
     pt_dir.mkdir(parents=True, exist_ok=True)
 
-    graph_dir_original = graph_dir
-    kernel_subsets = [kernel_subset] if kernel_subset else [None]
+    work = [
+        (graph_path, pt_dir / graph_path.relative_to(graph_dir).parent / (graph_path.stem + ".pt"))
+        for ks in ([kernel_subset] if kernel_subset else [None])
+        for _, graph_path in iter_graph_paths(graph_dir, ks, max_archives)
+    ]
 
-    for ks in kernel_subsets:
-        paths = list(iter_graph_paths(graph_dir, ks, max_archives))
-        if ks:
-            graph_dir_original = graph_dir
-
-        for _kernel_type, graph_path in tqdm.tqdm(
-            paths, desc="Processing graph files into PyTorch tensors"
-        ):
-            rel_path = graph_path.relative_to(graph_dir_original)
-            out_subdir = pt_dir / rel_path.parent
-            out_subdir.mkdir(parents=True, exist_ok=True)
-
-            graph_data = load_graph_json(graph_path)
-            data = _json_to_hetero(graph_data, vocab, target_labels)
-            out_path = out_subdir / (graph_path.stem + ".pt")
-            torch.save(data, out_path)
+    worker = partial(_process_one, vocab, inference_mode)
+    with ProcessPoolExecutor(max_workers=n_workers or os.cpu_count()) as pool:
+        list(tqdm.tqdm(pool.map(worker, work), total=len(work), desc="Processing graph files into PyTorch tensors"))
 
 
-def _json_to_hetero(graph_data: dict, vocab: dict, target_labels: str | list[str] | None) -> HeteroData:
+def _json_to_hetero(graph_data: dict, vocab: dict, inference_mode: bool) -> HeteroData:
     data = HeteroData()
     inst_map = {}
     var_map = {}
     const_map = {}
+    node_type_map: dict[int, int] = {}
 
     features = {
         "instruction": [],
@@ -75,13 +85,18 @@ def _json_to_hetero(graph_data: dict, vocab: dict, target_labels: str | list[str
     }
     nodes = graph_data.get("nodes") or []
     for n in nodes:
-        node_id = safe_int(n.get("id", -1))
-        if node_id == -1:
+        try:
+            node_id = int(n["id"])
+        except KeyError:
             raise ValueError(f"Missing node id in node {n}")
 
-        node_type = safe_int(n.get("type", -1))
-        if node_type not in [NODE_INSTRUCTION, NODE_VARIABLE, NODE_CONSTANT]:
-            raise ValueError(f"Invalid node type: {node_type} in node {n}")        
+        try:
+            node_type = int(n["type"])
+        except KeyError:
+            raise ValueError(f"Missing node type in node {n}")
+
+        # Convenience for edges mapping source/target node IDs to node types
+        node_type_map[node_id] = node_type
 
         # Map node text to vocabulary index (0 is unknown token)
         # Create global index map for each node type
@@ -100,6 +115,8 @@ def _json_to_hetero(graph_data: dict, vocab: dict, target_labels: str | list[str
             text_idx = vocab["constant"].get(node_term, -1) + 1
             features["constant"].append([text_idx])
             const_map[node_id] = len(const_map)
+        else:
+            raise ValueError(f"Invalid node type: {node_type} in node {n}")
 
     for k, v in features.items():
         if v:
@@ -113,7 +130,7 @@ def _json_to_hetero(graph_data: dict, vocab: dict, target_labels: str | list[str
         flow = safe_int(edge.get("flow", -1))
         source = safe_int(edge.get("source", -1))
         target = safe_int(edge.get("target", -1))
-        if source <= 0 or source >= len(nodes) or target <= 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL]: # this should fire next run, i know theres an off by one error here, i just dont know which direction
+        if source < 0 or source >= len(nodes) or target < 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL]:
             raise ValueError(f"Invalid edge with invalid source/target/flow: {edge}")
             
         position = safe_int(edge.get("position", 0))
@@ -126,16 +143,17 @@ def _json_to_hetero(graph_data: dict, vocab: dict, target_labels: str | list[str
             edge_index[("instruction", "control", "instruction")].append([local_idx_source, local_idx_target])
             edge_attrs[("instruction", "control", "instruction")].append([position])
         elif flow == FLOW_DATA:
-            if nodes[source].get("type") == NODE_INSTRUCTION:
+            src_type = node_type_map[source]
+            if src_type == NODE_INSTRUCTION:
                 local_idx_source = inst_map.get(source)
                 local_idx_target = var_map.get(target)
                 edge_index[("instruction", "data", "variable")].append([local_idx_source, local_idx_target])
-            elif nodes[source].get("type") == NODE_VARIABLE:
+            elif src_type == NODE_VARIABLE:
                 local_idx_source = var_map.get(source)
                 local_idx_target = inst_map.get(target)
                 edge_index[("variable", "data", "instruction")].append([local_idx_source, local_idx_target])
                 edge_attrs[("variable", "data", "instruction")].append([position])
-            elif nodes[source].get("type") == NODE_CONSTANT:
+            elif src_type == NODE_CONSTANT:
                 local_idx_source = const_map.get(source)
                 local_idx_target = inst_map.get(target)
                 edge_index[("constant", "data", "instruction")].append([local_idx_source, local_idx_target])
@@ -159,20 +177,15 @@ def _json_to_hetero(graph_data: dict, vocab: dict, target_labels: str | list[str
         if v:
             data[et].edge_attr = torch.tensor(v, dtype=torch.long)
 
-    # If target_label is None, default to all labels
-    if target_labels is None:
-        target_labels = LABEL_KEYS
-    elif isinstance(target_labels, str):
-        target_labels = [target_labels]
-
-    ys = []
-    labels = graph_data.get("labels", {})
-    for tl in target_labels:
-        if tl not in labels:
-            raise ValueError(f"Target label {tl} not found in graph data")
-        ys.append(labels[tl])
-
-    data.y = torch.tensor(ys, dtype=torch.float)
-    data.y_names = target_labels
+    # Always add all expected labels unless it is an inference-mode graph
+    if not inference_mode:
+        try:
+            labels = graph_data["labels"]
+            data.y = torch.tensor(
+                [labels[k] for k in LABEL_KEYS],
+                dtype=torch.float,
+            )
+        except KeyError as e:
+            raise ValueError(f"Missing labels in graph data: {e}") from e
 
     return data

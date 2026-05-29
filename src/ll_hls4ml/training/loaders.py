@@ -5,9 +5,10 @@ import os
 from torch_geometric.loader import DataLoader as PyGDataLoader
 
 
-def make_loader(ds, batch_size, shuffle=True):
-    cpu_cores = os.cpu_count() or 2
-    num_workers = max(2, min(4, cpu_cores))
+def make_loader(ds, batch_size, shuffle=True, num_workers=None):
+    if num_workers is None:
+        cpu_cores = os.cpu_count() or 2
+        num_workers = max(2, min(4, cpu_cores))
 
     return PyGDataLoader(
         ds,

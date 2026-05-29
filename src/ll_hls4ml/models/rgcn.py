@@ -7,7 +7,7 @@ from torch_geometric.data import HeteroData
 from torch_geometric.nn import HeteroConv, SAGEConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
 
-from ll_hls4ml.io.schema import EDGE_TYPES, EDGE_TYPES_WITH_ATTR, NODE_TYPES
+from ll_hls4ml.io.schema import EDGE_TYPES, EDGE_TYPES_WITH_ATTR, NODE_TYPES, LABEL_KEYS
 
 
 class CDFGInputProjection(nn.Module):
@@ -83,6 +83,7 @@ class CDFGRGCN(nn.Module):
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.pool = pool
+        self.output_dim = len(LABEL_KEYS)
 
         self.input_proj = CDFGInputProjection(
             node_vocab_sizes, edge_pos_vocab_size, hidden_dim
@@ -95,7 +96,7 @@ class CDFGRGCN(nn.Module):
             nn.Linear(hidden_dim * len(NODE_TYPES), hidden_dim),
             nn.ReLU(),
             nn.Dropout(dropout),
-            nn.Linear(hidden_dim, 1),
+            nn.Linear(hidden_dim, self.output_dim),
         )
 
     def forward(self, data: HeteroData):
