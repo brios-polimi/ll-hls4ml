@@ -19,12 +19,13 @@ class HeteroGraphDataset(Dataset):
         types: list[str] | None = None,
         max_per_type: dict[str, int] | int | None = None,
         transform=None,
+        silent: bool = True,
     ):
         self.root = Path(root)
         self.transform = transform
-        self.paths = self._index(types, max_per_type)
+        self.paths = self._index(types, max_per_type, silent)
 
-    def _index(self, types: list[str] | None, max_per_type: dict[str, int] | int | None) -> list[Path]:
+    def _index(self, types: list[str] | None, max_per_type: dict[str, int] | int | None, silent: bool) -> list[Path]:
         paths = []
         root = self.root
 
@@ -57,11 +58,12 @@ class HeteroGraphDataset(Dataset):
                     paths.append(pt_file)
                     type_sizes[type_dir.name] += pt_file.stat().st_size
 
-        print(f"Indexed {len(paths)} graphs across {len(type_dirs)} type(s)")
-        for type_name, count in type_counts.items():
-            print(f"  {type_name}: {count}")
-            print(f"    avg size: {type_sizes[type_name] / count / 1024 / 1024 :.2f} MB")
-            print(f"    total size: {type_sizes[type_name] / 1024 / 1024 :.2f} MB")
+        if not silent:
+            print(f"Indexed {len(paths)} graphs across {len(type_dirs)} type(s)")
+            for type_name, count in type_counts.items():
+                print(f"  {type_name}: {count}")
+                print(f"    avg size: {type_sizes[type_name] / count / 1024 / 1024 :.2f} MB")
+                print(f"    total size: {type_sizes[type_name] / 1024 / 1024 :.2f} MB")
         return paths
 
     def __len__(self) -> int:

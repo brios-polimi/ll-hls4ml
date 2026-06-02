@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.data import HeteroData
-from torch_geometric.nn import HeteroConv, SAGEConv
+from torch_geometric.nn import HeteroConv, GATv2Conv, SAGEConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
 
 from ll_hls4ml.io.schema import EDGE_TYPES, EDGE_TYPES_WITH_ATTR, NODE_TYPES, LABEL_KEYS

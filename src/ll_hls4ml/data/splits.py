@@ -16,11 +16,13 @@ def random_train_val_split(dataset, val_fraction: float = 0.2, seed: int = 42):
     return random_split(dataset, [n_train, n_val], generator=generator)
 
 
-def compute_target_stats(dataset) -> tuple[torch.Tensor, torch.Tensor]:
+def compute_target_stats(dataset, std_floor: float = 1e-3) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Compute mean and std of log1p(targets) over dataset
 
     Returns tensors of shape (len(LABEL_KEYS)) for mean and std.
     """
     log_ys = torch.log1p(torch.stack([graph.y for graph in dataset], dim=0))
-    return log_ys.mean(dim=0), log_ys.std(dim=0)  
+    mean = log_ys.mean(dim=0)
+    std = torch.clamp(log_ys.std(dim=0), min=std_floor)
+    return mean, std

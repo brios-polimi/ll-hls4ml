@@ -88,8 +88,7 @@ def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds):
 
             target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)   # [batch_size, num_targets]
             pred = model(batch)                                                         # [batch_size, num_targets]
-            # MAPE loss
-            loss = torch.mean(torch.abs(pred - target) / (torch.abs(target) + 1e-8))
+            loss = torch.nn.functional.huber_loss(pred, target, delta=1.0)
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()
@@ -97,12 +96,16 @@ def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds):
     preds = torch.cat(all_preds).numpy()
     targets = torch.cat(all_targets).numpy()
 
-    r_per_target = [
+    r_per_target = np.array([
         np.corrcoef(preds[:, i], targets[:, i])[0, 1]
+        if targets[:, i].std() > 1e-6 and preds[:, i].std() > 1e-6
+        else np.nan
         for i in range(preds.shape[1])
-    ]
+    ])
 
-    std_ratio_per_target = preds.std(axis=0) / targets.std(axis=0)
+    target_stds = targets.std(axis=0)
+    pred_stds = preds.std(axis=0)
+    std_ratio_per_target = np.where(target_stds > 1e-6, pred_stds / target_stds, np.nan)
 
     epoch_loss = running_loss / len(val_loader)
     return epoch_loss, preds, targets, r_per_target, std_ratio_per_target
@@ -166,8 +169,9 @@ def fit(
             print(
                 f"Epoch {epoch:3d}/{epochs} | "
                 f"Train: Loss={train_loss:.4f} | "
-                f"Val: Loss={val_loss:.4f}, R={r_per_target:.4f}, "
-                f"pred std/target std={std_ratio_per_target:.4f}, ",
+                f"Val: Loss={val_loss:.4f}, " 
+                f"R={np.array2string(r_per_target, formatter={'float_kind': lambda x: f"{x:.2f}"})}, "
+                f"pred std/target std={np.array2string(std_ratio_per_target, formatter={'float_kind': lambda x: f"{x:.2f}"})}, ",
                 end="",
             )
             if t0 is not None:
@@ -292,9 +296,9 @@ def transductive_vs_inductive_fit(
 
             train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=0.2)
 
-            train_loader = make_loader(train_ds, batch_size=4, shuffle=True)
-            val_loader = make_loader(val_ds, batch_size=4, shuffle=False)
-            test_loader = make_loader(test_ds, batch_size=4, shuffle=False)
+            train_loader = make_loader(train_ds, batch_size=1, shuffle=True)
+            val_loader = make_loader(val_ds, batch_size=1, shuffle=False)
+            test_loader = make_loader(test_ds, batch_size=1, shuffle=False)
 
             # Count number of Out-of-Vocabulary (OOV) nodes
             nodes_per_type = {nt: 0 for nt in NODE_TYPES}
@@ -305,10 +309,10 @@ def transductive_vs_inductive_fit(
                     oov_nodes_per_type[nt] += (batch[nt].x == 0).sum().item()
 
             print(
-                f"Training model with \"{kernel_type}\" as inductive set:\n"
-                f"Train size: {len(train_ds)}, "
-                f"Val size: {len(val_ds)}, "
-                f"Test size: {len(test_ds)}"
+                f"*********** \"{kernel_type}\" as inductive set ***********\n"
+                f"  Train size: {len(train_ds)}, "
+                f"  Val size: {len(val_ds)}, "
+                f"  Test size: {len(test_ds)}"
             )
             for nt in NODE_TYPES:
                 oov_pct = oov_nodes_per_type[nt] / nodes_per_type[nt] * 100
@@ -374,5 +378,6 @@ def transductive_vs_inductive_fit(
                 y_means,
                 y_stds,
             )
+        print("***********************************************\n\n")
 
     return training_histories
