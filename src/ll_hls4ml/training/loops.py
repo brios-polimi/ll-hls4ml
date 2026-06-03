@@ -8,7 +8,7 @@ import gc
 import time
 import torch
 import numpy as np
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import normalize_target
