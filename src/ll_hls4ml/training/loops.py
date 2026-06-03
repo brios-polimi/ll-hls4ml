@@ -156,8 +156,10 @@ def fit(
     print(f"Training {epochs} epochs...")
     for epoch in range(1, epochs + 1):
         leave_bar = True if epoch == 1 or (verbose > 0 and epoch % verbose == 0) else False
-        pbar = tqdm(total=len(train_loader) + len(val_loader),
+        pbar = tqdm(
+            total=len(train_loader) + len(val_loader),
             desc=f"Epoch {epoch:3d}/{epochs}",
+            unit="batch",
             leave=leave_bar)
 
         train_loss = train_one_epoch(
