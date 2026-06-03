@@ -8,6 +8,7 @@ import gc
 import time
 import torch
 import numpy as np
+from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import normalize_target
@@ -55,10 +56,9 @@ def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module
     return cls(param_groups)
 
 
-def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, y_stds):
+def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar):
     model.train()
     running_loss = 0.0
-
     num_targets = y_means.shape[0]
 
     for batch in train_loader:
@@ -73,11 +73,12 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, 
         optimizer.zero_grad()
 
         running_loss += loss.item()
+        pbar.update(1)
 
     return running_loss / len(train_loader)
 
 
-def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds):
+def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds, pbar):
     model.eval()
     all_preds, all_targets = [], []
     running_loss = 0.0
@@ -95,6 +96,7 @@ def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds):
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()
+            pbar.update(1)
 
     preds = torch.cat(all_preds).numpy()
     targets = torch.cat(all_targets).numpy()
@@ -152,14 +154,17 @@ def fit(
         best_epoch = 0
 
     print(f"Training {epochs} epochs...")
-    t0 = None
-
     for epoch in range(1, epochs + 1):
+        leave_bar = True if epoch == 1 or (verbose > 0 and epoch % verbose == 0) else False
+        pbar = tqdm(total=len(train_loader) + len(val_loader),
+            desc=f"Epoch {epoch:3d}/{epochs}",
+            leave=leave_bar)
+
         train_loss = train_one_epoch(
-            model, train_loader, criterion, optimizer, device, y_means, y_stds
+            model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar
         )
         val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
-            model, val_loader, criterion, device, y_means, y_stds
+            model, val_loader, criterion, device, y_means, y_stds, pbar
         )
 
         training_history["train_loss"].append(train_loss)
@@ -167,21 +172,15 @@ def fit(
         training_history["r_per_target"].append(r_per_target)
         training_history["std_ratio_per_target"].append(std_ratio_per_target)
 
-        if verbose > 0 and (epoch % verbose == 0 or epoch == 1):
-            t1 = time.time()
-            print(
-                f"Epoch {epoch:3d}/{epochs} | "
-                f"Train: Loss={train_loss:.4f} | "
-                f"Val: Loss={val_loss:.4f}, " 
-                f"R={np.array2string(r_per_target, formatter={'float_kind': lambda x: f"{x:.2f}"})}, "
-                f"pred std/target std={np.array2string(std_ratio_per_target, formatter={'float_kind': lambda x: f"{x:.2f}"})}, ",
-                end="",
-            )
-            if t0 is not None:
-                print(f"Time: {t1 - t0:.2f}s")
-            else:
-                print()
-            t0 = t1
+        if leave_bar:
+            pbar.set_postfix({
+                "train": f"{train_loss:.4f}",
+                "val": f"{val_loss:.4f}",
+                "R": np.array2string(r_per_target, formatter={"float_kind": lambda x: f"{x:.2f}"}),
+                "std_r": np.array2string(std_ratio_per_target, formatter={"float_kind": lambda x: f"{x:.2f}"}),
+            })
+        pbar.close()
+
 
         if patience > 0:
             current_metric = training_history[evaluation_metric][-1]
