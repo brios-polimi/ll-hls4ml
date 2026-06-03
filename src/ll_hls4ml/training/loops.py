@@ -177,11 +177,14 @@ def fit(
         training_history["std_ratio_per_target"].append(std_ratio_per_target)
 
         if leave_bar:
+            # take mean of R's onoly where not NaN
+            valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
+            valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
             pbar.set_postfix({
                 "train": f"{train_loss:.4f}",
                 "val": f"{val_loss:.4f}",
-                "R": np.array2string(r_per_target, formatter={"float_kind": lambda x: f"{x:.2f}"}),
-                "std_r": np.array2string(std_ratio_per_target, formatter={"float_kind": lambda x: f"{x:.2f}"}),
+                "R": f"{valid_R:.2f}",
+                "std_r": f"{valid_std_r:.2f}",
             })
         pbar.close()
 
