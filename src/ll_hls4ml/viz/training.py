@@ -51,8 +51,9 @@ def plot_predictions_vs_targets(
         sorted_preds = all_preds[:, i][sort_idx]
 
         plt.figure(figsize=figsize)
-        plt.plot(sorted_preds, label="Prediction")
-        plt.plot(sorted_targets, label="Target")
+        plt.plot(sorted_preds + 1, label="Prediction")
+        plt.plot(sorted_targets + 1, label="Target")
+        plt.yscale("log")
         plt.xlabel("Samples (sorted by target)")
         plt.ylabel(f"{LABEL_KEYS[i]}")
         plt.title(f"Predictions vs Targets for {LABEL_KEYS[i]}")

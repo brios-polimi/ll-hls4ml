@@ -63,14 +63,16 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, 
 
     for batch in train_loader:
         batch = batch.to(device)
-        optimizer.zero_grad(set_to_none=True)
-
         target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)
+
         pred = model(batch)
         loss = criterion(pred, target)
+
         loss.backward()
-        running_loss += loss.item()
         optimizer.step()
+        optimizer.zero_grad()
+
+        running_loss += loss.item()
 
     return running_loss / len(train_loader)
 
@@ -85,10 +87,11 @@ def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds):
     with torch.no_grad():
         for batch in val_loader:
             batch = batch.to(device)
-
             target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)   # [batch_size, num_targets]
+
             pred = model(batch)                                                         # [batch_size, num_targets]
             loss = torch.nn.functional.huber_loss(pred, target, delta=1.0)
+
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()

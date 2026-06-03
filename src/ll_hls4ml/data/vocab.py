@@ -9,6 +9,7 @@ import tqdm
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+from collections import defaultdict
 
 from ll_hls4ml.config import load_config
 from ll_hls4ml.io.discovery import iter_graph_paths
@@ -20,6 +21,7 @@ def vocab_scan(
     graph_dir: str | Path,
     kernel_subset: str | list[str] | None = None,
     max_archives: int | None = None,
+    first_n: int | None = None,
 ):
     """
     Walk graph_dir and collect vocabularies of instructions, variables, and constants.
@@ -38,7 +40,10 @@ def vocab_scan(
     }
     max_pos = 0
 
-    paths = list(iter_graph_paths(graph_dir, kernel_subset, max_archives))
+    paths = list(iter_graph_paths(graph_dir, kernel_subset, max_archives, first_n))
+    i = 0
+    path_number = defaultdict(int)
+    credit = defaultdict(lambda: defaultdict(list))
     for _ks, graph_path in tqdm.tqdm(paths, desc="Parsing graph files for building vocab"):
         try:
             graph_data = load_graph_json(graph_path)
@@ -46,16 +51,26 @@ def vocab_scan(
             print(f"Error loading JSON: {graph_path}: {e}")
             continue
         nodes = graph_data.get("nodes") or []
+        i += 1
         for n in nodes:
             node_type = n.get("type", -1)
             term = n.get("text", "")
             if node_type == NODE_INSTRUCTION:
+                if term not in vocab_sets["instruction"]:
+                    credit[graph_path]["instruction"].append(term)
+                    path_number[graph_path] = i
                 vocab_sets["instruction"].add(term)
                 vocab_counts["instruction"][term] = vocab_counts["instruction"].get(term, 0) + 1
             elif node_type == NODE_VARIABLE:
+                if term not in vocab_sets["variable"]:
+                    credit[graph_path]["variable"].append(term)
+                    path_number[graph_path] = i
                 vocab_sets["variable"].add(term)
                 vocab_counts["variable"][term] = vocab_counts["variable"].get(term, 0) + 1
             elif node_type == NODE_CONSTANT:
+                if term not in vocab_sets["constant"]:
+                    credit[graph_path]["constant"].append(term)
+                    path_number[graph_path] = i
                 vocab_sets["constant"].add(term)
                 vocab_counts["constant"][term] = vocab_counts["constant"].get(term, 0) + 1
 
@@ -64,11 +79,16 @@ def vocab_scan(
             if position > max_pos:
                 max_pos = position
 
+    for graph_path, credit in credit.items():
+        print(f"Credit for {graph_path} (number {path_number[graph_path]})")
+        for k, v in credit.items():
+            print(f"  {k}: {v}")
+
     vocab = {}
     for k, v in vocab_sets.items():
         vocab[k] = {"UNK": 0}
         vocab[k].update({t: i + 1 for i, t in enumerate(sorted(v))})
-    return vocab, max_pos, vocab_counts
+    return vocab, max_pos, vocab_counts, credit, path_number
 
 
 def _compile_and_graph(hls4ml_dir: Path, clang_binary: str, programl_binary: str, programl_to_json_binary: str) -> Path | None:

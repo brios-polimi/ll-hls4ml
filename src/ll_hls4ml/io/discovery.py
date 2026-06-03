@@ -18,6 +18,7 @@ def iter_graph_paths(
     graph_dir: str | Path,
     kernel_subset: str | list[str] | None = None,
     max_archives: int | None = None,
+    first_n: int | None = None,
 ) -> Iterator[tuple[str, Path]]:
     """
     Yield ``(kernel_type, path)`` for each CDFG JSON under ``graph_dir``.
@@ -40,6 +41,9 @@ def iter_graph_paths(
         else:
             graph_paths = sorted(subset_dir.rglob("*.json"))
 
+        if first_n is not None:
+            graph_paths = graph_paths[:first_n]
+
         for path in graph_paths:
             yield ks, path
 
@@ -48,6 +52,7 @@ def collect_graph_paths(
     graph_dir: str | Path,
     kernel_subset: str | list[str] | None = None,
     max_archives: int | None = None,
+    first_n: int | None = None,
 ) -> list[tuple[str, Path]]:
     """Return all ``(kernel_type, path)`` pairs from ``iter_graph_paths``."""
-    return list(iter_graph_paths(graph_dir, kernel_subset, max_archives))
+    return list(iter_graph_paths(graph_dir, kernel_subset, max_archives, first_n))

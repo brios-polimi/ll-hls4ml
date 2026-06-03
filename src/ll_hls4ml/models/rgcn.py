@@ -7,7 +7,7 @@ from torch_geometric.data import HeteroData
 from torch_geometric.nn import HeteroConv, GATv2Conv, SAGEConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
 
-from ll_hls4ml.io.schema import EDGE_TYPES, EDGE_TYPES_WITH_ATTR, NODE_TYPES, LABEL_KEYS
+from ll_hls4ml.io.schema import EDGE_TYPES, EDGE_TYPES_WITH_ATTR, NODE_TYPES, LABEL_KEYS, ALL_EDGE_TYPES
 
 
 class CDFGInputProjection(nn.Module):
@@ -46,9 +46,13 @@ class CDFGConvLayer(nn.Module):
         super().__init__()
         self.conv = HeteroConv(
             {
-                et: SAGEConv(
+                et: GATv2Conv(
                     in_channels=(hidden_dim, hidden_dim),
                     out_channels=hidden_dim,
+                    heads=4,
+                    concat=False,          
+                    edge_dim=hidden_dim if et in EDGE_TYPES_WITH_ATTR else None,
+                    add_self_loops=False,
                     aggr=aggr,
                 )
                 for et in EDGE_TYPES
@@ -59,7 +63,7 @@ class CDFGConvLayer(nn.Module):
 
     def forward(self, h_dict, edge_index_dict, edge_emb_dict):
         h = {nt: h_dict[nt] for nt in NODE_TYPES}
-        out = self.conv(h, edge_index_dict)
+        out = self.conv(h, edge_index_dict, edge_attr_dict=edge_emb_dict)
         for nt in NODE_TYPES:
             if nt not in out:
                 out[nt] = h_dict[nt]
@@ -107,6 +111,12 @@ class CDFGRGCN(nn.Module):
             for et in EDGE_TYPES_WITH_ATTR
             if hasattr(data[et], "edge_attr") and data[et].edge_attr is not None
         }
+
+        # # Create self loops for each node type
+        # for nt in NODE_TYPES:
+        #     num_nodes = x_dict[nt].size(0)
+        #     self_loop_idx = torch.arange(num_nodes, device=x_dict[nt].device)
+        #     edge_index_dict[(nt, 'self', nt)] = torch.stack([self_loop_idx, self_loop_idx])
 
         h_dict, edge_emb_dict = self.input_proj(x_dict, edge_attr_dict)
 

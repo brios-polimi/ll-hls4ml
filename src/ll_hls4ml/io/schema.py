@@ -18,11 +18,16 @@ EDGE_TYPES = [
     ("instruction", "call", "instruction"),
 ]
 
-EDGE_TYPES_WITH_ATTR = {
+SELF_LOOP_EDGE_TYPES = [
+    (nt, 'self', nt) for nt in NODE_TYPES
+]
+ALL_EDGE_TYPES = [*EDGE_TYPES, *SELF_LOOP_EDGE_TYPES]
+
+EDGE_TYPES_WITH_ATTR = [
     ("instruction", "control", "instruction"),
     ("variable", "data", "instruction"),
     ("constant", "data", "instruction"),
-}
+]
 
 LABEL_KEYS = [
     "lut",
