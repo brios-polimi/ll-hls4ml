@@ -56,7 +56,7 @@ def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module
     return cls(param_groups)
 
 
-def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar):
+def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar=None):
     model.train()
     running_loss = 0.0
     num_targets = y_means.shape[0]
@@ -73,12 +73,13 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, 
         optimizer.zero_grad()
 
         running_loss += loss.item()
-        pbar.update(1)
+        if pbar is not None:
+            pbar.update(1)
 
     return running_loss / len(train_loader)
 
 
-def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds, pbar):
+def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds, pbar=None):
     model.eval()
     all_preds, all_targets = [], []
     running_loss = 0.0
@@ -96,7 +97,8 @@ def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds, pb
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()
-            pbar.update(1)
+            if pbar is not None:
+                pbar.update(1)
 
     preds = torch.cat(all_preds).numpy()
     targets = torch.cat(all_targets).numpy()
@@ -163,10 +165,10 @@ def fit(
             leave=leave_bar)
 
         train_loss = train_one_epoch(
-            model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar
+            model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar=pbar
         )
         val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
-            model, val_loader, criterion, device, y_means, y_stds, pbar
+            model, val_loader, criterion, device, y_means, y_stds, pbar=pbar
         )
 
         training_history["train_loss"].append(train_loss)

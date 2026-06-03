@@ -26,16 +26,14 @@ class CDFGInputProjection(nn.Module):
     ):
         super().__init__()
         self.node_emb = nn.ModuleDict({
-            nt: nn.Embedding(vocab_size + 1, hidden_dim, padding_idx=0)
+            nt: nn.Embedding(vocab_size, hidden_dim, padding_idx=0)
             for nt, vocab_size in node_vocab_sizes.items()
         })
-        self.edge_pos_emb = nn.Embedding(edge_pos_vocab_size + 1, hidden_dim, padding_idx=0)
+        self.edge_pos_emb = nn.Embedding(edge_pos_vocab_size + 1, hidden_dim)
 
     def forward(self, x_dict, edge_attr_dict):
         h_dict = {nt: self.node_emb[nt](x[:, 0]) for nt, x in x_dict.items()}
-        edge_emb_dict = {
-            et: self.edge_pos_emb(attr[:, 0]) for et, attr in edge_attr_dict.items()
-        }
+        edge_emb_dict = {et: self.edge_pos_emb(attr[:, 0]) for et, attr in edge_attr_dict.items()}
         return h_dict, edge_emb_dict
 
 

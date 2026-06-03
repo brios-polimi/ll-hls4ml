@@ -104,15 +104,15 @@ def _json_to_hetero(graph_data: dict, vocab: dict, inference_mode: bool) -> Hete
         if node_term is None:
             raise ValueError(f"Missing text field in node {n}")
         if node_type == NODE_INSTRUCTION:
-            text_idx = vocab["instruction"].get(node_term, -1) + 1
+            text_idx = vocab["instruction"].get(node_term, 0)
             features["instruction"].append([text_idx])
             inst_map[node_id] = len(inst_map)
         elif node_type == NODE_VARIABLE:
-            text_idx = vocab["variable"].get(node_term, -1) + 1
+            text_idx = vocab["variable"].get(node_term, 0)
             features["variable"].append([text_idx])
             var_map[node_id] = len(var_map)
         elif node_type == NODE_CONSTANT:
-            text_idx = vocab["constant"].get(node_term, -1) + 1
+            text_idx = vocab["constant"].get(node_term, 0)
             features["constant"].append([text_idx])
             const_map[node_id] = len(const_map)
         else:
