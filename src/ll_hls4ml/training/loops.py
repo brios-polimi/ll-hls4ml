@@ -239,6 +239,7 @@ def transductive_vs_inductive_fit(
     max_per_kernel_type: dict[str, int],
     tensor_dir: str | Path,
     epochs,
+    batch_size,
     criterion,
     optimizer,
     device,
@@ -305,9 +306,9 @@ def transductive_vs_inductive_fit(
 
             train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=0.2)
 
-            train_loader = make_loader(train_ds, batch_size=1, shuffle=True)
-            val_loader = make_loader(val_ds, batch_size=1, shuffle=False)
-            test_loader = make_loader(test_ds, batch_size=1, shuffle=False)
+            train_loader = make_loader(train_ds, batch_size=batch_size, shuffle=True)
+            val_loader = make_loader(val_ds, batch_size=batch_size, shuffle=False)
+            test_loader = make_loader(test_ds, batch_size=batch_size, shuffle=False)
 
             # Count number of Out-of-Vocabulary (OOV) nodes
             nodes_per_type = {nt: 0 for nt in NODE_TYPES}
