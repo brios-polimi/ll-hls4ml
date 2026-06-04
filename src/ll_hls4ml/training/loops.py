@@ -7,6 +7,7 @@ import copy
 import gc
 import time
 import torch
+import json
 import numpy as np
 from tqdm.notebook import tqdm
 
@@ -368,6 +369,10 @@ def transductive_vs_inductive_fit(
                     "test_targets": test_targets,
                 }
             )
+
+            with open(f"/kaggle/working/artifacts/training_histories_{kernel_type}.json", "w") as f:
+                json.dump(training_histories[kernel_type], f)
+
 
             print(
                 f"Test loss (MAPE): {test_loss * 100:.2f}%, "
