@@ -32,6 +32,21 @@ def _persist_on_cpu(value):
         return np.copy(value)
     return value
 
+def _json_converter(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    if isinstance(obj, dict):
+        return {k: _json_converter(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_json_converter(v) for v in obj]
+    if isinstance(obj, tuple):
+        return tuple(_json_converter(v) for v in obj)
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.floating):
+        return float(obj)
+    return str(obj)
+
 
 def _release_cuda_memory(*objects: object) -> None:
     """Move modules off GPU, collect, and return cached memory to the driver."""
@@ -283,7 +298,7 @@ def transductive_vs_inductive_fit(
     training_histories = {}
     for kernel_type in (
         kt for kt in kernel_types
-        if kt in ["dense_resource", "exemplar", "rule4ml"]
+        if kt in ["exemplar", "rule4ml"]
     ):
         model = None
         loop_optimizer = None
@@ -373,8 +388,9 @@ def transductive_vs_inductive_fit(
                 }
             )
 
-            with open(f"/kaggle/working/artifacts/training_histories_{kernel_type}.json", "w") as f:
-                json.dump(training_histories[kernel_type], f)
+            th_path = checkpoint_dir.parent / f"training_histories_{kernel_type}.json"
+            with open(th_path, "w") as f:
+                json.dump(training_histories[kernel_type], f, default=_json_converter)
 
 
             print(
