@@ -5,11 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 import copy
 import gc
+import os
+import sys
 import torch
 import torch.distributed as dist
 import json
 import numpy as np
 from torch.utils.data.distributed import DistributedSampler
+from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import normalize_target
@@ -22,6 +25,17 @@ from ll_hls4ml.training.distributed import (
 )
 from ll_hls4ml.data.splits import compute_target_stats, random_train_val_split
 from ll_hls4ml.io.schema import LABEL_KEYS
+
+
+def _use_progress_bar() -> bool:
+    """Use tqdm only on an interactive terminal; log files get one-line epoch summaries."""
+    if not is_main_process():
+        return False
+    if os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+        return False
+    if os.environ.get("LL_HLS4ML_TQDM", "1").lower() in {"0", "false", "no"}:
+        return False
+    return sys.stdout.isatty()
 
 
 def _persist_on_cpu(value):
@@ -121,6 +135,7 @@ def train_one_epoch(
     device,
     y_means,
     y_stds,
+    pbar=None,
     distributed: bool = False,
 ):
     model.train()
@@ -141,6 +156,8 @@ def train_one_epoch(
 
         running_loss += loss.item()
         num_batches += 1
+        if pbar is not None:
+            pbar.update(1)
 
     if distributed and dist.is_initialized():
         stats = torch.tensor([running_loss, float(num_batches)], device=device)
@@ -158,6 +175,7 @@ def validate_one_epoch(
     device,
     y_means,
     y_stds,
+    pbar=None,
     distributed: bool = False,
 ):
     if distributed and not is_main_process():
@@ -180,6 +198,8 @@ def validate_one_epoch(
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()
+            if pbar is not None:
+                pbar.update(1)
 
     preds = torch.cat(all_preds).numpy()
     targets = torch.cat(all_targets).numpy()
@@ -260,17 +280,36 @@ def fit(
             train_sampler.set_epoch(epoch)
 
         log_epoch = main and (epoch == 1 or (verbose > 0 and epoch % verbose == 0))
+        pbar = None
+        if log_epoch and _use_progress_bar():
+            pbar = tqdm(
+                total=len(train_loader) + len(val_loader),
+                desc=f"Epoch {epoch:3d}/{epochs}",
+                unit="batch",
+                leave=False,
+            )
 
         train_loss = train_one_epoch(
             model, train_loader, criterion, optimizer, device, y_means, y_stds,
-            distributed=distributed,
+            pbar=pbar, distributed=distributed,
         )
         val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
             model, val_loader, criterion, device, y_means, y_stds,
-            distributed=distributed,
+            pbar=pbar, distributed=distributed,
         )
 
-        if log_epoch and r_per_target is not None:
+        if pbar is not None:
+            if r_per_target is not None:
+                valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
+                valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
+                pbar.set_postfix({
+                    "train": f"{train_loss:.4f}",
+                    "val": f"{val_loss:.4f}",
+                    "R": f"{valid_R:.2f}",
+                    "std_r": f"{valid_std_r:.2f}",
+                })
+            pbar.close()
+        elif log_epoch and r_per_target is not None:
             valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
             valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
             print(
