@@ -5,17 +5,24 @@ from __future__ import annotations
 from pathlib import Path
 import copy
 import gc
-import time
 import torch
+import torch.distributed as dist
 import json
 import numpy as np
-from tqdm.notebook import tqdm
+from torch.utils.data.distributed import DistributedSampler
+from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import normalize_target
 from ll_hls4ml.training.loaders import make_loader
+from ll_hls4ml.training.distributed import (
+    is_distributed,
+    is_main_process,
+    unwrap_model,
+    wrap_ddp,
+)
 from ll_hls4ml.data.splits import compute_target_stats, random_train_val_split
-from ll_hls4ml.io.schema import NODE_TYPES, LABEL_KEYS
+from ll_hls4ml.io.schema import LABEL_KEYS
 
 
 def _persist_on_cpu(value):
@@ -31,6 +38,7 @@ def _persist_on_cpu(value):
     if isinstance(value, np.ndarray):
         return np.copy(value)
     return value
+
 
 def _json_converter(obj):
     if isinstance(obj, np.ndarray):
@@ -52,7 +60,7 @@ def _release_cuda_memory(*objects: object) -> None:
     """Move modules off GPU, collect, and return cached memory to the driver."""
     for obj in objects:
         if isinstance(obj, torch.nn.Module):
-            obj.cpu()
+            unwrap_model(obj).cpu()
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.synchronize()
@@ -62,19 +70,64 @@ def _release_cuda_memory(*objects: object) -> None:
 def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module) -> torch.optim.Optimizer:
     """Fresh optimizer for ``model`` with the same hyperparameters as ``template``."""
     cls = type(template)
+    params = unwrap_model(model).parameters()
     if len(template.param_groups) == 1:
         kwargs = {k: v for k, v in template.param_groups[0].items() if k != "params"}
-        return cls(model.parameters(), **kwargs)
+        return cls(params, **kwargs)
     param_groups = [
-        {"params": list(model.parameters()), **{k: v for k, v in group.items() if k != "params"}}
+        {"params": list(params), **{k: v for k, v in group.items() if k != "params"}}
         for group in template.param_groups
     ]
     return cls(param_groups)
 
 
-def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar=None):
+def _broadcast_target_stats(
+    train_dataset,
+    device: torch.device,
+    distributed: bool,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    if distributed and is_main_process():
+        y_means, y_stds = compute_target_stats(train_dataset)
+    elif distributed:
+        y_means = torch.zeros(len(LABEL_KEYS))
+        y_stds = torch.ones(len(LABEL_KEYS))
+    else:
+        y_means, y_stds = compute_target_stats(train_dataset)
+
+    y_means = y_means.to(device)
+    y_stds = y_stds.to(device)
+
+    if distributed:
+        dist.broadcast(y_means, src=0)
+        dist.broadcast(y_stds, src=0)
+
+    return y_means, y_stds
+
+
+def _save_state_dict(model: torch.nn.Module, path: Path) -> None:
+    torch.save(unwrap_model(model).state_dict(), path)
+
+
+def _load_state_dict(model: torch.nn.Module, path: Path, device: torch.device) -> None:
+    unwrap_model(model).load_state_dict(
+        torch.load(path, map_location=device, weights_only=True)
+    )
+
+
+def train_one_epoch(
+    model,
+    train_loader,
+    criterion,
+    optimizer,
+    device,
+    y_means,
+    y_stds,
+    pbar=None,
+    distributed: bool = False,
+):
     model.train()
     running_loss = 0.0
+    num_batches = 0
     num_targets = y_means.shape[0]
 
     for batch in train_loader:
@@ -89,13 +142,32 @@ def train_one_epoch(model, train_loader, criterion, optimizer, device, y_means, 
         optimizer.zero_grad()
 
         running_loss += loss.item()
+        num_batches += 1
         if pbar is not None:
             pbar.update(1)
 
-    return running_loss / len(train_loader)
+    if distributed and dist.is_initialized():
+        stats = torch.tensor([running_loss, float(num_batches)], device=device)
+        dist.all_reduce(stats, op=dist.ReduceOp.SUM)
+        running_loss = stats[0].item()
+        num_batches = int(stats[1].item())
+
+    return running_loss / num_batches if num_batches else 0.0
 
 
-def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds, pbar=None):
+def validate_one_epoch(
+    model,
+    val_loader,
+    criterion,
+    device,
+    y_means,
+    y_stds,
+    pbar=None,
+    distributed: bool = False,
+):
+    if distributed and not is_main_process():
+        return 0.0, None, None, None, None
+
     model.eval()
     all_preds, all_targets = [], []
     running_loss = 0.0
@@ -105,10 +177,10 @@ def validate_one_epoch(model, val_loader, criterion, device, y_means, y_stds, pb
     with torch.no_grad():
         for batch in val_loader:
             batch = batch.to(device)
-            target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)   # [batch_size, num_targets]
+            target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)
 
-            pred = model(batch)                                                         # [batch_size, num_targets]
-            loss = torch.nn.functional.huber_loss(pred, target, delta=1.0)
+            pred = model(batch)
+            loss = criterion(pred, target)
 
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
@@ -150,62 +222,90 @@ def fit(
     verbose=2,
     experiment_name="",
     checkpoint_dir: str | Path | None = None,
+    distributed: bool = False,
 ):
     """
     Train model with optional early stopping.
 
     Checkpoints are saved to ``checkpoint_dir / {experiment_name}_model.pt``.
-    """
+  """
+    distributed = distributed or is_distributed()
+    main = is_main_process()
+
     checkpoint_dir = Path(checkpoint_dir or "artifacts/checkpoints")
-    checkpoint_dir.mkdir(parents=True, exist_ok=True)
+    if main:
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
     ckpt_path = checkpoint_dir / f"{experiment_name}_model.pt"
     backup_path = checkpoint_dir / f"{experiment_name}_backup.pt"
 
+    model = model.to(device)
+    if distributed:
+        model = wrap_ddp(model, device)
+
     training_history = {"train_loss": [], "val_loss": [], "r_per_target": [], "std_ratio_per_target": []}
 
-    y_means, y_stds = compute_target_stats(train_loader.dataset)
-    y_means, y_stds = y_means.to(device), y_stds.to(device)
+    y_means, y_stds = _broadcast_target_stats(train_loader.dataset, device, distributed)
+
+    train_sampler = (
+        train_loader.sampler
+        if isinstance(train_loader.sampler, DistributedSampler)
+        else None
+    )
 
     if patience > 0:
         patience_counter = 0
         best_metric = float("-inf") if mode == "max" else float("inf")
         best_epoch = 0
 
-    print(f"Training {epochs} epochs...")
+    if main:
+        print(f"Training {epochs} epochs...")
+
+    should_stop = torch.zeros(1, device=device)
+
     for epoch in range(1, epochs + 1):
-        leave_bar = True if epoch == 1 or (verbose > 0 and epoch % verbose == 0) else False
-        pbar = tqdm(
-            total=len(train_loader) + len(val_loader),
-            desc=f"Epoch {epoch:3d}/{epochs}",
-            unit="batch",
-            leave=leave_bar)
+        if train_sampler is not None:
+            train_sampler.set_epoch(epoch)
+
+        leave_bar = main and (epoch == 1 or (verbose > 0 and epoch % verbose == 0))
+        pbar = None
+        if leave_bar:
+            pbar = tqdm(
+                total=len(train_loader) + len(val_loader),
+                desc=f"Epoch {epoch:3d}/{epochs}",
+                unit="batch",
+                leave=leave_bar,
+            )
 
         train_loss = train_one_epoch(
-            model, train_loader, criterion, optimizer, device, y_means, y_stds, pbar=pbar
+            model, train_loader, criterion, optimizer, device, y_means, y_stds,
+            pbar=pbar, distributed=distributed,
         )
         val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
-            model, val_loader, criterion, device, y_means, y_stds, pbar=pbar
+            model, val_loader, criterion, device, y_means, y_stds,
+            pbar=pbar, distributed=distributed,
         )
 
-        training_history["train_loss"].append(train_loss)
-        training_history["val_loss"].append(val_loss)
-        training_history["r_per_target"].append(r_per_target)
-        training_history["std_ratio_per_target"].append(std_ratio_per_target)
+        if pbar is not None:
+            if r_per_target is not None:
+                valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
+                valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
+                pbar.set_postfix({
+                    "train": f"{train_loss:.4f}",
+                    "val": f"{val_loss:.4f}",
+                    "R": f"{valid_R:.2f}",
+                    "std_r": f"{valid_std_r:.2f}",
+                })
+            pbar.close()
 
-        if leave_bar:
-            # take mean of R's onoly where not NaN
-            valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
-            valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
-            pbar.set_postfix({
-                "train": f"{train_loss:.4f}",
-                "val": f"{val_loss:.4f}",
-                "R": f"{valid_R:.2f}",
-                "std_r": f"{valid_std_r:.2f}",
-            })
-        pbar.close()
+        if main:
+            training_history["train_loss"].append(train_loss)
+            training_history["val_loss"].append(val_loss)
+            training_history["r_per_target"].append(r_per_target)
+            training_history["std_ratio_per_target"].append(std_ratio_per_target)
 
+        should_stop.zero_()
 
-        if patience > 0:
+        if patience > 0 and main:
             current_metric = training_history[evaluation_metric][-1]
             is_improvement = (
                 current_metric > best_metric if mode == "max" else current_metric < best_metric
@@ -214,7 +314,7 @@ def fit(
             if is_improvement:
                 best_metric = current_metric
                 best_epoch = epoch
-                torch.save(model.state_dict(), ckpt_path)
+                _save_state_dict(model, ckpt_path)
                 training_history["best_val_preds"] = _persist_on_cpu(preds)
                 training_history["best_val_targets"] = _persist_on_cpu(targets)
                 patience_counter = 0
@@ -222,31 +322,43 @@ def fit(
                 patience_counter += 1
                 if patience_counter >= patience:
                     print(f"Early stopping triggered after {epoch} epochs.")
-                    break
+                    should_stop[0] = 1
 
-        if epoch % 10 == 0:
-            torch.save(model.state_dict(), backup_path)
+        if distributed:
+            dist.broadcast(should_stop, src=0)
+
+        if patience > 0 and should_stop.item() == 1:
+            break
+
+        if main and epoch % 10 == 0:
+            _save_state_dict(model, backup_path)
             print(f"Model saved to {backup_path}")
 
     if restore_best_weights and patience > 0 and ckpt_path.exists():
-        model.load_state_dict(torch.load(ckpt_path, weights_only=True))
-        print(
-            f"Best model restored from epoch {best_epoch} "
-            f"with {evaluation_metric} {best_metric:.4f}"
-        )
+        _load_state_dict(model, ckpt_path, device)
+        if main:
+            print(
+                f"Best model restored from epoch {best_epoch} "
+                f"with {evaluation_metric} {best_metric:.4f}"
+            )
 
-    if patience == 0:
-        torch.save(model.state_dict(), ckpt_path)
+    if patience == 0 and main:
+        best_metric = training_history[evaluation_metric][-1]
+        best_epoch = epoch
+        _save_state_dict(model, ckpt_path)
         training_history["best_val_preds"] = _persist_on_cpu(preds)
         training_history["best_val_targets"] = _persist_on_cpu(targets)
+
+    if distributed:
+        dist.barrier()
 
     return (
         model,
         y_means,
         y_stds,
-        _persist_on_cpu(training_history),
-        best_metric,
-        best_epoch,
+        _persist_on_cpu(training_history) if main else {},
+        best_metric if main else None,
+        best_epoch if main else None,
     )
 
 
@@ -267,39 +379,48 @@ def transductive_vs_inductive_fit(
     verbose=10,
     experiment_name="",
     checkpoint_dir: str | Path | None = None,
+    results_dir: str | Path | None = None,
+    distributed: bool = False,
 ):
     """
     Fits N models, one for each kernel type, where that kernel type is used as the inductive set,
     and the rest of the kernel types are used as the transductive set.
-    Validation/early stopping is done on the transductive set's MAPE (mean absolute percentage error).
+    Validation/early stopping is done on the transductive set's loss.
 
     Returns:
         A dictionary of metrics, keyed by inductive kernel type, containing:
-            train_loss: Train loss (MSE)
-            val_loss: Validation loss (MAPE)
+            train_loss: Train loss
+            val_loss: Validation loss
             r_per_target: Pearson correlation coefficient per target
             std_ratio_per_target: Ratio of predicted standard deviation to target standard deviation per target
             best_val_preds: Best validation predictions
             best_val_targets: Best validation targets
-            best_val_loss: Best validation loss (MAPE) during training
+            best_val_loss: Best validation loss during training
             best_epoch: Best epoch during training
-            test_loss: Test loss (MAPE)
+            test_loss: Test loss
             test_preds: Test predictions
             test_targets: Test targets
             y_means: Per-target means used for normalization (CPU numpy)
             y_stds: Per-target stds used for normalization (CPU numpy)
 
         All array/tensor fields are stored as CPU numpy arrays.
+        Under DDP, only rank 0 returns the full dictionary; other ranks return {}.
     """
+    distributed = distributed or is_distributed()
+    main = is_main_process()
+
+    checkpoint_dir = Path(checkpoint_dir or "artifacts/checkpoints")
+    results_dir = Path(results_dir) if results_dir is not None else checkpoint_dir.parent
+    if main:
+        checkpoint_dir.mkdir(parents=True, exist_ok=True)
+        results_dir.mkdir(parents=True, exist_ok=True)
+
     kernel_types = list(max_per_kernel_type.keys())
     device_type = device.type if isinstance(device, torch.device) else str(device)
     use_cuda = device_type.startswith("cuda") and torch.cuda.is_available()
 
     training_histories = {}
-    for kernel_type in (
-        kt for kt in kernel_types
-        if kt in ["exemplar", "rule4ml"]
-    ):
+    for kernel_type in kernel_types:
         model = None
         loop_optimizer = None
         train_loader = val_loader = test_loader = None
@@ -325,29 +446,22 @@ def transductive_vs_inductive_fit(
 
             train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=0.2)
 
-            train_loader = make_loader(train_ds, batch_size=batch_size, shuffle=True)
-            val_loader = make_loader(val_ds, batch_size=batch_size, shuffle=False)
-            test_loader = make_loader(test_ds, batch_size=batch_size, shuffle=False)
-
-            # Count number of Out-of-Vocabulary (OOV) nodes
-            nodes_per_type = {nt: 0 for nt in NODE_TYPES}
-            oov_nodes_per_type = {nt: 0 for nt in NODE_TYPES}
-            for batch in test_loader:
-                for nt in NODE_TYPES:
-                    nodes_per_type[nt] += batch[nt].x.shape[0]
-                    oov_nodes_per_type[nt] += (batch[nt].x == 0).sum().item()
-
-            print(
-                f"*********** \"{kernel_type}\" as inductive set ***********\n"
-                f"  Train size: {len(train_ds)}, "
-                f"  Val size: {len(val_ds)}, "
-                f"  Test size: {len(test_ds)}"
+            train_loader = make_loader(
+                train_ds, batch_size=batch_size, shuffle=True, distributed=distributed,
             )
-            for nt in NODE_TYPES:
-                oov_pct = oov_nodes_per_type[nt] / nodes_per_type[nt] * 100
+            val_loader = make_loader(
+                val_ds, batch_size=batch_size, shuffle=False, distributed=False,
+            )
+            test_loader = make_loader(
+                test_ds, batch_size=batch_size, shuffle=False, distributed=False,
+            )
+
+            if main:
                 print(
-                    f"  {nt}: {nodes_per_type[nt]} nodes, "
-                    f"{oov_nodes_per_type[nt]} OOV nodes ({oov_pct:.2f}%)"
+                    f"*********** \"{kernel_type}\" as inductive set ***********\n"
+                    f"  Train size: {len(train_ds)}, "
+                    f"  Val size: {len(val_ds)}, "
+                    f"  Test size: {len(test_ds)}"
                 )
 
             model = copy.deepcopy(original_model).to(device)
@@ -368,36 +482,37 @@ def transductive_vs_inductive_fit(
                 verbose,
                 experiment_name + f"_{kernel_type}",
                 checkpoint_dir,
+                distributed=distributed,
             )
 
-            print("Evaluating on test set...")
-            test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
-                model, test_loader, criterion, device, y_means, y_stds
-            )
+            if main:
+                print("Evaluating on test set...")
+                test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
+                    model, test_loader, criterion, device, y_means, y_stds
+                )
 
-            training_histories[kernel_type] = _persist_on_cpu(
-                {
-                    **training_history,
-                    "y_means": y_means,
-                    "y_stds": y_stds,
-                    "best_val_loss": best_val_loss,
-                    "best_epoch": best_epoch,
-                    "test_loss": test_loss,
-                    "test_preds": test_preds,
-                    "test_targets": test_targets,
-                }
-            )
+                training_histories[kernel_type] = _persist_on_cpu(
+                    {
+                        **training_history,
+                        "y_means": y_means,
+                        "y_stds": y_stds,
+                        "best_val_loss": best_val_loss,
+                        "best_epoch": best_epoch,
+                        "test_loss": test_loss,
+                        "test_preds": test_preds,
+                        "test_targets": test_targets,
+                    }
+                )
 
-            th_path = checkpoint_dir.parent / f"training_histories_{kernel_type}.json"
-            with open(th_path, "w") as f:
-                json.dump(training_histories[kernel_type], f, default=_json_converter)
+                th_path = results_dir / f"training_histories_{kernel_type}.json"
+                with open(th_path, "w") as f:
+                    json.dump(training_histories[kernel_type], f, default=_json_converter)
 
-
-            print(
-                f"Test loss (MAPE): {test_loss * 100:.2f}%, "
-                f"Best validation loss (MAPE): {best_val_loss * 100:.2f}%, "
-                f"Inductive-Transductive gap: {(test_loss - best_val_loss) * 100:.2f}%"
-            )
+                print(
+                    f"Test loss: {test_loss:.4f}, "
+                    f"Best validation loss: {best_val_loss:.4f}, "
+                    f"Inductive-Transductive gap: {(test_loss - best_val_loss):.4f}"
+                )
         finally:
             _release_cuda_memory(
                 model,
@@ -412,6 +527,10 @@ def transductive_vs_inductive_fit(
                 y_means,
                 y_stds,
             )
-        print("***********************************************\n\n")
+        if main:
+            print("***********************************************\n\n")
+
+        if distributed:
+            dist.barrier()
 
     return training_histories

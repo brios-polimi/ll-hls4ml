@@ -1,0 +1,15 @@
+{
+  "tensor_dir": "/home/brend/projects/data/tensors",
+  "max_per_kernel_type": {"exemplar": 10, "rule4ml": 10},
+  "epochs": 1,
+  "batch_size": 2,
+  "patience": 0,
+  "verbose": 1,
+  "seed": 42,
+  "hidden_dim": 8,
+  "num_layers": 1,
+  "dropout": 0.1,
+  "checkpoint_dir": "/home/brend/projects/ll-hls4ml/.test_artifacts/models",
+  "results_dir": "/home/brend/projects/ll-hls4ml/.test_artifacts",
+  "experiment_name": "smoke_test"
+}

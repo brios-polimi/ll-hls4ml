@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 import torch
+import numpy as np
 
 from ll_hls4ml.training.targets import to_luts
 from ll_hls4ml.io.schema import LABEL_KEYS
@@ -50,12 +51,19 @@ def plot_predictions_vs_targets(
         sorted_targets = all_targets[:, i][sort_idx]
         sorted_preds = all_preds[:, i][sort_idx]
 
+        err = np.abs((sorted_preds - sorted_targets) / (sorted_targets)) * 100
+        err = err.mean()
+        print(f"Mean error for {LABEL_KEYS[i]}: {err:.2f}%")
+
+
         plt.figure(figsize=figsize)
         plt.plot(sorted_preds + 1, label="Prediction")
         plt.plot(sorted_targets + 1, label="Target")
-        plt.yscale("log")
+        #plt.yscale("log")
         plt.xlabel("Samples (sorted by target)")
         plt.ylabel(f"{LABEL_KEYS[i]}")
-        plt.title(f"Predictions vs Targets for {LABEL_KEYS[i]}")
+        plt.title(f"Predictions vs Targets for {LABEL_KEYS[i]} ({err:.2f}% err)")
         plt.legend()
         plt.show()
+
+        
