@@ -10,7 +10,6 @@ import torch.distributed as dist
 import json
 import numpy as np
 from torch.utils.data.distributed import DistributedSampler
-from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import normalize_target
@@ -122,7 +121,6 @@ def train_one_epoch(
     device,
     y_means,
     y_stds,
-    pbar=None,
     distributed: bool = False,
 ):
     model.train()
@@ -143,8 +141,6 @@ def train_one_epoch(
 
         running_loss += loss.item()
         num_batches += 1
-        if pbar is not None:
-            pbar.update(1)
 
     if distributed and dist.is_initialized():
         stats = torch.tensor([running_loss, float(num_batches)], device=device)
@@ -162,7 +158,6 @@ def validate_one_epoch(
     device,
     y_means,
     y_stds,
-    pbar=None,
     distributed: bool = False,
 ):
     if distributed and not is_main_process():
@@ -185,8 +180,6 @@ def validate_one_epoch(
             all_preds.append(pred.cpu())
             all_targets.append(target.cpu())
             running_loss += loss.item()
-            if pbar is not None:
-                pbar.update(1)
 
     preds = torch.cat(all_preds).numpy()
     targets = torch.cat(all_targets).numpy()
@@ -266,36 +259,26 @@ def fit(
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
 
-        leave_bar = main and (epoch == 1 or (verbose > 0 and epoch % verbose == 0))
-        pbar = None
-        if leave_bar:
-            pbar = tqdm(
-                total=len(train_loader) + len(val_loader),
-                desc=f"Epoch {epoch:3d}/{epochs}",
-                unit="batch",
-                leave=leave_bar,
-            )
+        log_epoch = main and (epoch == 1 or (verbose > 0 and epoch % verbose == 0))
 
         train_loss = train_one_epoch(
             model, train_loader, criterion, optimizer, device, y_means, y_stds,
-            pbar=pbar, distributed=distributed,
+            distributed=distributed,
         )
         val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
             model, val_loader, criterion, device, y_means, y_stds,
-            pbar=pbar, distributed=distributed,
+            distributed=distributed,
         )
 
-        if pbar is not None:
-            if r_per_target is not None:
-                valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
-                valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
-                pbar.set_postfix({
-                    "train": f"{train_loss:.4f}",
-                    "val": f"{val_loss:.4f}",
-                    "R": f"{valid_R:.2f}",
-                    "std_r": f"{valid_std_r:.2f}",
-                })
-            pbar.close()
+        if log_epoch and r_per_target is not None:
+            valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
+            valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
+            print(
+                f"Epoch {epoch:3d}/{epochs}  "
+                f"train={train_loss:.4f}  val={val_loss:.4f}  "
+                f"R={valid_R:.2f}  std_r={valid_std_r:.2f}",
+                flush=True,
+            )
 
         if main:
             training_history["train_loss"].append(train_loss)

@@ -11,6 +11,7 @@ build/
 # Artifacts (keep directory structure via .gitkeep)
 artifacts/checkpoints/*.pt
 artifacts/vocab/*.json
+.test_artifacts/*
 
 # Local env
 .venv/
