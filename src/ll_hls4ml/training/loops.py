@@ -442,7 +442,8 @@ def transductive_vs_inductive_fit(
     use_cuda = device_type.startswith("cuda") and torch.cuda.is_available()
 
     training_histories = {}
-    for kernel_type in kernel_types:
+    # reverse order
+    for kernel_type in reversed(kernel_types):
         model = None
         loop_optimizer = None
         train_loader = val_loader = test_loader = None
