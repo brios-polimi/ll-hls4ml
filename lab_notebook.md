@@ -1,6 +1,10 @@
 # Lab Notebook
 
 ## Experiment 1
+### May 12
+
+
+## Experiment 2
 ### June 12
 When leaving one kernel type out at a time, what is the inductive vs. transductive generalization? Also serves as an initial baseline.
 
