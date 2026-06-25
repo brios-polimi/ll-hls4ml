@@ -443,7 +443,7 @@ def transductive_vs_inductive_fit(
 
     training_histories = {}
     # reverse order
-    for kernel_type in ["conv1d", "conv2d", "dense_latency", "dense_resource"]: # was kernel_types, hardcode for training
+    for kernel_type in ["dense_latency", "dense_resource"]: # was kernel_types, hardcode for training
         model = None
         loop_optimizer = None
         train_loader = val_loader = test_loader = None

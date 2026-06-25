@@ -24,8 +24,7 @@ When leaving one kernel type out at a time, what is the inductive vs. transducti
     "exemplar": 300,
     "rule4ml": 200
   }
+}
+```
 
 ### Results
-
-  
-}
