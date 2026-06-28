@@ -95,33 +95,35 @@ def main() -> None:
             distributed=distributed
         )
 
-        print("Evaluating on test set...")
-        test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
-            model, test_loader, criterion, device, y_means, y_stds
-        )
+        main = is_main_process()
+        if main:
+            print("Evaluating on test set...")
+            test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
+                model, test_loader, criterion, device, y_means, y_stds
+            )
 
-        training_history = _persist_on_cpu(
-            {
-                **training_history,
-                "y_means": y_means,
-                "y_stds": y_stds,
-                "best_val_loss": best_val_loss,
-                "best_epoch": best_epoch,
-                "test_loss": test_loss,
-                "test_preds": test_preds,
-                "test_targets": test_targets,
-            }
-        )
+            training_history = _persist_on_cpu(
+                {
+                    **training_history,
+                    "y_means": y_means,
+                    "y_stds": y_stds,
+                    "best_val_loss": best_val_loss,
+                    "best_epoch": best_epoch,
+                    "test_loss": test_loss,
+                    "test_preds": test_preds,
+                    "test_targets": test_targets,
+                }
+            )
 
-        th_path = results_dir / f"training_histories.json"
-        with open(th_path, "w") as f:
-            json.dump(training_history, f, default=_json_converter)
+            th_path = results_dir / f"training_histories.json"
+            with open(th_path, "w") as f:
+                json.dump(training_history, f, default=_json_converter)
 
-        print(
-            f"Test loss: {test_loss:.4f}, "
-            f"Best validation loss: {best_val_loss:.4f}, "
-            f"Inductive-Transductive gap: {(test_loss - best_val_loss):.4f}"
-        )
+            print(
+                f"Test loss: {test_loss:.4f}, "
+                f"Best validation loss: {best_val_loss:.4f}, "
+                f"Inductive-Transductive gap: {(test_loss - best_val_loss):.4f}"
+            )
 
     finally:
         cleanup_ddp()
