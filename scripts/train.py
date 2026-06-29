@@ -33,6 +33,7 @@ def main() -> None:
 
     _rank, world_size, local_rank = setup_from_env()
     distributed = world_size > 1
+    main = is_main_process()
 
     seed = config.get("seed", 42)
     torch.manual_seed(seed)
@@ -54,7 +55,7 @@ def main() -> None:
 
     val_frac = config.get("val_frac", 0.2)
     test_frac = config.get("test_frac", 0.1)
-    ds = HeteroGraphDataset(tensor_dir, types=kernel_types, max_per_type=max_per_kernel_type, silent=False)
+    ds = HeteroGraphDataset(tensor_dir, types=kernel_types, max_per_type=max_per_kernel_type, silent=(not main))
     train_val_ds, test_ds = random_train_val_split(ds, val_fraction=test_frac, seed=seed)
     train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=val_frac, seed=seed)
 
@@ -71,6 +72,13 @@ def main() -> None:
         num_layers=config["num_layers"],
         dropout=config["dropout"],
     )
+
+    load_model_path = config.get("load_model_path", None)
+    if load_model_path:
+        state_dict = torch.load(load_model_path)
+        model.load_state_dict(state_dict)
+        if main:
+            print(f"Loaded model from {load_model_path}")
 
     optimizer = torch.optim.Adam(model.parameters(), lr=config.get("lr", 1e-3))
     criterion = nn.HuberLoss(reduction="mean", delta=1.0)
@@ -95,7 +103,6 @@ def main() -> None:
             distributed=distributed
         )
 
-        main = is_main_process()
         if main:
             print("Evaluating on test set...")
             test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
