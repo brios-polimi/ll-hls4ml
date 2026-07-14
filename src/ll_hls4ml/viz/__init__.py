@@ -7,7 +7,7 @@ from ll_hls4ml.viz.eda import (
     plot_tsne_continuous,
     plot_vocab_counts,
 )
-from ll_hls4ml.viz.training import plot_loss_curves, plot_predictions_vs_targets
+from ll_hls4ml.viz.training import plot_loss_curves, plot_predictions_vs_targets, rpe_box_plots
 
 __all__ = [
     "analyze_graph_dataset",
@@ -19,4 +19,5 @@ __all__ = [
     "plot_tsne",
     "plot_tsne_continuous",
     "plot_vocab_counts",
+    "rpe_box_plots",
 ]

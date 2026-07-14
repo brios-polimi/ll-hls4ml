@@ -5,9 +5,11 @@ from __future__ import annotations
 import torch.nn as nn
 
 from ll_hls4ml.models.rgcn import CDFGRGCN
+from ll_hls4ml.models.mlp import MLP
 
 MODELS: dict[str, type[nn.Module]] = {
     "rgcn": CDFGRGCN,
+    "mlp": MLP,
 }
 
 

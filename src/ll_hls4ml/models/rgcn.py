@@ -75,6 +75,8 @@ class CDFGRGCN(nn.Module):
         self,
         node_vocab_sizes: dict[str, int],
         edge_pos_vocab_size: int,
+        y_means: torch.Tensor,
+        y_stds: torch.Tensor,
         hidden_dim: int = 128,
         num_layers: int = 3,
         dropout: float = 0.1,
@@ -82,6 +84,8 @@ class CDFGRGCN(nn.Module):
         aggr: str = "mean",
     ):
         super().__init__()
+        self.register_buffer("y_means", y_means.clone())
+        self.register_buffer("y_stds", y_stds.clone())
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.pool = pool
@@ -125,7 +129,7 @@ class CDFGRGCN(nn.Module):
 
         pool_fn = {
             "mean": global_mean_pool,
-            "sum": global_add_pool,
+            "sum": global_add_pool, ########################## REPRESENTATION BLOWS UP
             "max": global_max_pool,
         }[self.pool]
 

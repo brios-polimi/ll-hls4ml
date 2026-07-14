@@ -1,6 +1,6 @@
 data_root: ../data
 graph_dir: ${data_root}/graphs
 tensor_dir: ${data_root}/tensors
-vocab_path: ../artifacts/vocab/default.json
-checkpoint_dir: ../artifacts/checkpoints
-exports_dir: ../artifacts/exports
+vocab_path: artifacts/vocab/default.json
+checkpoint_dir: artifacts/checkpoints
+exports_dir: artifacts/exports

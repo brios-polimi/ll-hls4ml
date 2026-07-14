@@ -1,10 +1,11 @@
 """Training evaluation plots."""
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import SymmetricalLogLocator
 import torch
 import numpy as np
 
-from ll_hls4ml.training.targets import to_luts
+from ll_hls4ml.training.targets import denormalize_target
 from ll_hls4ml.io.schema import LABEL_KEYS
 
 
@@ -35,7 +36,7 @@ def plot_predictions_vs_targets(
     with torch.no_grad():
         for batch in val_loader:
             batch = batch.to(device)
-            preds = to_luts(
+            preds = denormalize_target(
                 model(batch),
                 y_mean.to(device),
                 y_std.to(device),
@@ -65,5 +66,81 @@ def plot_predictions_vs_targets(
         plt.title(f"Predictions vs Targets for {LABEL_KEYS[i]} ({err:.2f}% err)")
         plt.legend()
         plt.show()
+
+
+def rpe_box_plots(
+    predictions: torch.ndarray | torch.Tensor,
+    targets: np.ndarray | torch.Tensor,
+    labels: list[str],
+    ordering: list[str] = None,
+):
+    """
+    Box plots of the relative prediction error (RPE) for each label
+    in the style of the wa-hls4ml benchmark.
+    y-axis is symmetric log scale.
+    """
+    if isinstance(predictions, torch.Tensor):
+        predictions = predictions.cpu().numpy()
+    if isinstance(targets, torch.Tensor):
+        targets = targets.cpu().numpy()
+        
+    rpe = (targets - predictions) / (targets + 1.0) * 100
+
+    fig, axes = plt.subplots(
+        1, len(labels),
+        figsize=(1.5 * len(labels), 7),
+        sharey=True
+    )
+    box_width = 0.25
+    x_min, x_max = 1 - box_width / 2, 1 + box_width / 2
+    
+    plot_ordering = ordering if ordering else labels
+    for (ax, label) in zip(axes, plot_ordering):
+        i = labels.index(label)
+
+        ax.boxplot(rpe[:, i], widths=box_width)
+
+        median_line = ax.hlines(
+            np.median(rpe[:, i]),
+            x_min,
+            x_max,
+            color="orange",
+            linestyle="--",
+            label="Median"
+        )
+
+        mean_line = ax.hlines(
+            np.mean(rpe[:, i]),
+            x_min,
+            x_max,
+            color="green",
+            linestyle="--",
+            label="Mean"
+        )
+
+        ax.set_yscale("symlog")
+        ax.yaxis.set_major_locator(
+            SymmetricalLogLocator(base=10, linthresh=1)
+        )
+        ax.grid(True, which="major", axis="y", linestyle=":")
+
+        ax.set_xlabel(label)
+        
+        ax.set_xticks([])
+
+    axes[0].set_ylabel("Relative Percent Error")
+    fig.suptitle("GNN Prediction Errors on Test Set")
+
+    fig.legend(
+        handles=[median_line, mean_line],
+        labels=["Median", "Mean"],
+        loc="upper right",
+        ncol=2,
+        bbox_to_anchor=(0.9, 1.0)
+    )
+
+    #plt.tight_layout(rect=[0, 0, 0.9, 0.95])
+    plt.tight_layout()
+    plt.show()
 
         

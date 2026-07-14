@@ -11,11 +11,12 @@ import torch
 import torch.distributed as dist
 import json
 import numpy as np
+from collections import defaultdict
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
-from ll_hls4ml.training.targets import normalize_target
+from ll_hls4ml.training.targets import normalize_target, wahls4ml_metrics
 from ll_hls4ml.training.loaders import make_loader
 from ll_hls4ml.training.distributed import (
     is_distributed,
@@ -35,7 +36,7 @@ def _use_progress_bar() -> bool:
         return False
     if os.environ.get("LL_HLS4ML_TQDM", "1").lower() in {"0", "false", "no"}:
         return False
-    return sys.stdout.isatty()
+    return True
 
 
 def _persist_on_cpu(value):
@@ -94,37 +95,13 @@ def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module
     return cls(param_groups)
 
 
-def _broadcast_target_stats(
-    train_dataset,
-    device: torch.device,
-    distributed: bool,
-) -> tuple[torch.Tensor, torch.Tensor]:
-    if distributed and is_main_process():
-        y_means, y_stds = compute_target_stats(train_dataset)
-    elif distributed:
-        y_means = torch.zeros(len(LABEL_KEYS))
-        y_stds = torch.ones(len(LABEL_KEYS))
-    else:
-        y_means, y_stds = compute_target_stats(train_dataset)
-
-    y_means = y_means.to(device)
-    y_stds = y_stds.to(device)
-
-    if distributed:
-        dist.broadcast(y_means, src=0)
-        dist.broadcast(y_stds, src=0)
-
-    return y_means, y_stds
-
-
-def _save_state_dict(model: torch.nn.Module, path: Path) -> None:
-    torch.save(unwrap_model(model).state_dict(), path)
-
-
-def _load_state_dict(model: torch.nn.Module, path: Path, device: torch.device) -> None:
-    unwrap_model(model).load_state_dict(
-        torch.load(path, map_location=device, weights_only=True)
-    )
+def _save_checkpoint(epoch, model, optimizer, scheduler, path):
+    torch.save({
+        "epoch": epoch,
+        "model": unwrap_model(model).state_dict(),
+        "optimizer": optimizer.state_dict(),
+        "scheduler": scheduler.state_dict() if scheduler else None,
+    }, path)
 
 
 def train_one_epoch(
@@ -133,39 +110,37 @@ def train_one_epoch(
     criterion,
     optimizer,
     device,
-    y_means,
-    y_stds,
     pbar=None,
     distributed: bool = False,
 ):
     model.train()
-    running_loss = 0.0
-    num_batches = 0
-    num_targets = y_means.shape[0]
+    loss_sum = 0.0
+    num_samples = 0
+    num_targets = len(model.y_means)
 
     for batch in train_loader:
         batch = batch.to(device)
-        target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)
+        target = normalize_target(batch.y.view(-1, num_targets), model.y_means, model.y_stds)
 
+        optimizer.zero_grad(set_to_none=True)
         pred = model(batch)
         loss = criterion(pred, target)
-
         loss.backward()
         optimizer.step()
-        optimizer.zero_grad()
 
-        running_loss += loss.item()
-        num_batches += 1
+        n = batch.num_graphs
+        loss_sum += loss.item() * n
+        num_samples += n
+
         if pbar is not None:
             pbar.update(1)
 
     if distributed and dist.is_initialized():
-        stats = torch.tensor([running_loss, float(num_batches)], device=device)
+        stats = torch.tensor([loss_sum, float(num_samples)], device=device)
         dist.all_reduce(stats, op=dist.ReduceOp.SUM)
-        running_loss = stats[0].item()
-        num_batches = int(stats[1].item())
+        loss_sum, num_samples = stats.tolist()
 
-    return running_loss / num_batches if num_batches else 0.0
+    return loss_sum / num_samples if num_samples else 0.0
 
 
 def validate_one_epoch(
@@ -173,8 +148,6 @@ def validate_one_epoch(
     val_loader,
     criterion,
     device,
-    y_means,
-    y_stds,
     pbar=None,
     distributed: bool = False,
 ):
@@ -183,40 +156,37 @@ def validate_one_epoch(
 
     model.eval()
     all_preds, all_targets = [], []
-    running_loss = 0.0
-
-    num_targets = y_means.shape[0]
+    loss_sum = 0.0
+    num_samples = 0
+    num_targets = len(model.y_means)
 
     with torch.no_grad():
         for batch in val_loader:
             batch = batch.to(device)
-            target = normalize_target(batch.y.view(-1, num_targets), y_means, y_stds)
+            target = normalize_target(batch.y.view(-1, num_targets), model.y_means, model.y_stds)
 
             pred = model(batch)
             loss = criterion(pred, target)
 
-            all_preds.append(pred.cpu())
-            all_targets.append(target.cpu())
-            running_loss += loss.item()
+            all_preds.append(pred)
+            all_targets.append(target)
+
+            n = batch.num_graphs
+            loss_sum += loss.item() * n
+            num_samples += n
+
             if pbar is not None:
                 pbar.update(1)
 
-    preds = torch.cat(all_preds).numpy()
-    targets = torch.cat(all_targets).numpy()
+    preds = torch.cat(all_preds)
+    targets = torch.cat(all_targets)
 
-    r_per_target = np.array([
-        np.corrcoef(preds[:, i], targets[:, i])[0, 1]
-        if targets[:, i].std() > 1e-6 and preds[:, i].std() > 1e-6
-        else np.nan
-        for i in range(preds.shape[1])
-    ])
+    # print(model.y_means, model.y_stds, "\n", preds, "\n", targets)
+    # print(preds.std(dim=0))
 
-    target_stds = targets.std(axis=0)
-    pred_stds = preds.std(axis=0)
-    std_ratio_per_target = np.where(target_stds > 1e-6, pred_stds / target_stds, np.nan)
-
-    epoch_loss = running_loss / len(val_loader)
-    return epoch_loss, preds, targets, r_per_target, std_ratio_per_target
+    metrics = wahls4ml_metrics(preds, targets, model.y_means, model.y_stds)
+    metrics.update({"loss" : loss_sum / num_samples if num_samples else 0.0})
+    return metrics
 
 
 def fit(
@@ -226,15 +196,16 @@ def fit(
     epochs,
     criterion,
     optimizer,
+    scheduler,
     device,
     patience=50,
-    evaluation_metric="val_loss",
     mode="min",
     restore_best_weights=True,
     writer=None,
     verbose=2,
     experiment_name="",
     checkpoint_dir: str | Path | None = None,
+    resume_from_backup: str | Path | None = None,
     distributed: bool = False,
 ):
     """
@@ -248,16 +219,21 @@ def fit(
     checkpoint_dir = Path(checkpoint_dir or "artifacts/checkpoints")
     if main:
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
-    ckpt_path = checkpoint_dir / f"{experiment_name}_model.pt"
+    ckpt_path = checkpoint_dir / f"{experiment_name}_checkpoint.pt"
     backup_path = checkpoint_dir / f"{experiment_name}_backup.pt"
+
+    if resume_from_backup:
+        checkpoint = torch.load(resume_from_backup)
+        model.load_state_dict(checkpoint["model"])
+        optimizer.load_state_dict(checkpoint["optimizer"])
+        scheduler.load_state_dict(checkpoint["scheduler"])
+        start_epoch = checkpoint["epoch"] + 1
+    else:
+        start_epoch = 1
 
     model = model.to(device)
     if distributed:
         model = wrap_ddp(model, device)
-
-    training_history = {"train_loss": [], "val_loss": [], "r_per_target": [], "std_ratio_per_target": []}
-
-    y_means, y_stds = _broadcast_target_stats(train_loader.dataset, device, distributed)
 
     train_sampler = (
         train_loader.sampler
@@ -275,60 +251,54 @@ def fit(
 
     should_stop = torch.zeros(1, device=device)
 
-    for epoch in range(1, epochs + 1):
+    for epoch in range(start_epoch, epochs + 1):
         if train_sampler is not None:
             train_sampler.set_epoch(epoch)
 
         log_epoch = main and (epoch == 1 or (verbose > 0 and epoch % verbose == 0))
         pbar = None
-        if log_epoch and _use_progress_bar():
+        if _use_progress_bar(): ### used to have log_epoch and 
             pbar = tqdm(
                 total=len(train_loader) + len(val_loader),
                 desc=f"Epoch {epoch:3d}/{epochs}",
                 unit="batch",
-                leave=False,
+                leave=log_epoch, #### used to be True/False
             )
 
         train_loss = train_one_epoch(
-            model, train_loader, criterion, optimizer, device, y_means, y_stds,
+            model, train_loader, criterion, optimizer, device,
             pbar=pbar, distributed=distributed,
         )
-        val_loss, preds, targets, r_per_target, std_ratio_per_target = validate_one_epoch(
-            model, val_loader, criterion, device, y_means, y_stds,
+        val_metrics = validate_one_epoch(
+            model, val_loader, criterion, device,
             pbar=pbar, distributed=distributed,
         )
 
         if pbar is not None:
-            if r_per_target is not None:
-                valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
-                valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
-                pbar.set_postfix({
-                    "train": f"{train_loss:.4f}",
-                    "val": f"{val_loss:.4f}",
-                    "R": f"{valid_R:.2f}",
-                    "std_r": f"{valid_std_r:.2f}",
-                })
+            pbar.set_postfix({
+                "train": f"{train_loss:.4f}",
+                "val": f"{val_metrics['loss']:.4f}"
+            })
             pbar.close()
-        elif log_epoch and r_per_target is not None:
-            valid_R = np.nanmean(r_per_target[~np.isnan(r_per_target)])
-            valid_std_r = np.nanmean(std_ratio_per_target[~np.isnan(std_ratio_per_target)])
+        elif log_epoch:
             print(
                 f"Epoch {epoch:3d}/{epochs}  "
-                f"train={train_loss:.4f}  val={val_loss:.4f}  "
-                f"R={valid_R:.2f}  std_r={valid_std_r:.2f}",
+                f"train={train_loss:.4f}  val={val_metrics['loss']:.4f}",
                 flush=True,
             )
 
-        if main:
-            training_history["train_loss"].append(train_loss)
-            training_history["val_loss"].append(val_loss)
-            training_history["r_per_target"].append(r_per_target)
-            training_history["std_ratio_per_target"].append(std_ratio_per_target)
+        if main and writer is not None:
+            writer.add_scalar("loss/train", train_loss, epoch) 
+            writer.add_scalar("loss/val", val_metrics['loss'], epoch) 
+            for name, value in val_metrics.items(): 
+                if name != 'loss':
+                    for i, lbl in enumerate(LABEL_KEYS):
+                        writer.add_scalar(f"{name}/{lbl}", value[i].item(), epoch)
 
         should_stop.zero_()
 
         if patience > 0 and main:
-            current_metric = training_history[evaluation_metric][-1]
+            current_metric = val_metrics["loss"]
             is_improvement = (
                 current_metric > best_metric if mode == "max" else current_metric < best_metric
             )
@@ -336,15 +306,17 @@ def fit(
             if is_improvement:
                 best_metric = current_metric
                 best_epoch = epoch
-                _save_state_dict(model, ckpt_path)
-                training_history["best_val_preds"] = _persist_on_cpu(preds)
-                training_history["best_val_targets"] = _persist_on_cpu(targets)
                 patience_counter = 0
+                _save_checkpoint(epoch, model, optimizer, scheduler, ckpt_path)                
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
                     print(f"Early stopping triggered after {epoch} epochs.")
                     should_stop[0] = 1
+
+        if main and epoch % 10 == 0:
+            _save_checkpoint(epoch, model, optimizer, scheduler, backup_path)
+            print(f"Model saved to {backup_path}")
 
         if distributed:
             dist.broadcast(should_stop, src=0)
@@ -352,36 +324,22 @@ def fit(
         if patience > 0 and should_stop.item() == 1:
             break
 
-        if main and epoch % 10 == 0:
-            _save_state_dict(model, backup_path)
-            print(f"Model saved to {backup_path}")
-
     if restore_best_weights and patience > 0 and ckpt_path.exists():
-        _load_state_dict(model, ckpt_path, device)
+        checkpoint = torch.load(ckpt_path, map_location=device, weights_only=True)
+        unwrap_model(model).load_state_dict(checkpoint["model"])
         if main:
             print(
                 f"Best model restored from epoch {best_epoch} "
-                f"with {evaluation_metric} {best_metric:.4f}"
+                f"with validation loss {best_metric:.4f}"
             )
 
     if patience == 0 and main:
-        best_metric = training_history[evaluation_metric][-1]
-        best_epoch = epoch
-        _save_state_dict(model, ckpt_path)
-        training_history["best_val_preds"] = _persist_on_cpu(preds)
-        training_history["best_val_targets"] = _persist_on_cpu(targets)
+        _save_checkpoint(epoch, model, optimizer, scheduler, ckpt_path)
 
     if distributed:
         dist.barrier()
 
-    return (
-        model,
-        y_means,
-        y_stds,
-        _persist_on_cpu(training_history) if main else {},
-        best_metric if main else None,
-        best_epoch if main else None,
-    )
+    return model
 
 
 def transductive_vs_inductive_fit(
