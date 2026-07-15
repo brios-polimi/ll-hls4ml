@@ -24,7 +24,7 @@ from ll_hls4ml.training.distributed import (
     unwrap_model,
     wrap_ddp,
 )
-from ll_hls4ml.data.splits import compute_target_stats, random_train_val_split
+from ll_hls4ml.data.splits import random_train_val_test_split
 from ll_hls4ml.io.schema import LABEL_KEYS
 
 

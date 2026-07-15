@@ -34,7 +34,7 @@ LABEL_KEYS = [
     "ff",
     "dsp",
     "bram",
-    "uram",
+    #"uram",
     "cycles_max",
     #"cycles_min",
     #"estimated_clock",
