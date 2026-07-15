@@ -1,4 +1,5 @@
 data_root: ../data
+ll_dir: ${data_root}/ll
 graph_dir: ${data_root}/graphs
 tensor_dir: ${data_root}/tensors
 vocab_path: artifacts/vocab/default.json
