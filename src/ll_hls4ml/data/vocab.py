@@ -6,97 +6,99 @@ import json
 from pathlib import Path
 
 import tqdm
-import subprocess
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import threading
-from collections import defaultdict
-from networkx.readwrite import json_graph
 
-from ll_hls4ml.config import load_config
 from ll_hls4ml.io.discovery import iter_graph_paths
 from ll_hls4ml.io.load_json import load_graph_json
 from ll_hls4ml.io.schema import NODE_CONSTANT, NODE_INSTRUCTION, NODE_VARIABLE
 
 import re
 
+TYPE_RE = re.compile(r'(?:type|baseType): !(\d+)')
+NAME_RE = re.compile(r'name: "(.+?)"')
 
 STRUCT_RE = re.compile(
     r'^(%'
     r'"?(?:'
-        r'struct\.(?:ap_fixed(?:_base)?|ap_int(?:_base)?|ssdm_int_sim)'
-        r'|class\.(?:ap_private|ac_fixed|anon|ac_private::iv(?:_base)?)'
+        r'struct\.(?:ap_(?:u)?fixed(?:_base)?|ap_(?:u)?int(?:_base)?|ssdm_int_sim|nnet::array)'
+        r'|class\.(?:ap_private|ac_fixed|anon|ac_private::iv(?:_base)?|hls::stream)'
     r')(?:\.\d+)?'
     r'"?)\s*=\s*type\s*(.*)$'
 )
-# call void @llvm.dbg.declare(metadata %class.ac_fixed** %3, metadata !4030, metadata !DIExpression()), !dbg !4031
+# ... call void @llvm.dbg.declare(metadata %class.ac_fixed** %3, metadata !4030, ...
 DBG_RE = re.compile(
     r'call void @llvm\.dbg\.declare\(metadata '
     r'(%'
     r'"?(?:'
-        r'struct\.(?:ap_fixed(?:_base)?|ap_int(?:_base)?|ssdm_int_sim)'
-        r'|class\.(?:ap_private|ac_fixed|anon|ac_private::iv(?:_base)?)'
+        r'struct\.(?:ap_(?:u)?fixed(?:_base)?|ap_(?:u)?int(?:_base)?|ssdm_int_sim|nnet::array)'
+        r'|class\.(?:ap_private|ac_fixed|anon|ac_private::iv(?:_base)?|hls::stream)'
     r')(?:\.\d+)?'
     r'"?)(\**)'
     r'.*metadata !(\d+)'
 )
 META_RE = re.compile(r'^!(\d+)\s*=\s*(.*)$')
 
-def find_base_type(metadata, line_num):
-    """
-    Recursively searches DWARF debug info (Clang compiler flag `-g`)
-    to find base type semantic of LLVM locally-defined type.
-    Returns None if not found.
-    """
-    line = metadata[line_num]
-
-    type_match = re.search(r'(?:type|baseType): !(\d+)', line)
-    if type_match:
-        return find_base_type(metadata, int(type_match.group(1)))
-
-    name_match = re.search(r'name: "(.+?)"', line)
-    if name_match:
-        return name_match.group(1)
-
-    return None
-
-def get_llvm_type_converter(path: str | Path) -> dict(str, str):
+def _get_llvm_type_converter(path: str | Path) -> dict[str, str]:
     """ 
     Returns dictionary mapping each local ap/ac_type string
     to a tuple containing base ap/ac_type
     """
-    structs = {}      # "%struct.ap_fixed.1" -> definition line
-    dbg_links = {}    # "%struct.ap_fixed.1" -> metadata ID
-    metadata = {}     # metadata ID -> metadata text
+    structs = set()   # "%struct.ap_fixed.1" -> definition line
+    dbg_links = {}         # "%struct.ap_fixed.1" -> metadata ID
+    metadata = {}          # metadata ID -> metadata text
 
     with open(Path(path)) as f:
         for line in f:
+            c = line[0]
+
             # structs
-            m = STRUCT_RE.match(line)
-            if m:
-                structs[m.group(1)] = m.group(2)
+            if c == "%":
+                if m := STRUCT_RE.match(line):
+                    structs.add(m.group(1))
 
             # debug
-            m = DBG_RE.search(line)
-            if m:
-                llvm_type = m.group(1)
-                dbg_id = int(m.group(3))
-                dbg_links[llvm_type] = dbg_id
+            elif "llvm.dbg.declare" in line:
+                if m := DBG_RE.search(line):
+                    llvm_type = m.group(1)
+                    dbg_id = int(m.group(3))
+                    dbg_links[llvm_type] = dbg_id
 
             # metadata
-            m = META_RE.match(line)
-            if m:
-                metadata[int(m.group(1))] = m.group(2)
+            elif c == "!":
+                if m := META_RE.match(line):
+                    metadata[int(m.group(1))] = m.group(2)
 
-    if set(structs.keys()) != set(dbg_links.keys()):
+    if structs != set(dbg_links.keys()):
         raise RuntimeError(
             f"LLVM type declarations and usages do not match up in {path}:"
             f"{structs.keys()=}"
             f"{dbg_links.keys()=}"
         )
 
+    memo = {}
+    def find_base_type(line_num):
+        """
+        Recursively searches DWARF debug info (Clang compiler flag `-g`)
+        to find base type semantic of LLVM locally-defined type.
+        Returns None if not found.
+        """
+        if line_num in memo:
+            return memo[line_num]
+
+        line = metadata[line_num]
+
+        if m := TYPE_RE.search(line):
+            result = find_base_type(int(m.group(1)))
+        elif m := NAME_RE.search(line):
+            result = m.group(1)
+        else:
+            result = None
+
+        memo[line_num] = result
+        return result
+
     final_types = {}
     for k, v in dbg_links.items():
-        base_type = find_base_type(metadata, v)
+        base_type = find_base_type(v)
         if base_type:
             final_types[k] = base_type
         else:
@@ -104,49 +106,53 @@ def get_llvm_type_converter(path: str | Path) -> dict(str, str):
 
     return final_types
 
-ARRAY_RE = re.compile(
-    r"\[(\d+) x (.+)\]"
-)
 
-PTR_RE = re.compile(
-    r"(\*+)$"
-)
+def make_local_types_global(json_path: str | Path, ll_path: str | Path):
+    type_converter = _get_llvm_type_converter(ll_path)
 
-def make_local_types_global(json_path: str | Path, ll_path: str | Path, new_json_path: str | Path):
-    type_converter = get_llvm_type_converter(ll_path)
-    
     with open(json_path) as f:
         data = json.load(f)
-    G = json_graph.node_link_graph(data, edges="links")
-    
-    for node, data in list(G.nodes().data()):
-        typ = data['type']
-        txt = data['text']
-        if typ == 1 or typ == 2: # 1: Variable, 2: Constant
-            ptr_depth = 0
-            arr_length = 0
-            
-            ptr = PTR_RE.search(txt)
-            if ptr:
-                ptr_depth = len(ptr.group(1))
-                txt = txt.rstrip("*")
-                
-            arr = ARRAY_RE.match(txt)
-            if arr:
-                arr_length = int(arr.group(1))
-                txt = arr.group(2)
-            
-            new_txt = type_converter.get(txt, txt)
-            if arr_length > 0:
-                new_txt = f"[{arr_length} x {new_txt}]"
-            if ptr_depth > 0:
-                new_txt = new_txt + ("*" * ptr_depth)
-                
-            data['text'] = new_txt
 
-    data = json_graph.node_link_data(G, edges="links")
-    with open(new_json_path, 'w') as f:
-        json.dump(data, f)
+    for node in data["nodes"]:
+        if node["type"] not in (1, 2):
+            continue
+
+        txt = node["text"]
+
+        # Pointer parsing
+        ptr_depth = len(txt) - len(txt.rstrip("*"))
+        if ptr_depth:
+            txt = txt[:-ptr_depth]
+
+        # Nested array parsing
+        array_lengths = []
+        while txt.startswith("[") and txt.endswith("]"):
+            separator = txt.find(" x ", 1)
+            if separator == -1:
+                break
+
+            try:
+                length = int(txt[1:separator])
+            except ValueError:
+                break
+
+            array_lengths.append(length)
+            txt = txt[separator + 3:-1]
+
+        # Convert base type
+        new_txt = type_converter.get(txt, txt)
+
+        # Rebuild arrays from innermost to outermost
+        for length in reversed(array_lengths):
+            new_txt = f"[{length} x {new_txt}]"
+
+        if ptr_depth:
+            new_txt += "*" * ptr_depth
+
+        node["text"] = new_txt
+
+    with open(json_path, "w") as f:
+        json.dump(data, f, separators=(",", ":"))
 
 
 def vocab_scan(
@@ -154,17 +160,15 @@ def vocab_scan(
     kernel_subset: str | list[str] | None = None,
     max_archives: int | None = None,
     first_n: int | None = None,
-):
+) -> tuple(dict, int, dict):
     """
-    Walk graph_dir and collect vocabularies of instructions, variables, and constants.
+    Walk graph_dir and collect instruction vocabulary mappings,
+    max edge position for positional arguments, and vocab counts
+    for every type of node.
 
-    Returns vocab dict, max edge position, and per-token counts.
+    Returns instruction vocab mapping, max edge position, and vocab counts.
     """
-    vocab_sets = {
-        "instruction": set(),
-        "variable": set(),
-        "constant": set(),
-    }
+    instruction_set = set()
     vocab_counts = {
         "instruction": {},
         "variable": {},
@@ -173,9 +177,6 @@ def vocab_scan(
     max_pos = 0
 
     paths = list(iter_graph_paths(graph_dir, kernel_subset, max_archives, first_n))
-    i = 0
-    path_number = defaultdict(int)
-    credit = defaultdict(lambda: defaultdict(list))
     for _ks, graph_path in tqdm.tqdm(paths, desc="Parsing graph files for building vocab"):
         try:
             graph_data = load_graph_json(graph_path)
@@ -183,27 +184,15 @@ def vocab_scan(
             print(f"Error loading JSON: {graph_path}: {e}")
             continue
         nodes = graph_data.get("nodes") or []
-        i += 1
         for n in nodes:
             node_type = n.get("type", -1)
             term = n.get("text", "")
             if node_type == NODE_INSTRUCTION:
-                if term not in vocab_sets["instruction"]:
-                    credit[graph_path]["instruction"].append(term)
-                    path_number[graph_path] = i
-                vocab_sets["instruction"].add(term)
+                instruction_set.add(term)
                 vocab_counts["instruction"][term] = vocab_counts["instruction"].get(term, 0) + 1
             elif node_type == NODE_VARIABLE:
-                if term not in vocab_sets["variable"]:
-                    credit[graph_path]["variable"].append(term)
-                    path_number[graph_path] = i
-                vocab_sets["variable"].add(term)
                 vocab_counts["variable"][term] = vocab_counts["variable"].get(term, 0) + 1
             elif node_type == NODE_CONSTANT:
-                if term not in vocab_sets["constant"]:
-                    credit[graph_path]["constant"].append(term)
-                    path_number[graph_path] = i
-                vocab_sets["constant"].add(term)
                 vocab_counts["constant"][term] = vocab_counts["constant"].get(term, 0) + 1
 
         for link in graph_data.get("links") or []:
@@ -211,25 +200,16 @@ def vocab_scan(
             if position > max_pos:
                 max_pos = position
 
-    for graph_path, credit in credit.items():
-        print(f"Credit for {graph_path} (number {path_number[graph_path]})")
-        for k, v in credit.items():
-            print(f"  {k}: {v}")
-
-    vocab = {}
-    for k, v in vocab_sets.items():
-        vocab[k] = {"UNK": 0}
-        vocab[k].update({t: i + 1 for i, t in enumerate(sorted(v))})
-    return vocab, max_pos, vocab_counts, credit, path_number
+    instruction_vocab = {"UNK": 0}
+    instruction_vocab.update({t: i + 1 for i, t in enumerate(sorted(instruction_set))})
+    return instruction_vocab, max_pos, vocab_counts
 
 
-def save_vocab(vocab: dict, path: str | Path, max_pos: int | None = None, vocab_counts: dict | None = None) -> None:
+def save_vocab(vocab: dict, max_pos: int, path: str | Path, vocab_counts: dict | None = None) -> None:
     """Persist vocab mapping to JSON."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"vocab": vocab}
-    if max_pos is not None:
-        payload["max_pos"] = max_pos
+    payload = {"vocab": vocab, "max_pos": max_pos}
     if vocab_counts is not None:
         payload["vocab_counts"] = vocab_counts
     with path.open("w") as f:
@@ -240,4 +220,4 @@ def load_vocab(path: str | Path) -> tuple[dict, int, dict]:
     """Load vocab from JSON. Returns (vocab, max_pos, vocab_counts)."""
     with Path(path).open() as f:
         payload = json.load(f)
-    return payload["vocab"], payload.get("max_pos", 0), payload.get("vocab_counts", {})
+    return payload["vocab"], payload["max_pos"], payload.get("vocab_counts", {})
