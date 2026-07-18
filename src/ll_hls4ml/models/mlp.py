@@ -10,27 +10,60 @@ from torch_geometric.nn import (
 )
 
 from ll_hls4ml.io.schema import NODE_TYPES, LABEL_KEYS
+from ll_hls4ml.data.tensorize import EMBED_SIZE
+
+class MultilayerDense(nn.Module):
+    def __init__(self, in_dim, out_dim, n_layers):
+        super().__init__()
+        layers = []
+
+        dims = [in_dim] + [out_dim] * n_layers
+        for i in range(len(dims) - 1):
+            layers.append(nn.Linear(dims[i], dims[i+1]))
+            if i < len(dims) - 2:
+                layers.append(nn.ReLU())
+
+        self.net = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return self.net(x)
 
 class CDFGInputProjection(nn.Module):
     """
-    Embeds opcode vocab per node type and positional arg encoding for edges.
+    Embeds opcode vocab per node type and feature vectors for variable/constant nodes.
 
-    Node feature layout: [vocab_id]
+    Expected node feature layout:
+        instruction: LongTensor of shape (N, 1)
+        variable:    FloatTensor of shape (N, EMBED_SIZE)
+        constant:    FloatTensor of shape (N, EMBED_SIZE)
     """
 
     def __init__(
         self,
-        node_vocab_sizes: dict[str, int],
+        instruction_vocab_size: int,
+        variable_constant_size: int,
         hidden_dim: int,
+        n_layers: int,
     ):
         super().__init__()
-        self.node_emb = nn.ModuleDict({
-            nt: nn.Embedding(vocab_size, hidden_dim, padding_idx=0)
-            for nt, vocab_size in node_vocab_sizes.items()
-        })
+
+        self.instruction_emb = nn.Embedding(
+            instruction_vocab_size, hidden_dim, padding_idx=0
+        )
+        self.variable_emb = MultilayerDense(variable_constant_size, hidden_dim, n_layers)
+        self.constant_emb = MultilayerDense(variable_constant_size, hidden_dim, n_layers)
 
     def forward(self, x_dict):
-        h_dict = {nt: self.node_emb[nt](x[:, 0]) for nt, x in x_dict.items()}
+        h_dict = {}
+
+        # instruction: (N, 1) -> (N,)
+        instr = x_dict["instruction"]
+        h_dict["instruction"] = self.instruction_emb(instr.squeeze(-1))
+
+        # variable / constant: (N, D)
+        h_dict["variable"] = self.variable_emb(x_dict["variable"])
+        h_dict["constant"] = self.constant_emb(x_dict["constant"])
+
         return h_dict
 
 class MLP(nn.Module):
@@ -38,11 +71,12 @@ class MLP(nn.Module):
 
     def __init__(
         self,
-        node_vocab_sizes: dict[str, int],
+        instruction_vocab_size: int,
         y_means: torch.Tensor,
         y_stds: torch.Tensor,
         hidden_dim: int = 128,
         num_layers: int = 3,
+        num_var_embed_layers: int = 3,
         dropout: float = 0.1,
         pool: str = "mean",
         node_aggr: str = "concat",  # concat | sum | mean
@@ -51,7 +85,7 @@ class MLP(nn.Module):
 
         self.register_buffer("y_means", y_means.clone())
         self.register_buffer("y_stds", y_stds.clone())
-        self.node_vocab_sizes = node_vocab_sizes
+        self.instruction_vocab_size = instruction_vocab_size
 
         self.pool_fn = {
             "mean": global_mean_pool,
@@ -61,7 +95,7 @@ class MLP(nn.Module):
         self.node_aggr = node_aggr
         self.output_dim = len(LABEL_KEYS)
 
-        self.node_encoder = CDFGInputProjection(node_vocab_sizes, hidden_dim)
+        self.node_encoder = CDFGInputProjection(instruction_vocab_size, EMBED_SIZE, hidden_dim, num_var_embed_layers)
 
         layers = []
         for _ in range(num_layers - 1):
@@ -85,7 +119,7 @@ class MLP(nn.Module):
         )
 
     def forward(self, data: HeteroData):
-        x_dict = {nt: data[nt].x.long() for nt in NODE_TYPES}
+        x_dict = {nt: data[nt].x for nt in NODE_TYPES}
 
         # for nt, x in x_dict.items():
         #     ids = x[:, 0]
