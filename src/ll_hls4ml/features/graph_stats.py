@@ -5,6 +5,74 @@ from collections import Counter, deque
 import networkx as nx
 import numpy as np
 
+from ll_hls4ml.data.tensorize import (
+    ARRAY_LEN_OFF,
+    BITS_OFF,
+    FRAC_OFF,
+    IS_AC_OFF,
+    IS_AP_OFF,
+    PTR_DEPTH_OFF,
+    SIGNED_OFF,
+    type_embedding,
+)
+from ll_hls4ml.io.schema import NODE_CONSTANT, NODE_VARIABLE
+
+
+TYPE_FLAGS = {
+    "integer": 0,
+    "float": 1,
+    "double": 2,
+    "arb_int": 3,
+    "arb_fixed": 4,
+    "array": 5,
+    "pointer": 6,
+    "stream": 7,
+    "nnet_array": 8,
+    "unknown": 9,
+}
+
+
+def semantic_type_stats(nodes):
+    """Aggregate variable/constant type vectors into compact graph features."""
+    typed_nodes = [
+        n for n in nodes
+        if n.get("type") in (NODE_VARIABLE, NODE_CONSTANT)
+    ]
+    embeddings = (
+        np.stack([type_embedding(n.get("text", "")) for n in typed_nodes])
+        if typed_nodes
+        else np.empty((0, PTR_DEPTH_OFF + 1), dtype=np.float32)
+    )
+
+    stats = {
+        f"type_{name}_ratio": float(embeddings[:, index].mean()) if len(embeddings) else 0.0
+        for name, index in TYPE_FLAGS.items()
+    }
+    stats["type_ap_ratio"] = float(embeddings[:, IS_AP_OFF].mean()) if len(embeddings) else 0.0
+    stats["type_ac_ratio"] = float(embeddings[:, IS_AC_OFF].mean()) if len(embeddings) else 0.0
+
+    parsed_numeric = embeddings[:, BITS_OFF] > 0 if len(embeddings) else np.array([], dtype=bool)
+    fixed = embeddings[:, TYPE_FLAGS["arb_fixed"]] > 0 if len(embeddings) else np.array([], dtype=bool)
+    arrays = embeddings[:, TYPE_FLAGS["array"]] > 0 if len(embeddings) else np.array([], dtype=bool)
+    pointers = embeddings[:, TYPE_FLAGS["pointer"]] > 0 if len(embeddings) else np.array([], dtype=bool)
+
+    stats.update({
+        "type_bits_mean": float(embeddings[parsed_numeric, BITS_OFF].mean()) if parsed_numeric.any() else 0.0,
+        "type_bits_max": float(embeddings[parsed_numeric, BITS_OFF].max()) if parsed_numeric.any() else 0.0,
+        "type_signed_ratio": float(embeddings[parsed_numeric, SIGNED_OFF].mean()) if parsed_numeric.any() else 0.0,
+        "type_fractional_ratio_mean": float(embeddings[fixed, FRAC_OFF].mean()) if fixed.any() else 0.0,
+        "type_array_log_length_mean": float(embeddings[arrays, ARRAY_LEN_OFF].mean()) if arrays.any() else 0.0,
+        "type_pointer_depth_mean": float(embeddings[pointers, PTR_DEPTH_OFF].mean()) if pointers.any() else 0.0,
+    })
+
+    for node_type, name in [(NODE_VARIABLE, "variable"), (NODE_CONSTANT, "constant")]:
+        mask = np.array([n.get("type") == node_type for n in typed_nodes], dtype=bool)
+        stats[f"type_{name}_unknown_ratio"] = (
+            float(embeddings[mask, TYPE_FLAGS["unknown"]].mean()) if mask.any() else 0.0
+        )
+
+    return stats
+
 
 def dag_level_stats(G):
     in_deg = dict(G.in_degree())
@@ -40,15 +108,12 @@ def extract_graph_features(graph_data):
     num_edges = len(links)
 
     node_type_counts = Counter()
-    node_text_counts = Counter()
 
     for n in nodes:
         nid = n.get("id")
         G.add_node(nid)
         node_type = n.get("type", -1)
         node_type_counts[node_type] += 1
-        node_text = n.get("text", "")
-        node_text_counts[node_text] += 1
 
     num_instruction_nodes = node_type_counts[0]
     num_variable_nodes = node_type_counts[1]
@@ -155,13 +220,7 @@ def extract_graph_features(graph_data):
         "std_out_degree": std_out_degree,
     }
     features.update(geometry_features)
-
-    for term, count in node_text_counts.items():
-        features[f"op_{term}"] = count
-    if node_text_counts.get("load", 0) != 0 and node_text_counts.get("store", 0) != 0:
-        features["load_store_ratio"] = (
-            node_text_counts.get("load") / node_text_counts.get("store")
-        )
+    features.update(semantic_type_stats(nodes))
 
     labels = graph_data.get("labels", {})
     for k, v in labels.items():

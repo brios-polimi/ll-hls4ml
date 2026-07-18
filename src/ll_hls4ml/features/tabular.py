@@ -25,41 +25,57 @@ def build_feature_row(graph_path):
         return None
 
 
+def _iter_feature_rows(graph_paths, num_workers):
+    if num_workers == 1:
+        yield from map(build_feature_row, graph_paths)
+        return
+
+    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+        yield from executor.map(build_feature_row, graph_paths)
+
+
 def build_feature_dataframe(
     graph_dir,
     kernel_subset=None,
     max_archives=None,
+    first_n=None,
     num_workers=None,
 ):
     """
     Walk graph_dir and create a dataframe of graph features.
 
-    Returns a DataFrame with a ``kernel_type`` column per graph.
+    Returns a DataFrame with ``kernel_type``, ``archive``, ``graph_id``, and
+    ``graph_path`` metadata columns per graph. ``first_n`` limits graphs per
+    selected kernel and is intended for smoke runs.
     """
     graph_dir = Path(graph_dir)
     rows = []
 
-    paths = list(iter_graph_paths(graph_dir, kernel_subset, max_archives))
+    paths = list(iter_graph_paths(graph_dir, kernel_subset, max_archives, first_n))
     if not paths:
         return pd.DataFrame()
 
     if num_workers is None:
         num_workers = min(32, (os.cpu_count() or 1))
 
-    by_kernel: dict[str, list] = {}
+    by_kernel: dict[str, list[Path]] = {}
     for ks, path in paths:
         by_kernel.setdefault(ks, []).append(path)
 
     for ks, graph_paths in by_kernel.items():
-        with ProcessPoolExecutor(max_workers=num_workers) as executor:
-            for features in tqdm.tqdm(
-                executor.map(build_feature_row, graph_paths),
-                total=len(graph_paths),
-                desc=f"Parsing graph files for kernel subset '{ks}'",
-            ):
-                if features is None:
-                    continue
-                features["kernel_type"] = ks
-                rows.append(features)
+        results = _iter_feature_rows(graph_paths, num_workers)
+        for graph_path, features in tqdm.tqdm(
+            zip(graph_paths, results),
+            total=len(graph_paths),
+            desc=f"Parsing graph files for kernel subset '{ks}'",
+        ):
+            if features is None:
+                continue
+            features["kernel_type"] = ks
+            relative = graph_path.relative_to(graph_dir / ks if ks else graph_dir)
+            features["archive"] = relative.parts[0] if len(relative.parts) > 1 else ""
+            features["graph_id"] = relative.stem
+            features["graph_path"] = str(graph_path)
+            rows.append(features)
 
     return pd.DataFrame(rows)

@@ -5,9 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 import shutil
 import math
-import torch
 import tqdm
-from torch_geometric.data import HeteroData
 import re
 import numpy as np
 from functools import lru_cache
@@ -33,6 +31,8 @@ from functools import partial
 import os
 
 def _process_one(vocab: dict, inference_mode: bool, paths: tuple[Path, Path]) -> None:
+    import torch
+
     graph_path, out_path = paths
     out_path.parent.mkdir(parents=True, exist_ok=True)
     try:
@@ -90,6 +90,9 @@ def create_graph_tensors(
 
 
 def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: bool) -> HeteroData:
+    import torch
+    from torch_geometric.data import HeteroData
+
     data = HeteroData()
     inst_map = {}
     var_map = {}
@@ -131,13 +134,13 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             features["instruction"].append([text_idx])
             inst_map[node_id] = len(inst_map)
         elif node_type == NODE_VARIABLE:
-            type_emb = _type_embedding(node_text)
+            type_emb = type_embedding(node_text)
             if type_emb[TYPE_SIZE - 1]:
                 unknown_types.add(node_text)
             features["variable"].append(type_emb)
             var_map[node_id] = len(var_map)
         elif node_type == NODE_CONSTANT:
-            type_emb = _type_embedding(node_text)
+            type_emb = type_embedding(node_text)
             if type_emb[TYPE_SIZE - 1]:
                 unknown_types.add(node_text)
             features["constant"].append(type_emb)
@@ -316,18 +319,13 @@ EMBED_SIZE = sum([
 
 
 @lru_cache(maxsize=10000)
-def _type_embedding(type_str):
+def type_embedding(type_str):
     """
-    To be applied going from graph -> tensor 
-    
-    TODO:
-    BUILD THIS FOR A GIVEN LLVM AND THEN JUST USE IT AS A MAPPING FOR BUILDING THE TENSOR!!! DONT REBUILD EACH TYPE:
-    would collaboration between make_local_types_global and tensorize :(
-    Anon is funneled to unknown struct
-    PRINT LIST OF WHAT IS PUT TO UNKNOWN SO YOU CAN TELL  NO IMPORTAN TTYPES ARE GETTING THROUGH
-
     Embeds any LLVM, ap_types, or ac_types into a
-    vector with the following format:
+    vector with the given schema. Unknown/not parsed types are assigned
+    as a general "struct"
+
+    return np.array:
      type:          multi-hot (integer, float, double, arb_int, arb_fixed, arr, ptr, stream, nnet_array, struct)
      is_ap:         boolean
      is_ac:         boolean
@@ -338,7 +336,7 @@ def _type_embedding(type_str):
                              ac: TRN, RND, TRN_ZERO, RND_ZERO, RND_INF, RND_MIN_INF, RND_CONV, RND_CONV_ODD)
      overflow_m:    one-hot (ap: SAT, SAT_ZERO, SAT_SYM, WRAP, WRAP_SM 
                              ac: WRAP, SAT, SAT_ZERO, SAT_SYM) 
-     array_length:  float (log2 of array length: e.g. [16 x %class.ac_fixed] -> 4.0)
+     array_length:  float (log2 of array length: e.g. [16 x %class.ac_fixed] -> 4.0) (accumulates length additively)
      ptr_depth:     integer (*** -> 3)
     """
 
