@@ -7,7 +7,14 @@ from torch_geometric.data import HeteroData
 from torch_geometric.nn import HeteroConv, GATv2Conv, SAGEConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
 
-from ll_hls4ml.io.schema import EDGE_TYPES, EDGE_TYPES_WITH_ATTR, NODE_TYPES, LABEL_KEYS, ALL_EDGE_TYPES
+from ll_hls4ml.io.schema import (
+    ALL_EDGE_TYPES,
+    EDGE_TYPES,
+    EDGE_TYPES_WITH_ATTR,
+    LABEL_KEYS,
+    NODE_TYPES,
+    PRAGMA_VOCAB,
+)
 
 
 class CDFGInputProjection(nn.Module):
@@ -91,6 +98,8 @@ class CDFGRGCN(nn.Module):
         self.pool = pool
         self.output_dim = len(LABEL_KEYS)
 
+        node_vocab_sizes = dict(node_vocab_sizes)
+        node_vocab_sizes.setdefault("pragma", len(PRAGMA_VOCAB))
         self.input_proj = CDFGInputProjection(
             node_vocab_sizes, edge_pos_vocab_size, hidden_dim
         )
@@ -134,7 +143,10 @@ class CDFGRGCN(nn.Module):
         }[self.pool]
 
         pooled = torch.cat(
-            [pool_fn(h_dict[nt], data[nt].batch) for nt in NODE_TYPES],
+            [
+                pool_fn(h_dict[nt], data[nt].batch, size=data.num_graphs)
+                for nt in NODE_TYPES
+            ],
             dim=-1,
         )
         return self.classifier(pooled)

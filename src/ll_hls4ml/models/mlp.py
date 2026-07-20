@@ -9,7 +9,7 @@ from torch_geometric.nn import (
     global_mean_pool,
 )
 
-from ll_hls4ml.io.schema import NODE_TYPES, LABEL_KEYS
+from ll_hls4ml.io.schema import LABEL_KEYS, NODE_TYPES, PRAGMA_VOCAB
 from ll_hls4ml.data.tensorize import EMBED_SIZE
 
 class MultilayerDense(nn.Module):
@@ -36,6 +36,7 @@ class CDFGInputProjection(nn.Module):
         instruction: LongTensor of shape (N, 1)
         variable:    FloatTensor of shape (N, EMBED_SIZE)
         constant:    FloatTensor of shape (N, EMBED_SIZE)
+        pragma:      LongTensor of shape (N, 1)
     """
 
     def __init__(
@@ -52,6 +53,7 @@ class CDFGInputProjection(nn.Module):
         )
         self.variable_emb = MultilayerDense(variable_constant_size, hidden_dim, n_layers)
         self.constant_emb = MultilayerDense(variable_constant_size, hidden_dim, n_layers)
+        self.pragma_emb = nn.Embedding(len(PRAGMA_VOCAB), hidden_dim, padding_idx=0)
 
     def forward(self, x_dict):
         h_dict = {}
@@ -63,6 +65,7 @@ class CDFGInputProjection(nn.Module):
         # variable / constant: (N, D)
         h_dict["variable"] = self.variable_emb(x_dict["variable"])
         h_dict["constant"] = self.constant_emb(x_dict["constant"])
+        h_dict["pragma"] = self.pragma_emb(x_dict["pragma"].squeeze(-1))
 
         return h_dict
 
@@ -136,7 +139,9 @@ class MLP(nn.Module):
         pooled = []
         for nt in NODE_TYPES:
             h = self.mlp(h_dict[nt])
-            pooled.append(self.pool_fn(h, data[nt].batch))
+            pooled.append(
+                self.pool_fn(h, data[nt].batch, size=data.num_graphs)
+            )
 
         if self.node_aggr == "concat":
             graph_emb = torch.cat(pooled, dim=-1)
