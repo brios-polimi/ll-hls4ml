@@ -6,11 +6,14 @@ from ll_hls4ml.io.schema import (
     FLOW_CALL,
     FLOW_CONTROL,
     FLOW_DATA,
+    FLOW_PRAGMA,
     LABEL_KEYS,
     NODE_CONSTANT,
     NODE_INSTRUCTION,
+    NODE_PRAGMA,
     NODE_TYPES,
     NODE_VARIABLE,
+    PRAGMA_VOCAB,
     safe_int,
 )
 
@@ -22,10 +25,13 @@ __all__ = [
     "FLOW_CALL",
     "FLOW_CONTROL",
     "FLOW_DATA",
+    "FLOW_PRAGMA",
     "LABEL_KEYS",
     "NODE_CONSTANT",
     "NODE_INSTRUCTION",
+    "NODE_PRAGMA",
     "NODE_TYPES",
     "NODE_VARIABLE",
+    "PRAGMA_VOCAB",
     "safe_int",
 ]

@@ -12,6 +12,7 @@ build/
 artifacts/checkpoints/*.pt
 artifacts/vocab/*.json
 .test_artifacts/*
+notebooks/vitis_llvm_ir/*
 
 # Local env
 .venv/

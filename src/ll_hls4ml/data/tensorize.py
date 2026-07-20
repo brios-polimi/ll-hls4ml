@@ -17,9 +17,12 @@ from ll_hls4ml.io.schema import (
     FLOW_CALL,
     FLOW_CONTROL,
     FLOW_DATA,
+    FLOW_PRAGMA,
     NODE_CONSTANT,
     NODE_INSTRUCTION,
+    NODE_PRAGMA,
     NODE_VARIABLE,
+    PRAGMA_VOCAB,
     EDGE_TYPES,
     EDGE_TYPES_WITH_ATTR,
     LABEL_KEYS,
@@ -97,6 +100,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
     inst_map = {}
     var_map = {}
     const_map = {}
+    pragma_map = {}
     node_type_map: dict[int, int] = {}
 
     unknown_types = set()
@@ -105,6 +109,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         "instruction": [],
         "variable": [],
         "constant": [],
+        "pragma": [],
     }
     nodes = graph_data.get("nodes") or []
     for n in nodes:
@@ -145,12 +150,16 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
                 unknown_types.add(node_text)
             features["constant"].append(type_emb)
             const_map[node_id] = len(const_map)
+        elif node_type == NODE_PRAGMA:
+            features["pragma"].append([PRAGMA_VOCAB.get(node_text, 0)])
+            pragma_map[node_id] = len(pragma_map)
         else:
             raise ValueError(f"Invalid node type: {node_type} in node {n}")
 
     data["instruction"].x = torch.tensor(features["instruction"], dtype=torch.long)
     data["variable"].x    = torch.from_numpy(np.stack(features["variable"]))
     data["constant"].x    = torch.from_numpy(np.stack(features["constant"]))
+    data["pragma"].x      = torch.tensor(features["pragma"], dtype=torch.long).reshape(-1, 1)
 
 
     edge_index = { k: [] for k in EDGE_TYPES }
@@ -160,7 +169,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         flow = safe_int(edge.get("flow", -1))
         source = safe_int(edge.get("source", -1))
         target = safe_int(edge.get("target", -1))
-        if source < 0 or source >= len(nodes) or target < 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL]:
+        if source < 0 or source >= len(nodes) or target < 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL, FLOW_PRAGMA]:
             raise ValueError(f"Invalid edge with invalid source/target/flow: {edge}")
             
         position = safe_int(edge.get("position", 0))
@@ -192,6 +201,19 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             local_idx_source = inst_map.get(source)
             local_idx_target = inst_map.get(target)
             edge_index[("instruction", "call", "instruction")].append([local_idx_source, local_idx_target])
+        elif flow == FLOW_PRAGMA:
+            local_idx_source = pragma_map.get(source)
+            target_type = node_type_map[target]
+            if target_type == NODE_INSTRUCTION:
+                local_idx_target = inst_map.get(target)
+                edge_index[("pragma", "applies_to", "instruction")].append(
+                    [local_idx_source, local_idx_target]
+                )
+            elif target_type == NODE_VARIABLE:
+                local_idx_target = var_map.get(target)
+                edge_index[("pragma", "applies_to", "variable")].append(
+                    [local_idx_source, local_idx_target]
+                )
 
         if local_idx_source is None or local_idx_target is None:
             raise ValueError(
@@ -200,8 +222,11 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             )
 
     for et, v in edge_index.items():
-        if v:
-            data[et].edge_index = torch.tensor(v, dtype=torch.long).t().contiguous()
+        data[et].edge_index = (
+            torch.tensor(v, dtype=torch.long).t().contiguous()
+            if v
+            else torch.empty((2, 0), dtype=torch.long)
+        )
 
     for et, v in edge_attrs.items():
         if v:

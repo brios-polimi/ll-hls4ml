@@ -9,7 +9,12 @@ import tqdm
 
 from ll_hls4ml.io.discovery import iter_graph_paths
 from ll_hls4ml.io.load_json import load_graph_json
-from ll_hls4ml.io.schema import NODE_CONSTANT, NODE_INSTRUCTION, NODE_VARIABLE
+from ll_hls4ml.io.schema import (
+    NODE_CONSTANT,
+    NODE_INSTRUCTION,
+    NODE_PRAGMA,
+    NODE_VARIABLE,
+)
 
 import re
 
@@ -173,6 +178,7 @@ def vocab_scan(
         "instruction": {},
         "variable": {},
         "constant": {},
+        "pragma": {},
     }
     max_pos = 0
 
@@ -194,6 +200,8 @@ def vocab_scan(
                 vocab_counts["variable"][term] = vocab_counts["variable"].get(term, 0) + 1
             elif node_type == NODE_CONSTANT:
                 vocab_counts["constant"][term] = vocab_counts["constant"].get(term, 0) + 1
+            elif node_type == NODE_PRAGMA:
+                vocab_counts["pragma"][term] = vocab_counts["pragma"].get(term, 0) + 1
 
         for link in graph_data.get("links") or []:
             position = link.get("position", 0)
