@@ -185,6 +185,37 @@ class TrainingSmokeTests(unittest.TestCase):
             self.assertTrue((result_dir / "figures" / "test__rpe.png").is_file())
             self.assertTrue((result_dir / "figures" / "test__scatter.png").is_file())
 
+            ddp_config = json.loads(config_path.read_text())
+            ddp_config.update(
+                {
+                    "experiment_name": "cli_ddp_smoke",
+                    "batch_size": 2,
+                    "epochs": 2,
+                }
+            )
+            config_path.write_text(json.dumps(ddp_config))
+            ddp_environment = environment.copy()
+            ddp_environment["CUDA_VISIBLE_DEVICES"] = ""
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "torch.distributed.run",
+                    "--standalone",
+                    "--nproc_per_node=2",
+                    str(repository / "scripts" / "train.py"),
+                    "--config",
+                    str(config_path),
+                ],
+                check=True,
+                cwd=repository,
+                env=ddp_environment,
+                timeout=60,
+            )
+            self.assertTrue(
+                (root / "results" / "cli_ddp_smoke" / "summary.json").is_file()
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -160,8 +160,9 @@ def validate_one_epoch(
     if distributed and not is_main_process():
         return 0.0, None, None, None, None
 
-    model.eval()
     base_model = unwrap_model(model)
+    evaluation_model = base_model if distributed else model
+    evaluation_model.eval()
     all_preds, all_targets = [], []
     loss_sum = 0.0
     num_samples = 0
@@ -176,7 +177,7 @@ def validate_one_epoch(
                 base_model.y_stds,
             )
 
-            pred = model(batch)
+            pred = evaluation_model(batch)
             loss = criterion(pred, target)
 
             all_preds.append(pred)

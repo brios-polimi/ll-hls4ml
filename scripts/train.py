@@ -118,8 +118,8 @@ def _split_manifest(dataset, splits: dict[str, object], tensor_dir: Path) -> dic
 
 
 def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
-    model.eval()
     base_model = unwrap_model(model)
+    base_model.eval()
     predictions = []
     targets = []
     if device.type == "cuda":
@@ -129,7 +129,7 @@ def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
         for batch in loader:
             batch = batch.to(device)
             prediction = denormalize_target(
-                model(batch),
+                base_model(batch),
                 base_model.y_means,
                 base_model.y_stds,
             )
