@@ -14,6 +14,11 @@ from ll_hls4ml.io.schema import (
     NODE_TYPES,
     NODE_VARIABLE,
     PRAGMA_VOCAB,
+    PRAGMA_ARGUMENT_SIZE,
+    PRAGMA_FEATURE_SIZE,
+    PRAGMA_SCHEMA_VERSION,
+    PRAGMA_VOCAB_SIZE,
+    pragma_directive_id,
     safe_int,
 )
 
@@ -33,5 +38,10 @@ __all__ = [
     "NODE_TYPES",
     "NODE_VARIABLE",
     "PRAGMA_VOCAB",
+    "PRAGMA_ARGUMENT_SIZE",
+    "PRAGMA_FEATURE_SIZE",
+    "PRAGMA_SCHEMA_VERSION",
+    "PRAGMA_VOCAB_SIZE",
+    "pragma_directive_id",
     "safe_int",
 ]

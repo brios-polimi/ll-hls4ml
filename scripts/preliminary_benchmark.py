@@ -34,7 +34,14 @@ sys.path.insert(0, str(_REPO_ROOT / "src"))
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.io.load_json import load_graph_json
-from ll_hls4ml.io.schema import EDGE_TYPES, LABEL_KEYS, NODE_PRAGMA, NODE_TYPES, PRAGMA_VOCAB
+from ll_hls4ml.io.schema import (
+    EDGE_TYPES,
+    LABEL_KEYS,
+    NODE_PRAGMA,
+    NODE_TYPES,
+    PRAGMA_VOCAB,
+    PRAGMA_VOCAB_SIZE,
+)
 from ll_hls4ml.models.registry import build
 from ll_hls4ml.training.distributed import unwrap_model
 from ll_hls4ml.training.loaders import make_loader
@@ -178,8 +185,10 @@ def _tensor_features(data, instruction_vocab_size: int) -> dict[str, float]:
     for index, count in enumerate(instruction_histogram):
         features[f"instruction_id_{index}_ratio"] = count / instruction_denominator
 
-    pragma = data["pragma"].x.view(-1).numpy()
-    pragma_histogram = np.bincount(pragma, minlength=len(PRAGMA_VOCAB))[:len(PRAGMA_VOCAB)]
+    pragma = data["pragma"].x[:, 0].long().numpy()
+    pragma_histogram = np.bincount(
+        pragma, minlength=PRAGMA_VOCAB_SIZE
+    )[:PRAGMA_VOCAB_SIZE]
     pragma_denominator = max(len(pragma), 1)
     for index, count in enumerate(pragma_histogram):
         features[f"pragma_id_{index}_ratio"] = count / pragma_denominator

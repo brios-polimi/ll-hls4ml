@@ -28,7 +28,17 @@ class TrainingSmokeTests(unittest.TestCase):
                 {"id": 0, "type": 0, "text": "add"},
                 {"id": 1, "type": 1, "text": "ap_fixed<16, 6, AP_TRN, AP_WRAP>"},
                 {"id": 2, "type": 2, "text": "i32"},
-                {"id": 3, "type": 3, "text": "pragma.pipeline"},
+                {
+                    "id": 3,
+                    "type": 3,
+                    "text": "pragma.pipeline",
+                    "features": {
+                        "schema_version": ["2"],
+                        "arguments_json": [
+                            json.dumps({"ii": ["2"], "rewind": ["true"]})
+                        ],
+                    },
+                },
             ],
             "links": [
                 {"source": 0, "target": 0, "flow": 0, "position": 0},
@@ -166,9 +176,14 @@ class TrainingSmokeTests(unittest.TestCase):
                 cwd=repository,
                 env=environment,
             )
-            result = json.loads((root / "results" / "cli_smoke.json").read_text())
+            result_dir = root / "results" / "cli_smoke"
+            result = json.loads((result_dir / "summary.json").read_text())
             self.assertEqual(result["sizes"], {"train": 6, "validation": 1, "test": 1})
-            self.assertIn("r2", result["test_metrics"])
+            self.assertTrue((result_dir / "metrics.csv").is_file())
+            self.assertTrue((result_dir / "predictions.csv").is_file())
+            self.assertTrue((result_dir / "split_manifest.json").is_file())
+            self.assertTrue((result_dir / "figures" / "test__rpe.png").is_file())
+            self.assertTrue((result_dir / "figures" / "test__scatter.png").is_file())
 
 
 if __name__ == "__main__":

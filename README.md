@@ -46,6 +46,11 @@ python scripts/build_tensors.py
 python scripts/train.py --config configs/train.example.json
 ```
 
+Each training run writes a self-contained bundle under
+`results_dir/experiment_name/`: resolved config, exact split manifest,
+checkpoints reference, metrics and predictions CSVs, summary JSON, report, and
+validation/test RPE and scatter figures.
+
 Notebooks are intentionally thin clients, not the source of truth for training
 logic. See [docs/RESEARCH_ROADMAP.md](docs/RESEARCH_ROADMAP.md).
 

@@ -12,7 +12,8 @@ from ll_hls4ml.io.schema import (
     EDGE_TYPES_WITH_ATTR,
     LABEL_KEYS,
     NODE_TYPES,
-    PRAGMA_VOCAB,
+    PRAGMA_ARGUMENT_SIZE,
+    PRAGMA_VOCAB_SIZE,
 )
 from ll_hls4ml.data.tensorize import EMBED_SIZE
 
@@ -41,8 +42,9 @@ class CDFGInputProjection(nn.Module):
             instruction_vocab_size, hidden_dim, padding_idx=0
         )
         self.pragma_emb = nn.Embedding(
-            len(PRAGMA_VOCAB), hidden_dim, padding_idx=0
+            PRAGMA_VOCAB_SIZE, hidden_dim, padding_idx=0
         )
+        self.pragma_arg_proj = _dense_projection(PRAGMA_ARGUMENT_SIZE, hidden_dim)
         self.variable_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.constant_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.edge_pos_emb = nn.Embedding(edge_pos_vocab_size + 1, hidden_dim)
@@ -52,7 +54,10 @@ class CDFGInputProjection(nn.Module):
             "instruction": self.instruction_emb(x_dict["instruction"][:, 0].long()),
             "variable": self.variable_proj(x_dict["variable"].float()),
             "constant": self.constant_proj(x_dict["constant"].float()),
-            "pragma": self.pragma_emb(x_dict["pragma"][:, 0].long()),
+            "pragma": (
+                self.pragma_emb(x_dict["pragma"][:, 0].long())
+                + self.pragma_arg_proj(x_dict["pragma"][:, 1:].float())
+            ),
         }
         edge_emb_dict = {
             et: self.edge_pos_emb(attr[:, 0])

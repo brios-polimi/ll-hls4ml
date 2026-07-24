@@ -5,6 +5,8 @@ from __future__ import annotations
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache, partial
+import json
+import math
 import os
 from pathlib import Path
 import re
@@ -25,11 +27,94 @@ from ll_hls4ml.io.schema import (
     NODE_PRAGMA,
     NODE_VARIABLE,
     LABEL_KEYS,
-    PRAGMA_VOCAB,
+    PRAGMA_ARGUMENT_SIZE,
+    PRAGMA_ARGUMENT_DIRECTIVES,
+    PRAGMA_CATEGORICAL_ARGUMENTS,
+    PRAGMA_FEATURE_SIZE,
+    PRAGMA_NUMERIC_ARGUMENTS,
+    PRAGMA_SCHEMA_VERSION,
+    PRAGMA_TARGET_ARGUMENTS,
+    pragma_directive_id,
     safe_int,
 )
 from ll_hls4ml.io.discovery import iter_graph_paths
 from ll_hls4ml.io.load_json import load_graph_json
+
+
+def _single_feature(node: dict, name: str) -> str:
+    values = node.get("features", {}).get(name)
+    if not isinstance(values, list) or len(values) != 1:
+        raise ValueError(
+            f"Pragma node {node.get('id')} requires one features.{name} value"
+        )
+    return str(values[0])
+
+
+def _scaled_number(value: str) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(number):
+        return None
+    return math.copysign(math.log1p(abs(number)), number)
+
+
+def pragma_embedding(node: dict) -> np.ndarray:
+    """Encode the explicit, inspectable v2 pragma feature schema."""
+
+    version = int(_single_feature(node, "schema_version"))
+    if version != PRAGMA_SCHEMA_VERSION:
+        raise ValueError(
+            f"Unsupported pragma schema version {version}; "
+            f"expected {PRAGMA_SCHEMA_VERSION}"
+        )
+    try:
+        arguments = json.loads(_single_feature(node, "arguments_json"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Invalid pragma arguments_json on node {node.get('id')}") from exc
+    if not isinstance(arguments, dict):
+        raise ValueError(f"Pragma arguments_json must be an object on node {node.get('id')}")
+
+    embedding = np.zeros(PRAGMA_FEATURE_SIZE, dtype=np.float32)
+    embedding[0] = pragma_directive_id(node["text"])
+    if node["text"] not in PRAGMA_ARGUMENT_DIRECTIVES:
+        return embedding
+
+    numeric_offset = 1
+    numeric_mask_offset = numeric_offset + len(PRAGMA_NUMERIC_ARGUMENTS)
+    categorical_offset = numeric_mask_offset + len(PRAGMA_NUMERIC_ARGUMENTS)
+    numeric_indices = {
+        name: index for index, name in enumerate(PRAGMA_NUMERIC_ARGUMENTS)
+    }
+    categorical_indices = {
+        token: index for index, token in enumerate(PRAGMA_CATEGORICAL_ARGUMENTS)
+    }
+
+    for raw_key, raw_values in arguments.items():
+        key = str(raw_key)
+        if not isinstance(raw_values, list):
+            raise ValueError(
+                f"Pragma argument {key!r} must contain a list on node {node.get('id')}"
+            )
+        if key in PRAGMA_TARGET_ARGUMENTS:
+            # Targets are represented structurally by FLOW_PRAGMA edges.
+            continue
+        for raw_value in raw_values:
+            value = str(raw_value)
+            number = _scaled_number(value)
+            numeric_index = numeric_indices.get(key)
+            if number is not None and numeric_index is not None:
+                embedding[numeric_offset + numeric_index] = number
+                embedding[numeric_mask_offset + numeric_index] = 1.0
+                continue
+            categorical_index = categorical_indices.get((key, value.lower()))
+            if categorical_index is not None:
+                embedding[categorical_offset + categorical_index] = 1.0
+
+    if embedding.shape != (1 + PRAGMA_ARGUMENT_SIZE,):
+        raise AssertionError("Pragma feature schema size is inconsistent")
+    return embedding
 
 
 def _process_one(
@@ -194,7 +279,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             features["constant"].append(type_emb)
             const_map[node_id] = len(const_map)
         elif node_type == NODE_PRAGMA:
-            features["pragma"].append([PRAGMA_VOCAB.get(node_text, 0)])
+            features["pragma"].append(pragma_embedding(n))
             pragma_map[node_id] = len(pragma_map)
         else:
             raise ValueError(f"Invalid node type: {node_type} in node {n}")
@@ -213,8 +298,11 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         else np.empty((0, EMBED_SIZE), dtype=np.float32)
     )
     data["pragma"].x = torch.tensor(
-        features["pragma"], dtype=torch.long
-    ).reshape(-1, 1)
+        np.stack(features["pragma"])
+        if features["pragma"]
+        else np.empty((0, PRAGMA_FEATURE_SIZE), dtype=np.float32),
+        dtype=torch.float,
+    )
 
 
     edge_index = { k: [] for k in EDGE_TYPES }
