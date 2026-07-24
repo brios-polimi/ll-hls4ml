@@ -10,6 +10,9 @@ build/
 
 # Artifacts (keep directory structure via .gitkeep)
 artifacts/checkpoints/*.pt
+artifacts/exports/
+artifacts/results/
+artifacts/runs/
 artifacts/vocab/*.json
 .test_artifacts/*
 notebooks/vitis_llvm_ir/*

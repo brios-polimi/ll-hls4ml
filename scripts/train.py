@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Torchrun entry point for R-GCN training."""
+"""Config-driven training entry point for portable local/Colab/Kaggle runs."""
 
 from __future__ import annotations
 
@@ -15,131 +15,166 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
-from ll_hls4ml.data.splits import random_train_val_split
+from ll_hls4ml.data.splits import random_train_val_test_split
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.models.registry import build
-from ll_hls4ml.training import make_loader
-from ll_hls4ml.training.distributed import cleanup_ddp, is_main_process, setup_from_env
-from ll_hls4ml.training.loops import _json_converter, fit, _persist_on_cpu, validate_one_epoch
+from ll_hls4ml.training import compute_target_z_stats, make_loader
+from ll_hls4ml.training.distributed import (
+    cleanup_ddp,
+    is_main_process,
+    setup_from_env,
+    unwrap_model,
+)
+from ll_hls4ml.training.loops import _json_converter, fit, validate_one_epoch
+
+
+def _config_path(value: str, config_dir: Path) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else (config_dir / path).resolve()
+
+
+def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
+    y_means, y_stds = compute_target_z_stats(train_ds)
+    common = {
+        "instruction_vocab_size": vocab_size,
+        "y_means": y_means,
+        "y_stds": y_stds,
+        "hidden_dim": config.get("hidden_dim", 128),
+        "num_layers": config.get("num_layers", 3),
+        "dropout": config.get("dropout", 0.1),
+        "pool": config.get("pool", "mean"),
+    }
+    model_name = config.get("model", "rgcn")
+    if model_name == "rgcn":
+        common["edge_pos_vocab_size"] = max_pos
+        common["aggr"] = config.get("aggr", "mean")
+    elif model_name == "mlp":
+        common["num_var_embed_layers"] = config.get("num_var_embed_layers", 2)
+        common["node_aggr"] = config.get("node_aggr", "concat")
+    return build(model_name, **common)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="R-GCN distributed training")
+    parser = argparse.ArgumentParser(description="Train an HLS surrogate model")
     parser.add_argument("--config", required=True, help="Path to JSON training config")
     args = parser.parse_args()
 
-    with open(args.config) as f:
-        config = json.load(f)
+    config_file = Path(args.config).resolve()
+    with config_file.open() as handle:
+        config = json.load(handle)
+    config_dir = config_file.parent
 
     _rank, world_size, local_rank = setup_from_env()
     distributed = world_size > 1
-    main = is_main_process()
+    main_process = is_main_process()
 
     seed = config.get("seed", 42)
     torch.manual_seed(seed)
-
-    use_cuda = torch.cuda.is_available() and torch.cuda.device_count() > 0
-    if distributed and use_cuda:
-        device = torch.device(f"cuda:{local_rank}")
-    elif use_cuda:
-        device = torch.device("cuda")
+    if torch.cuda.is_available():
+        device = torch.device(f"cuda:{local_rank}" if distributed else "cuda")
     else:
         device = torch.device("cpu")
 
-    max_per_kernel_type = config["max_per_kernel_type"]
-    kernel_types = list[str](max_per_kernel_type.keys())
-
-    tensor_dir = Path(config["tensor_dir"])
-    vocab, max_pos, _ = load_vocab(tensor_dir / "vocab.json")
-    vocab_sizes = {k: len(v) for k, v in vocab.items()}
-
-    val_frac = config.get("val_frac", 0.2)
-    test_frac = config.get("test_frac", 0.1)
-    ds = HeteroGraphDataset(tensor_dir, types=kernel_types, max_per_type=max_per_kernel_type, silent=(not main))
-    train_val_ds, test_ds = random_train_val_split(ds, val_fraction=test_frac, seed=seed)
-    train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=val_frac, seed=seed)
-
-    batch_size = config["batch_size"]
-    train_loader = make_loader(train_ds, batch_size=batch_size, shuffle=True)
-    val_loader = make_loader(val_ds, batch_size=batch_size, shuffle=False)
-    test_loader = make_loader(test_ds, batch_size=batch_size, shuffle=False)
-
-    model = build(
-        "rgcn",
-        node_vocab_sizes=vocab_sizes,
-        edge_pos_vocab_size=max_pos,
-        hidden_dim=config["hidden_dim"],
-        num_layers=config["num_layers"],
-        dropout=config["dropout"],
+    tensor_dir = _config_path(config["tensor_dir"], config_dir)
+    vocab_path = _config_path(
+        config.get("vocab_path", str(tensor_dir / "vocab.json")),
+        config_dir,
     )
+    vocab, max_pos, _counts = load_vocab(vocab_path)
 
-    load_model_path = config.get("load_model_path", None)
-    if load_model_path:
-        state_dict = torch.load(load_model_path)
-        model.load_state_dict(state_dict)
-        if main:
-            print(f"Loaded model from {load_model_path}")
-
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.get("lr", 1e-3))
-    criterion = nn.HuberLoss(reduction="mean", delta=1.0)
-
-    checkpoint_dir = Path(config["checkpoint_dir"])
-    results_dir = Path(config.get("results_dir", checkpoint_dir.parent))
-
-    try:
-        model, y_means, y_stds, training_history, best_val_loss, best_epoch = fit(
-            model, train_loader, val_loader,
-            epochs=config["epochs"],
-            criterion=criterion,
-            optimizer=optimizer,
-            device=device,
-            patience=config.get("patience", 50),
-            evaluation_metric=config.get("evaluation_metric", "val_loss"),
-            mode=config.get("mode", "min"),
-            restore_best_weights=config.get("restore_best_weights", True),
-            verbose=config.get("verbose", 2),
-            experiment_name=config.get("experiment_name", "fit"),
-            checkpoint_dir=checkpoint_dir,
-            distributed=distributed
+    max_per_type = config.get("max_per_kernel_type")
+    kernel_types = list(max_per_type) if max_per_type else config.get("kernel_types")
+    dataset = HeteroGraphDataset(
+        tensor_dir,
+        types=kernel_types,
+        max_per_type=max_per_type,
+        silent=not main_process,
+    )
+    train_ds, val_ds, test_ds = random_train_val_test_split(
+        dataset,
+        val_fraction=config.get("val_fraction", 0.15),
+        test_fraction=config.get("test_fraction", 0.15),
+        seed=seed,
+    )
+    if not train_ds or not val_ds or not test_ds:
+        raise ValueError(
+            "Train/validation/test split is empty; increase the dataset or fractions"
         )
 
-        if main:
-            print("Evaluating on test set...")
-            test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
-                model, test_loader, criterion, device, y_means, y_stds
-            )
+    batch_size = config.get("batch_size", 4)
+    num_workers = config.get("num_workers")
+    train_loader = make_loader(
+        train_ds,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        distributed=distributed,
+    )
+    val_loader = make_loader(
+        val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+    )
+    test_loader = make_loader(
+        test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+    )
 
-            training_history = _persist_on_cpu(
-                {
-                    **training_history,
-                    "y_means": y_means,
-                    "y_stds": y_stds,
-                    "best_val_loss": best_val_loss,
-                    "best_epoch": best_epoch,
-                    "test_loss": test_loss,
-                    "test_preds": test_preds,
-                    "test_targets": test_targets,
-                }
-            )
+    model = _model_from_config(config, len(vocab), max_pos, train_ds)
+    optimizer = torch.optim.AdamW(
+        model.parameters(),
+        lr=config.get("learning_rate", 1e-3),
+        weight_decay=config.get("weight_decay", 0.0),
+    )
+    criterion = nn.HuberLoss(delta=config.get("huber_delta", 1.0))
 
-            th_path = results_dir / f"training_histories.json"
-            with open(th_path, "w") as f:
-                json.dump(training_history, f, default=_json_converter)
+    checkpoint_dir = _config_path(
+        config.get("checkpoint_dir", "../artifacts/checkpoints"),
+        config_dir,
+    )
+    results_dir = _config_path(
+        config.get("results_dir", "../artifacts/results"),
+        config_dir,
+    )
+    experiment_name = config.get("experiment_name", "baseline")
 
-            print(
-                f"Test loss: {test_loss:.4f}, "
-                f"Best validation loss: {best_val_loss:.4f}, "
-                f"Inductive-Transductive gap: {(test_loss - best_val_loss):.4f}"
-            )
+    try:
+        model = fit(
+            model,
+            train_loader,
+            val_loader,
+            epochs=config.get("epochs", 200),
+            criterion=criterion,
+            optimizer=optimizer,
+            scheduler=None,
+            device=device,
+            patience=config.get("patience", 30),
+            mode="min",
+            restore_best_weights=True,
+            verbose=config.get("verbose", 5),
+            experiment_name=experiment_name,
+            checkpoint_dir=checkpoint_dir,
+            distributed=distributed,
+        )
 
+        if main_process:
+            test_metrics = validate_one_epoch(model, test_loader, criterion, device)
+            base_model = unwrap_model(model)
+            results_dir.mkdir(parents=True, exist_ok=True)
+            result = {
+                "config": config,
+                "sizes": {
+                    "train": len(train_ds),
+                    "validation": len(val_ds),
+                    "test": len(test_ds),
+                },
+                "target_log_mean": base_model.y_means.detach().cpu(),
+                "target_log_std": base_model.y_stds.detach().cpu(),
+                "test_metrics": test_metrics,
+            }
+            output = results_dir / f"{experiment_name}.json"
+            with output.open("w") as handle:
+                json.dump(result, handle, indent=2, default=_json_converter)
+            print(f"Wrote results to {output}")
     finally:
         cleanup_ddp()
-
-    if is_main_process() and training_history:
-        combined_path = results_dir / "training_histories.json"
-        with open(combined_path, "w") as f:
-            json.dump(training_history, f, default=_json_converter)
-        print(f"Wrote combined training histories to {combined_path}")
 
 
 if __name__ == "__main__":

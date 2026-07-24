@@ -25,7 +25,7 @@ def main():
         kernel_subset=args.kernels,
         max_archives=args.max_archives,
     )
-    save_vocab(vocab, cfg.vocab_path, max_pos=max_pos)
+    save_vocab(vocab, max_pos, cfg.vocab_path, vocab_counts=_counts)
     print(f"Saved vocab to {cfg.vocab_path} (max_pos={max_pos})")
 
 

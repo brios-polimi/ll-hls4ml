@@ -2,12 +2,18 @@
 
 from __future__ import annotations
 
-import orjson
+import json
 from pathlib import Path
 from typing import Any
+
+try:
+    import orjson
+except ImportError:  # Optional acceleration; stdlib JSON keeps fresh installs usable.
+    orjson = None
 
 
 def load_graph_json(path: str | Path) -> dict[str, Any]:
     path = Path(path)
     with path.open("rb") as f:
-        return orjson.loads(f.read())
+        payload = f.read()
+    return orjson.loads(payload) if orjson is not None else json.loads(payload)

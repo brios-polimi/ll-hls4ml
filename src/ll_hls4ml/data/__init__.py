@@ -1,13 +1,13 @@
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.data.splits import random_train_val_test_split
 from ll_hls4ml.data.tensorize import create_graph_tensors
-from ll_hls4ml.data.vocab import save_vocab, vocab_scan
+from ll_hls4ml.data.vocab import load_vocab, save_vocab, vocab_scan
 
 __all__ = [
     "HeteroGraphDataset",
-    "compute_target_stats",
     "create_graph_tensors",
-    "random_train_val_split",
+    "load_vocab",
+    "random_train_val_test_split",
     "save_vocab",
     "vocab_scan",
 ]

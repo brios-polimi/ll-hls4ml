@@ -1,6 +1,8 @@
 """PyG DataLoader helpers."""
 
 import os
+from pathlib import Path
+import tempfile
 
 from torch.utils.data.distributed import DistributedSampler
 from torch_geometric.loader import DataLoader as PyGDataLoader
@@ -8,6 +10,12 @@ from torch_geometric.loader import DataLoader as PyGDataLoader
 
 def _default_num_workers(distributed: bool) -> int:
     if distributed or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+        return 0
+    # Python 3.14 uses a forkserver on POSIX. Unix-domain sockets cannot be
+    # created in WSL's Windows-mounted temp directories, so worker startup
+    # fails before the first batch. Users can still override this explicitly
+    # after pointing TMPDIR at a native Linux path.
+    if Path(tempfile.gettempdir()).as_posix().startswith("/mnt/"):
         return 0
     cpu_cores = os.cpu_count() or 2
     return max(2, min(4, cpu_cores))

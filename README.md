@@ -19,6 +19,12 @@ Each JSON graph has `nodes`, `links`, and `labels` (LUT, FF, DSP, cycles, etc.).
 pip install -e .
 ```
 
+For EDA notebooks:
+
+```bash
+pip install -e '.[notebooks]'
+```
+
 Override data location:
 
 ```bash
@@ -27,17 +33,21 @@ export LL_HLS4ML_DATA_ROOT=/path/to/data
 
 ## Workflow
 
-1. **EDA** — `notebooks/01_eda_tabular.ipynb`: handcrafted graph features, PCA/t-SNE
-2. **Preprocess** — `notebooks/02_preprocess_tensors.ipynb`: vocab scan, JSON → `.pt` tensors
-3. **Train** — `notebooks/03_train_rgcn.ipynb`: heterogeneous R-GCN experiments
+1. **Inspect** — use notebooks for plots, examples, and result interpretation.
+2. **Preprocess** — build versioned vocabularies and JSON → `.pt` tensors with scripts.
+3. **Train** — run config-driven experiments with scripts so Colab, Kaggle, and
+   local runs use the same code path.
 
 Batch scripts (optional):
 
 ```bash
 python scripts/build_vocab.py
 python scripts/build_tensors.py
-python scripts/train.py
+python scripts/train.py --config configs/train.example.json
 ```
+
+Notebooks are intentionally thin clients, not the source of truth for training
+logic. See [docs/RESEARCH_ROADMAP.md](docs/RESEARCH_ROADMAP.md).
 
 ## Package structure
 

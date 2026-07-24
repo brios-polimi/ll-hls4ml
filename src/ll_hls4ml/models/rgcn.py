@@ -4,43 +4,60 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.data import HeteroData
-from torch_geometric.nn import HeteroConv, GATv2Conv, SAGEConv
+from torch_geometric.nn import GATv2Conv, HeteroConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
 
 from ll_hls4ml.io.schema import (
-    ALL_EDGE_TYPES,
     EDGE_TYPES,
     EDGE_TYPES_WITH_ATTR,
     LABEL_KEYS,
     NODE_TYPES,
     PRAGMA_VOCAB,
 )
+from ll_hls4ml.data.tensorize import EMBED_SIZE
+
+
+def _dense_projection(in_dim: int, hidden_dim: int) -> nn.Sequential:
+    return nn.Sequential(
+        nn.Linear(in_dim, hidden_dim),
+        nn.ReLU(),
+        nn.Linear(hidden_dim, hidden_dim),
+    )
 
 
 class CDFGInputProjection(nn.Module):
     """
-    Embeds opcode vocab per node type and positional arg encoding for edges.
-
-    Node feature layout: [vocab_id]
-    Edge attr layout:    [arg_position]
+    Embed categorical instruction/pragma nodes and project numeric type features.
     """
 
     def __init__(
         self,
-        node_vocab_sizes: dict[str, int],
+        instruction_vocab_size: int,
         edge_pos_vocab_size: int,
         hidden_dim: int,
     ):
         super().__init__()
-        self.node_emb = nn.ModuleDict({
-            nt: nn.Embedding(vocab_size, hidden_dim, padding_idx=0)
-            for nt, vocab_size in node_vocab_sizes.items()
-        })
+        self.instruction_emb = nn.Embedding(
+            instruction_vocab_size, hidden_dim, padding_idx=0
+        )
+        self.pragma_emb = nn.Embedding(
+            len(PRAGMA_VOCAB), hidden_dim, padding_idx=0
+        )
+        self.variable_proj = _dense_projection(EMBED_SIZE, hidden_dim)
+        self.constant_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.edge_pos_emb = nn.Embedding(edge_pos_vocab_size + 1, hidden_dim)
 
     def forward(self, x_dict, edge_attr_dict):
-        h_dict = {nt: self.node_emb[nt](x[:, 0]) for nt, x in x_dict.items()}
-        edge_emb_dict = {et: self.edge_pos_emb(attr[:, 0]) for et, attr in edge_attr_dict.items()}
+        h_dict = {
+            "instruction": self.instruction_emb(x_dict["instruction"][:, 0].long()),
+            "variable": self.variable_proj(x_dict["variable"].float()),
+            "constant": self.constant_proj(x_dict["constant"].float()),
+            "pragma": self.pragma_emb(x_dict["pragma"][:, 0].long()),
+        }
+        edge_emb_dict = {
+            et: self.edge_pos_emb(attr[:, 0])
+            for et, attr in edge_attr_dict.items()
+        }
         return h_dict, edge_emb_dict
 
 
@@ -55,7 +72,7 @@ class CDFGConvLayer(nn.Module):
                     in_channels=(hidden_dim, hidden_dim),
                     out_channels=hidden_dim,
                     heads=4,
-                    concat=False,          
+                    concat=False,
                     edge_dim=hidden_dim if et in EDGE_TYPES_WITH_ATTR else None,
                     add_self_loops=False,
                     aggr=aggr,
@@ -80,17 +97,22 @@ class CDFGRGCN(nn.Module):
 
     def __init__(
         self,
-        node_vocab_sizes: dict[str, int],
         edge_pos_vocab_size: int,
         y_means: torch.Tensor,
         y_stds: torch.Tensor,
+        instruction_vocab_size: int | None = None,
         hidden_dim: int = 128,
         num_layers: int = 3,
         dropout: float = 0.1,
         pool: str = "mean",
         aggr: str = "mean",
+        node_vocab_sizes: dict[str, int] | None = None,
     ):
         super().__init__()
+        if instruction_vocab_size is None:
+            if not node_vocab_sizes or "instruction" not in node_vocab_sizes:
+                raise ValueError("instruction_vocab_size is required")
+            instruction_vocab_size = node_vocab_sizes["instruction"]
         self.register_buffer("y_means", y_means.clone())
         self.register_buffer("y_stds", y_stds.clone())
         self.hidden_dim = hidden_dim
@@ -98,10 +120,8 @@ class CDFGRGCN(nn.Module):
         self.pool = pool
         self.output_dim = len(LABEL_KEYS)
 
-        node_vocab_sizes = dict(node_vocab_sizes)
-        node_vocab_sizes.setdefault("pragma", len(PRAGMA_VOCAB))
         self.input_proj = CDFGInputProjection(
-            node_vocab_sizes, edge_pos_vocab_size, hidden_dim
+            instruction_vocab_size, edge_pos_vocab_size, hidden_dim
         )
         self.layers = nn.ModuleList([
             CDFGConvLayer(hidden_dim, aggr=aggr) for _ in range(num_layers)
@@ -115,7 +135,7 @@ class CDFGRGCN(nn.Module):
         )
 
     def forward(self, data: HeteroData):
-        x_dict = {nt: data[nt].x.long() for nt in NODE_TYPES}
+        x_dict = {nt: data[nt].x for nt in NODE_TYPES}
         edge_index_dict = {et: data[et].edge_index for et in EDGE_TYPES}
         edge_attr_dict = {
             et: data[et].edge_attr.long()
@@ -138,7 +158,7 @@ class CDFGRGCN(nn.Module):
 
         pool_fn = {
             "mean": global_mean_pool,
-            "sum": global_add_pool, ########################## REPRESENTATION BLOWS UP
+            "sum": global_add_pool,
             "max": global_max_pool,
         }[self.pool]
 

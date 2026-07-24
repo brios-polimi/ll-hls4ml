@@ -47,7 +47,6 @@ class Config:
     data_root: Path
     graph_dir: Path
     tensor_dir: Path
-    target_label: str
     vocab_path: Path
     checkpoint_dir: Path
     exports_dir: Path
@@ -65,7 +64,6 @@ class Config:
             data_root=data_root,
             graph_dir=graph_dir,
             tensor_dir=tensor_dir,
-            target_label=raw.get("target_label", "lut"),
             vocab_path=vocab_path,
             checkpoint_dir=checkpoint_dir,
             exports_dir=exports_dir,

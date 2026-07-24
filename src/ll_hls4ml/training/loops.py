@@ -2,21 +2,24 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import copy
 import gc
+import json
 import os
-import sys
+from pathlib import Path
+
+import numpy as np
 import torch
 import torch.distributed as dist
-import json
-import numpy as np
-from collections import defaultdict
 from torch.utils.data.distributed import DistributedSampler
 from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
-from ll_hls4ml.training.targets import normalize_target, wahls4ml_metrics
+from ll_hls4ml.training.targets import (
+    compute_target_z_stats,
+    normalize_target,
+    wahls4ml_metrics,
+)
 from ll_hls4ml.training.loaders import make_loader
 from ll_hls4ml.training.distributed import (
     is_distributed,
@@ -55,6 +58,8 @@ def _persist_on_cpu(value):
 
 
 def _json_converter(obj):
+    if isinstance(obj, torch.Tensor):
+        return obj.detach().cpu().tolist()
     if isinstance(obj, np.ndarray):
         return obj.tolist()
     if isinstance(obj, dict):
@@ -88,11 +93,7 @@ def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module
     if len(template.param_groups) == 1:
         kwargs = {k: v for k, v in template.param_groups[0].items() if k != "params"}
         return cls(params, **kwargs)
-    param_groups = [
-        {"params": list(params), **{k: v for k, v in group.items() if k != "params"}}
-        for group in template.param_groups
-    ]
-    return cls(param_groups)
+    raise ValueError("Leave-family-out training currently requires one optimizer group")
 
 
 def _save_checkpoint(epoch, model, optimizer, scheduler, path):
@@ -114,13 +115,18 @@ def train_one_epoch(
     distributed: bool = False,
 ):
     model.train()
+    base_model = unwrap_model(model)
     loss_sum = 0.0
     num_samples = 0
-    num_targets = len(model.y_means)
+    num_targets = len(base_model.y_means)
 
     for batch in train_loader:
         batch = batch.to(device)
-        target = normalize_target(batch.y.view(-1, num_targets), model.y_means, model.y_stds)
+        target = normalize_target(
+            batch.y.view(-1, num_targets),
+            base_model.y_means,
+            base_model.y_stds,
+        )
 
         optimizer.zero_grad(set_to_none=True)
         pred = model(batch)
@@ -155,15 +161,20 @@ def validate_one_epoch(
         return 0.0, None, None, None, None
 
     model.eval()
+    base_model = unwrap_model(model)
     all_preds, all_targets = [], []
     loss_sum = 0.0
     num_samples = 0
-    num_targets = len(model.y_means)
+    num_targets = len(base_model.y_means)
 
     with torch.no_grad():
         for batch in val_loader:
             batch = batch.to(device)
-            target = normalize_target(batch.y.view(-1, num_targets), model.y_means, model.y_stds)
+            target = normalize_target(
+                batch.y.view(-1, num_targets),
+                base_model.y_means,
+                base_model.y_stds,
+            )
 
             pred = model(batch)
             loss = criterion(pred, target)
@@ -184,8 +195,10 @@ def validate_one_epoch(
     # print(model.y_means, model.y_stds, "\n", preds, "\n", targets)
     # print(preds.std(dim=0))
 
-    metrics = wahls4ml_metrics(preds, targets, model.y_means, model.y_stds)
-    metrics.update({"loss" : loss_sum / num_samples if num_samples else 0.0})
+    metrics = wahls4ml_metrics(
+        preds, targets, base_model.y_means, base_model.y_stds
+    )
+    metrics["loss"] = loss_sum / num_samples if num_samples else 0.0
     return metrics
 
 
@@ -211,8 +224,8 @@ def fit(
     """
     Train model with optional early stopping.
 
-    Checkpoints are saved to ``checkpoint_dir / {experiment_name}_model.pt``.
-  """
+    Checkpoints are saved under ``checkpoint_dir`` using ``experiment_name``.
+    """
     distributed = distributed or is_distributed()
     main = is_main_process()
 
@@ -223,10 +236,11 @@ def fit(
     backup_path = checkpoint_dir / f"{experiment_name}_backup.pt"
 
     if resume_from_backup:
-        checkpoint = torch.load(resume_from_backup)
+        checkpoint = torch.load(resume_from_backup, map_location=device, weights_only=True)
         model.load_state_dict(checkpoint["model"])
         optimizer.load_state_dict(checkpoint["optimizer"])
-        scheduler.load_state_dict(checkpoint["scheduler"])
+        if scheduler is not None and checkpoint["scheduler"] is not None:
+            scheduler.load_state_dict(checkpoint["scheduler"])
         start_epoch = checkpoint["epoch"] + 1
     else:
         start_epoch = 1
@@ -257,12 +271,12 @@ def fit(
 
         log_epoch = main and (epoch == 1 or (verbose > 0 and epoch % verbose == 0))
         pbar = None
-        if _use_progress_bar(): ### used to have log_epoch and 
+        if _use_progress_bar():
             pbar = tqdm(
                 total=len(train_loader) + len(val_loader),
                 desc=f"Epoch {epoch:3d}/{epochs}",
                 unit="batch",
-                leave=log_epoch, #### used to be True/False
+                leave=log_epoch,
             )
 
         train_loss = train_one_epoch(
@@ -307,7 +321,7 @@ def fit(
                 best_metric = current_metric
                 best_epoch = epoch
                 patience_counter = 0
-                _save_checkpoint(epoch, model, optimizer, scheduler, ckpt_path)                
+                _save_checkpoint(epoch, model, optimizer, scheduler, ckpt_path)
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
@@ -400,8 +414,7 @@ def transductive_vs_inductive_fit(
     use_cuda = device_type.startswith("cuda") and torch.cuda.is_available()
 
     training_histories = {}
-    # reverse order
-    for kernel_type in ["dense_latency", "dense_resource"]: # was kernel_types, hardcode for training
+    for kernel_type in kernel_types:
         model = None
         loop_optimizer = None
         train_loader = val_loader = test_loader = None
@@ -425,7 +438,11 @@ def transductive_vs_inductive_fit(
                 max_per_type=max_per_kernel_type[kernel_type],
             )
 
-            train_ds, val_ds = random_train_val_split(train_val_ds, val_fraction=0.2)
+            train_ds, val_ds, _unused_test = random_train_val_test_split(
+                train_val_ds,
+                val_fraction=0.2,
+                test_fraction=0.0,
+            )
 
             train_loader = make_loader(
                 train_ds, batch_size=batch_size, shuffle=True, distributed=distributed,
@@ -446,42 +463,40 @@ def transductive_vs_inductive_fit(
                 )
 
             model = copy.deepcopy(original_model).to(device)
+            y_means, y_stds = compute_target_z_stats(train_ds)
+            model.y_means.copy_(y_means)
+            model.y_stds.copy_(y_stds)
             loop_optimizer = _optimizer_for_model(optimizer, model)
-            model, y_means, y_stds, training_history, best_val_loss, best_epoch = fit(
-                model,
-                train_loader,
-                val_loader,
-                epochs,
-                criterion,
-                loop_optimizer,
-                device,
-                patience,
-                evaluation_metric,
-                mode,
-                restore_best_weights,
-                writer,
-                verbose,
-                experiment_name + f"_{kernel_type}",
-                checkpoint_dir,
+            model = fit(
+                model=model,
+                train_loader=train_loader,
+                val_loader=val_loader,
+                epochs=epochs,
+                criterion=criterion,
+                optimizer=loop_optimizer,
+                scheduler=None,
+                device=device,
+                patience=patience,
+                mode=mode,
+                restore_best_weights=restore_best_weights,
+                writer=writer,
+                verbose=verbose,
+                experiment_name=experiment_name + f"_{kernel_type}",
+                checkpoint_dir=checkpoint_dir,
                 distributed=distributed,
             )
 
             if main:
                 print("Evaluating on test set...")
-                test_loss, test_preds, test_targets, _, _ = validate_one_epoch(
-                    model, test_loader, criterion, device, y_means, y_stds
+                test_metrics = validate_one_epoch(
+                    model, test_loader, criterion, device
                 )
 
                 training_histories[kernel_type] = _persist_on_cpu(
                     {
-                        **training_history,
                         "y_means": y_means,
                         "y_stds": y_stds,
-                        "best_val_loss": best_val_loss,
-                        "best_epoch": best_epoch,
-                        "test_loss": test_loss,
-                        "test_preds": test_preds,
-                        "test_targets": test_targets,
+                        "test_metrics": test_metrics,
                     }
                 )
 
@@ -489,11 +504,7 @@ def transductive_vs_inductive_fit(
                 with open(th_path, "w") as f:
                     json.dump(training_histories[kernel_type], f, default=_json_converter)
 
-                print(
-                    f"Test loss: {test_loss:.4f}, "
-                    f"Best validation loss: {best_val_loss:.4f}, "
-                    f"Inductive-Transductive gap: {(test_loss - best_val_loss):.4f}"
-                )
+                print(f"Test loss: {test_metrics['loss']:.4f}")
         finally:
             _release_cuda_memory(
                 model,

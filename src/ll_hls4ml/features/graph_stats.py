@@ -15,7 +15,7 @@ from ll_hls4ml.data.tensorize import (
     SIGNED_OFF,
     type_embedding,
 )
-from ll_hls4ml.io.schema import NODE_CONSTANT, NODE_VARIABLE
+from ll_hls4ml.io.schema import NODE_CONSTANT, NODE_PRAGMA, NODE_VARIABLE
 
 
 TYPE_FLAGS = {
@@ -28,7 +28,8 @@ TYPE_FLAGS = {
     "pointer": 6,
     "stream": 7,
     "nnet_array": 8,
-    "unknown": 9,
+    "shift_reg": 9,
+    "unknown": 10,
 }
 
 
@@ -118,10 +119,12 @@ def extract_graph_features(graph_data):
     num_instruction_nodes = node_type_counts[0]
     num_variable_nodes = node_type_counts[1]
     num_constant_nodes = node_type_counts[2]
+    num_pragma_nodes = node_type_counts[NODE_PRAGMA]
 
     instruction_ratio = num_instruction_nodes / num_nodes if num_nodes > 0 else 0.0
     variable_ratio = num_variable_nodes / num_nodes if num_nodes > 0 else 0.0
     constant_ratio = num_constant_nodes / num_nodes if num_nodes > 0 else 0.0
+    pragma_ratio = num_pragma_nodes / num_nodes if num_nodes > 0 else 0.0
 
     flow_counts = Counter()
     in_degree = Counter()
@@ -133,6 +136,8 @@ def extract_graph_features(graph_data):
         ("variable", "data", "instruction"),
         ("constant", "data", "instruction"),
         ("instruction", "call", "instruction"),
+        ("pragma", "applies_to", "instruction"),
+        ("pragma", "applies_to", "variable"),
     ]
 
     for e in links:
@@ -166,6 +171,13 @@ def extract_graph_features(graph_data):
             if source_type == 0 and target_type == 0:
                 flow_counts[flow_types[4]] += 1
                 known_edge_type = True
+        elif flow == 3:
+            if source_type == NODE_PRAGMA and target_type == 0:
+                flow_counts[flow_types[5]] += 1
+                known_edge_type = True
+            elif source_type == NODE_PRAGMA and target_type == NODE_VARIABLE:
+                flow_counts[flow_types[6]] += 1
+                known_edge_type = True
 
         if not known_edge_type:
             raise ValueError(
@@ -178,12 +190,16 @@ def extract_graph_features(graph_data):
     num_var_data_inst_edges = flow_counts[flow_types[2]]
     num_const_data_inst_edges = flow_counts[flow_types[3]]
     num_inst_call_inst_edges = flow_counts[flow_types[4]]
+    num_pragma_inst_edges = flow_counts[flow_types[5]]
+    num_pragma_var_edges = flow_counts[flow_types[6]]
 
     inst_control_inst_ratio = num_inst_control_inst_edges / num_edges if num_edges > 0 else 0.0
     inst_data_var_ratio = num_inst_data_var_edges / num_edges if num_edges > 0 else 0.0
     var_data_inst_ratio = num_var_data_inst_edges / num_edges if num_edges > 0 else 0.0
     const_data_inst_ratio = num_const_data_inst_edges / num_edges if num_edges > 0 else 0.0
     inst_call_inst_ratio = num_inst_call_inst_edges / num_edges if num_edges > 0 else 0.0
+    pragma_inst_ratio = num_pragma_inst_edges / num_edges if num_edges > 0 else 0.0
+    pragma_var_ratio = num_pragma_var_edges / num_edges if num_edges > 0 else 0.0
 
     density = num_edges / (num_nodes * (num_nodes - 1)) if num_nodes > 1 else 0.0
     condensed = nx.condensation(G)
@@ -207,11 +223,14 @@ def extract_graph_features(graph_data):
         "instruction_ratio": instruction_ratio,
         "variable_ratio": variable_ratio,
         "constant_ratio": constant_ratio,
+        "pragma_ratio": pragma_ratio,
         "inst_control_inst_ratio": inst_control_inst_ratio,
         "inst_data_var_ratio": inst_data_var_ratio,
         "var_data_inst_ratio": var_data_inst_ratio,
         "const_data_inst_ratio": const_data_inst_ratio,
         "inst_call_inst_ratio": inst_call_inst_ratio,
+        "pragma_inst_ratio": pragma_inst_ratio,
+        "pragma_var_ratio": pragma_var_ratio,
         "mean_in_degree": mean_in_degree,
         "max_in_degree": max_in_degree,
         "std_in_degree": std_in_degree,

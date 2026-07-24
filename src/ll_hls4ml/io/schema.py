@@ -23,6 +23,20 @@ PRAGMA_VOCAB = {
     "pragma.interface": 7,
     "pragma.pipeline": 8,
     "pragma.unroll": 9,
+    "pragma.dependence": 10,
+    "pragma.latency": 11,
+    "pragma.loop_flatten": 12,
+    "pragma.loop_merge": 13,
+    "pragma.loop_tripcount": 14,
+    "pragma.occurrence": 15,
+    "pragma.protocol": 16,
+    "pragma.reset": 17,
+    "pragma.resource": 18,
+    "pragma.stable": 19,
+    "pragma.stream": 20,
+    "pragma.bind_op": 21,
+    "pragma.bind_storage": 22,
+    "pragma.reqd_pipe_depth": 23,
 }
 
 EDGE_TYPES = [

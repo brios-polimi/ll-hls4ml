@@ -15,6 +15,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from ll_hls4ml.data.vocab import load_vocab
+from ll_hls4ml.io.schema import LABEL_KEYS
 from ll_hls4ml.models.registry import build
 from ll_hls4ml.training.distributed import cleanup_ddp, is_main_process, setup_from_env
 from ll_hls4ml.training.loops import _json_converter, transductive_vs_inductive_fit
@@ -44,12 +45,12 @@ def main() -> None:
 
     tensor_dir = Path(config["tensor_dir"])
     vocab, max_pos, _ = load_vocab(tensor_dir / "vocab.json")
-    vocab_sizes = {k: len(v) for k, v in vocab.items()}
-
     model = build(
         "rgcn",
-        node_vocab_sizes=vocab_sizes,
+        instruction_vocab_size=len(vocab),
         edge_pos_vocab_size=max_pos,
+        y_means=torch.zeros(len(LABEL_KEYS)),
+        y_stds=torch.ones(len(LABEL_KEYS)),
         hidden_dim=config["hidden_dim"],
         num_layers=config["num_layers"],
         dropout=config["dropout"],

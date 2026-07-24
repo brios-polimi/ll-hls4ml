@@ -5,7 +5,7 @@ from matplotlib.ticker import SymmetricalLogLocator
 import torch
 import numpy as np
 
-from ll_hls4ml.training.targets import denormalize_target
+from ll_hls4ml.training.targets import denormalize_target, relative_percentage_error
 from ll_hls4ml.io.schema import LABEL_KEYS
 
 
@@ -69,10 +69,12 @@ def plot_predictions_vs_targets(
 
 
 def rpe_box_plots(
-    predictions: torch.ndarray | torch.Tensor,
+    predictions: np.ndarray | torch.Tensor,
     targets: np.ndarray | torch.Tensor,
     labels: list[str],
-    ordering: list[str] = None,
+    ordering: list[str] | None = None,
+    title: str = "Relative prediction errors",
+    show: bool = True,
 ):
     """
     Box plots of the relative prediction error (RPE) for each label
@@ -83,8 +85,10 @@ def rpe_box_plots(
         predictions = predictions.cpu().numpy()
     if isinstance(targets, torch.Tensor):
         targets = targets.cpu().numpy()
-        
-    rpe = (targets - predictions) / (targets + 1.0) * 100
+    rpe = relative_percentage_error(
+        torch.from_numpy(np.array(predictions, copy=True)),
+        torch.from_numpy(np.array(targets, copy=True)),
+    ).numpy()
 
     fig, axes = plt.subplots(
         1, len(labels),
@@ -98,7 +102,15 @@ def rpe_box_plots(
     for (ax, label) in zip(axes, plot_ordering):
         i = labels.index(label)
 
-        ax.boxplot(rpe[:, i], widths=box_width)
+        box = ax.boxplot(
+            rpe[:, i],
+            widths=box_width,
+            patch_artist=True,
+            showfliers=True,
+            flierprops={"markersize": 2, "alpha": 0.35},
+        )
+        box["boxes"][0].set_facecolor(f"C{i % 10}")
+        box["boxes"][0].set_alpha(0.45)
 
         median_line = ax.hlines(
             np.median(rpe[:, i]),
@@ -128,8 +140,8 @@ def rpe_box_plots(
         
         ax.set_xticks([])
 
-    axes[0].set_ylabel("Relative Percent Error")
-    fig.suptitle("GNN Prediction Errors on Test Set")
+    axes[0].set_ylabel("Relative percentage error (%)")
+    fig.suptitle(title)
 
     fig.legend(
         handles=[median_line, mean_line],
@@ -139,8 +151,50 @@ def rpe_box_plots(
         bbox_to_anchor=(0.9, 1.0)
     )
 
-    #plt.tight_layout(rect=[0, 0, 0.9, 0.95])
     plt.tight_layout()
-    plt.show()
+    if show:
+        plt.show()
+    return fig, axes
 
-        
+
+def prediction_scatter_plots(
+    predictions: np.ndarray | torch.Tensor,
+    targets: np.ndarray | torch.Tensor,
+    labels: list[str],
+    title: str = "Predictions versus synthesized targets",
+    show: bool = True,
+):
+    """Paper-style per-target scatter plots with logarithmic axes."""
+    if isinstance(predictions, torch.Tensor):
+        predictions = predictions.detach().cpu().numpy()
+    if isinstance(targets, torch.Tensor):
+        targets = targets.detach().cpu().numpy()
+
+    n_columns = 3
+    n_rows = int(np.ceil(len(labels) / n_columns))
+    fig, axes = plt.subplots(
+        n_rows,
+        n_columns,
+        figsize=(4.2 * n_columns, 3.7 * n_rows),
+        squeeze=False,
+    )
+    for index, (ax, label) in enumerate(zip(axes.flat, labels)):
+        target = np.clip(targets[:, index], 0, None) + 1.0
+        prediction = np.clip(predictions[:, index], 0, None) + 1.0
+        lower = min(float(target.min()), float(prediction.min()))
+        upper = max(float(target.max()), float(prediction.max()))
+        ax.scatter(target, prediction, s=14, alpha=0.55)
+        ax.plot([lower, upper], [lower, upper], color="red", linewidth=1)
+        ax.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlabel("Synthesized")
+        ax.set_ylabel("Predicted")
+        ax.set_title(label)
+        ax.grid(True, which="major", linestyle=":", alpha=0.45)
+    for ax in axes.flat[len(labels):]:
+        ax.set_visible(False)
+    fig.suptitle(title)
+    fig.tight_layout()
+    if show:
+        plt.show()
+    return fig, axes

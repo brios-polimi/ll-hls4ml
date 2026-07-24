@@ -8,19 +8,31 @@ dependencies = [
     "torch",
     "torch-geometric",
     "numpy",
+    "tqdm",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+analysis = [
     "pandas",
     "networkx",
     "scikit-learn",
     "matplotlib",
     "seaborn",
-    "tqdm",
-    "pyyaml",
     "scipy",
-    "ipywidgets",
 ]
-
-[project.optional-dependencies]
-dev = ["ipython", "jupyter"]
+notebooks = [
+    "ipython",
+    "jupyter",
+    "ipywidgets",
+    "pandas",
+    "networkx",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "scipy",
+]
+dev = ["pytest"]
 
 [build-system]
 requires = ["setuptools>=61"]
