@@ -69,7 +69,12 @@ class CDFGInputProjection(nn.Module):
 class CDFGConvLayer(nn.Module):
     """One heterogeneous message-passing step over all edge types."""
 
-    def __init__(self, hidden_dim: int, aggr: str = "mean"):
+    def __init__(
+        self,
+        hidden_dim: int,
+        aggr: str = "mean",
+        dropout: float = 0.0,
+    ):
         super().__init__()
         self.conv = HeteroConv(
             {
@@ -86,15 +91,22 @@ class CDFGConvLayer(nn.Module):
             },
             aggr="mean",
         )
-        self.norm = nn.ModuleDict({nt: nn.LayerNorm(hidden_dim) for nt in NODE_TYPES})
+        self.dropout = nn.Dropout(dropout)
+        self.norm = nn.ModuleDict(
+            {nt: nn.LayerNorm(hidden_dim) for nt in NODE_TYPES}
+        )
 
     def forward(self, h_dict, edge_index_dict, edge_emb_dict):
         h = {nt: h_dict[nt] for nt in NODE_TYPES}
         out = self.conv(h, edge_index_dict, edge_attr_dict=edge_emb_dict)
+        updated = {}
         for nt in NODE_TYPES:
-            if nt not in out:
-                out[nt] = h_dict[nt]
-        return {nt: self.norm[nt](F.relu(h_out)) for nt, h_out in out.items()}
+            if nt in out:
+                message = self.dropout(F.relu(out[nt]))
+                updated[nt] = self.norm[nt](h_dict[nt] + message)
+            else:
+                updated[nt] = self.norm[nt](h_dict[nt])
+        return updated
 
 
 class CDFGRGCN(nn.Module):
@@ -129,11 +141,15 @@ class CDFGRGCN(nn.Module):
             instruction_vocab_size, edge_pos_vocab_size, hidden_dim
         )
         self.layers = nn.ModuleList([
-            CDFGConvLayer(hidden_dim, aggr=aggr) for _ in range(num_layers)
+            CDFGConvLayer(hidden_dim, aggr=aggr, dropout=dropout)
+            for _ in range(num_layers)
         ])
-        self.dropout = nn.Dropout(dropout)
+        graph_stats_dim = len(NODE_TYPES)
         self.classifier = nn.Sequential(
-            nn.Linear(hidden_dim * len(NODE_TYPES), hidden_dim),
+            nn.Linear(
+                hidden_dim * len(NODE_TYPES) + graph_stats_dim,
+                hidden_dim,
+            ),
             nn.ReLU(),
             nn.Dropout(dropout),
             nn.Linear(hidden_dim, self.output_dim),
@@ -156,10 +172,8 @@ class CDFGRGCN(nn.Module):
 
         h_dict, edge_emb_dict = self.input_proj(x_dict, edge_attr_dict)
 
-        for i, layer in enumerate(self.layers):
+        for layer in self.layers:
             h_dict = layer(h_dict, edge_index_dict, edge_emb_dict)
-            if i < len(self.layers) - 1:
-                h_dict = {nt: self.dropout(h) for nt, h in h_dict.items()}
 
         pool_fn = {
             "mean": global_mean_pool,
@@ -174,4 +188,20 @@ class CDFGRGCN(nn.Module):
             ],
             dim=-1,
         )
-        return self.classifier(pooled)
+        # Mean pooling captures composition but not scale. Log counts restore a
+        # bounded graph-size signal without letting large graphs dominate.
+        node_counts = torch.stack(
+            [
+                torch.bincount(
+                    data[nt].batch,
+                    minlength=data.num_graphs,
+                )
+                for nt in NODE_TYPES
+            ],
+            dim=-1,
+        ).to(dtype=pooled.dtype)
+        graph_features = torch.cat(
+            [pooled, torch.log1p(node_counts)],
+            dim=-1,
+        )
+        return self.classifier(graph_features)

@@ -4,6 +4,7 @@
   "tensor_dir": "../../data/tensors",
   "vocab_path": "../artifacts/vocab/default.json",
   "checkpoint_dir": "../artifacts/checkpoints",
+  "resume_checkpoint_path": null,
   "results_dir": "../artifacts/results",
   "seed": 42,
   "val_fraction": 0.15,
