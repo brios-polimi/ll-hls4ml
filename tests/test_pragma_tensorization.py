@@ -3,7 +3,7 @@ import unittest
 
 import numpy as np
 
-from ll_hls4ml.data.tensorize import pragma_embedding
+from ll_hls4ml.data.tensorize import _json_to_hetero, pragma_embedding
 from ll_hls4ml.io.schema import (
     PRAGMA_CATEGORICAL_ARGUMENTS,
     PRAGMA_FEATURE_SIZE,
@@ -78,11 +78,62 @@ class PragmaTensorizationTests(unittest.TestCase):
 
         np.testing.assert_array_equal(baseline, with_unknown)
 
+    def test_rejects_symbolic_values_for_numeric_arguments(self):
+        node = pragma_node({"ii": ["CONFIG_T::reuse_factor"]})
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "Numeric pragma argument 'ii' received non-number "
+            "'CONFIG_T::reuse_factor' on node 3",
+        ):
+            pragma_embedding(node)
+
     def test_categorical_feature_count_is_explicit(self):
         self.assertEqual(
             PRAGMA_FEATURE_SIZE,
             1 + 2 * len(PRAGMA_NUMERIC_ARGUMENTS)
             + len(PRAGMA_CATEGORICAL_ARGUMENTS),
+        )
+
+    def test_preserves_pragma_edges_to_llvm_global_constants(self):
+        graph = {
+            "nodes": [
+                {
+                    "id": 0,
+                    "type": 2,
+                    "text": "i32*",
+                    "features": {"full_text": ["@global"]},
+                },
+                {
+                    "id": 1,
+                    "type": 3,
+                    "text": "pragma.array_partition",
+                    "features": {
+                        "schema_version": ["2"],
+                        "arguments_json": [
+                            json.dumps({"variable": ["global"]})
+                        ],
+                    },
+                },
+            ],
+            "links": [
+                {
+                    "source": 1,
+                    "target": 0,
+                    "flow": 3,
+                    "position": 0,
+                }
+            ],
+        }
+
+        data, _ = _json_to_hetero(graph, {}, inference_mode=True)
+
+        edge_index = data[
+            ("pragma", "applies_to", "constant")
+        ].edge_index
+        np.testing.assert_array_equal(
+            edge_index.numpy(),
+            np.array([[0], [0]]),
         )
 
 

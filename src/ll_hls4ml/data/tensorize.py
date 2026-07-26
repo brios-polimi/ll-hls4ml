@@ -102,9 +102,15 @@ def pragma_embedding(node: dict) -> np.ndarray:
             continue
         for raw_value in raw_values:
             value = str(raw_value)
-            number = _scaled_number(value)
             numeric_index = numeric_indices.get(key)
-            if number is not None and numeric_index is not None:
+            if numeric_index is not None:
+                number = _scaled_number(value)
+                if number is None:
+                    raise ValueError(
+                        f"Numeric pragma argument {key!r} received non-number "
+                        f"{value!r} on node {node.get('id')} "
+                        f"({node.get('text', 'pragma.unknown')})"
+                    )
                 embedding[numeric_offset + numeric_index] = number
                 embedding[numeric_mask_offset + numeric_index] = 1.0
                 continue
@@ -355,6 +361,11 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             elif target_type == NODE_VARIABLE:
                 local_idx_target = var_map.get(target)
                 edge_index[("pragma", "applies_to", "variable")].append(
+                    [local_idx_source, local_idx_target]
+                )
+            elif target_type == NODE_CONSTANT:
+                local_idx_target = const_map.get(target)
+                edge_index[("pragma", "applies_to", "constant")].append(
                     [local_idx_source, local_idx_target]
                 )
 

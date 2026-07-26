@@ -84,7 +84,6 @@ PRAGMA_NUMERIC_ARGUMENTS = (
     "latency",
     "interval",
     "num",
-    "instances",
     "max_read_burst_length",
     "max_write_burst_length",
     "num_read_outstanding",
@@ -157,6 +156,7 @@ EDGE_TYPES = [
     ("instruction", "call", "instruction"),
     ("pragma", "applies_to", "instruction"),
     ("pragma", "applies_to", "variable"),
+    ("pragma", "applies_to", "constant"),
 ]
 
 SELF_LOOP_EDGE_TYPES = [
