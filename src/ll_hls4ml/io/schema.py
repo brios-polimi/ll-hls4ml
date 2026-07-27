@@ -4,13 +4,16 @@ NODE_INSTRUCTION = 0
 NODE_VARIABLE = 1
 NODE_CONSTANT = 2
 NODE_PRAGMA = 3
+NODE_BLOCK = 4
 
 FLOW_CONTROL = 0
 FLOW_DATA = 1
 FLOW_CALL = 2
 FLOW_PRAGMA = 3
+FLOW_BLOCK = 4
 
-NODE_TYPES = ["instruction", "variable", "constant", "pragma"]
+NODE_TYPES = ["instruction", "variable", "constant", "pragma", "block"]
+BLOCK_FEATURE_SIZE = 3
 
 PRAGMA_VOCAB = {
     "UNK": 0,
@@ -157,6 +160,10 @@ EDGE_TYPES = [
     ("pragma", "applies_to", "instruction"),
     ("pragma", "applies_to", "variable"),
     ("pragma", "applies_to", "constant"),
+    ("pragma", "applies_to", "block"),
+    ("block", "control", "block"),
+    ("block", "contains", "instruction"),
+    ("instruction", "in_block", "block"),
 ]
 
 SELF_LOOP_EDGE_TYPES = [

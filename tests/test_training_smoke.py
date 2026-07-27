@@ -39,6 +39,15 @@ class TrainingSmokeTests(unittest.TestCase):
                         ],
                     },
                 },
+                {
+                    "id": 4,
+                    "type": 4,
+                    "text": "llvm.basic_block",
+                    "features": {
+                        "name": ["ReuseLoop"],
+                        "is_source_loop": ["true"],
+                    },
+                },
             ],
             "links": [
                 {"source": 0, "target": 0, "flow": 0, "position": 0},
@@ -48,6 +57,9 @@ class TrainingSmokeTests(unittest.TestCase):
                 {"source": 0, "target": 0, "flow": 2, "position": 0},
                 {"source": 3, "target": 0, "flow": 3, "position": 0},
                 {"source": 3, "target": 1, "flow": 3, "position": 0},
+                {"source": 3, "target": 4, "flow": 3, "position": 0},
+                {"source": 4, "target": 0, "flow": 4, "position": 0},
+                {"source": 0, "target": 4, "flow": 4, "position": 0},
             ],
         }
         labels = [100, 200, 3, 4, 1000, 10]
@@ -57,7 +69,9 @@ class TrainingSmokeTests(unittest.TestCase):
             root = Path(temp)
             graph_dir = root / "graphs"
             archive_dir = graph_dir / "smoke" / "archive_1"
+            exemplar_dir = graph_dir / "exemplar" / "archive_1"
             archive_dir.mkdir(parents=True)
+            exemplar_dir.mkdir(parents=True)
             for index in range(8):
                 sample = dict(graph)
                 sample["labels"] = {
@@ -75,13 +89,17 @@ class TrainingSmokeTests(unittest.TestCase):
                     )
                 }
                 (archive_dir / f"sample_{index}.json").write_text(json.dumps(sample))
+                if index < 2:
+                    (exemplar_dir / f"sample_{index}.json").write_text(
+                        json.dumps(sample)
+                    )
 
             tensor_dir = root / "tensors"
             create_graph_tensors(
                 graph_dir,
                 tensor_dir,
                 instruction_vocab,
-                kernel_subset="smoke",
+                kernel_subset=["smoke", "exemplar"],
                 n_workers=1,
             )
             dataset = HeteroGraphDataset(tensor_dir, types=["smoke"])
@@ -178,7 +196,10 @@ class TrainingSmokeTests(unittest.TestCase):
             )
             result_dir = root / "results" / "cli_smoke"
             result = json.loads((result_dir / "summary.json").read_text())
-            self.assertEqual(result["sizes"], {"train": 6, "validation": 1, "test": 1})
+            self.assertEqual(
+                result["sizes"],
+                {"train": 6, "validation": 1, "test": 1, "exemplar": 2},
+            )
             self.assertTrue((result_dir / "metrics.csv").is_file())
             self.assertTrue((result_dir / "predictions.csv").is_file())
             self.assertTrue((result_dir / "split_manifest.json").is_file())

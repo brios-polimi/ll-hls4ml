@@ -8,6 +8,7 @@ from torch_geometric.nn import GATv2Conv, HeteroConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
 
 from ll_hls4ml.io.schema import (
+    BLOCK_FEATURE_SIZE,
     EDGE_TYPES,
     EDGE_TYPES_WITH_ATTR,
     LABEL_KEYS,
@@ -47,6 +48,7 @@ class CDFGInputProjection(nn.Module):
         self.pragma_arg_proj = _dense_projection(PRAGMA_ARGUMENT_SIZE, hidden_dim)
         self.variable_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.constant_proj = _dense_projection(EMBED_SIZE, hidden_dim)
+        self.block_proj = _dense_projection(BLOCK_FEATURE_SIZE, hidden_dim)
         self.edge_pos_emb = nn.Embedding(edge_pos_vocab_size + 1, hidden_dim)
 
     def forward(self, x_dict, edge_attr_dict):
@@ -54,6 +56,7 @@ class CDFGInputProjection(nn.Module):
             "instruction": self.instruction_emb(x_dict["instruction"][:, 0].long()),
             "variable": self.variable_proj(x_dict["variable"].float()),
             "constant": self.constant_proj(x_dict["constant"].float()),
+            "block": self.block_proj(x_dict["block"].float()),
             "pragma": (
                 self.pragma_emb(x_dict["pragma"][:, 0].long())
                 + self.pragma_arg_proj(x_dict["pragma"][:, 1:].float())

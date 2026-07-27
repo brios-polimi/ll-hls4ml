@@ -18,11 +18,14 @@ import tqdm
 from ll_hls4ml.io.schema import (
     EDGE_TYPES,
     EDGE_TYPES_WITH_ATTR,
+    BLOCK_FEATURE_SIZE,
+    FLOW_BLOCK,
     FLOW_CALL,
     FLOW_CONTROL,
     FLOW_DATA,
     FLOW_PRAGMA,
     NODE_CONSTANT,
+    NODE_BLOCK,
     NODE_INSTRUCTION,
     NODE_PRAGMA,
     NODE_VARIABLE,
@@ -121,6 +124,22 @@ def pragma_embedding(node: dict) -> np.ndarray:
     if embedding.shape != (1 + PRAGMA_ARGUMENT_SIZE,):
         raise AssertionError("Pragma feature schema size is inconsistent")
     return embedding
+
+
+def block_embedding(node: dict) -> np.ndarray:
+    """Encode stable block roles while retaining the exact name in graph JSON."""
+
+    features = node.get("features", {})
+    names = features.get("name", [])
+    name = str(names[0]) if len(names) == 1 else ""
+    loop_values = features.get("is_source_loop", [])
+    is_source_loop = (
+        len(loop_values) == 1 and str(loop_values[0]).lower() == "true"
+    )
+    return np.asarray(
+        [name == "entry", bool(name), is_source_loop],
+        dtype=np.float32,
+    )
 
 
 def _process_one(
@@ -235,6 +254,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
     var_map = {}
     const_map = {}
     pragma_map = {}
+    block_map = {}
     node_type_map: dict[int, int] = {}
 
     unknown_types = set()
@@ -244,6 +264,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         "variable": [],
         "constant": [],
         "pragma": [],
+        "block": [],
     }
     nodes = graph_data.get("nodes") or []
     for n in nodes:
@@ -287,6 +308,9 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         elif node_type == NODE_PRAGMA:
             features["pragma"].append(pragma_embedding(n))
             pragma_map[node_id] = len(pragma_map)
+        elif node_type == NODE_BLOCK:
+            features["block"].append(block_embedding(n))
+            block_map[node_id] = len(block_map)
         else:
             raise ValueError(f"Invalid node type: {node_type} in node {n}")
 
@@ -309,6 +333,12 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         else np.empty((0, PRAGMA_FEATURE_SIZE), dtype=np.float32),
         dtype=torch.float,
     )
+    data["block"].x = torch.tensor(
+        np.stack(features["block"])
+        if features["block"]
+        else np.empty((0, BLOCK_FEATURE_SIZE), dtype=np.float32),
+        dtype=torch.float,
+    )
 
 
     edge_index = { k: [] for k in EDGE_TYPES }
@@ -318,7 +348,7 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
         flow = safe_int(edge.get("flow", -1))
         source = safe_int(edge.get("source", -1))
         target = safe_int(edge.get("target", -1))
-        if source < 0 or source >= len(nodes) or target < 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL, FLOW_PRAGMA]:
+        if source < 0 or source >= len(nodes) or target < 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL, FLOW_PRAGMA, FLOW_BLOCK]:
             raise ValueError(f"Invalid edge with invalid source/target/flow: {edge}")
             
         position = safe_int(edge.get("position", 0))
@@ -366,6 +396,32 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             elif target_type == NODE_CONSTANT:
                 local_idx_target = const_map.get(target)
                 edge_index[("pragma", "applies_to", "constant")].append(
+                    [local_idx_source, local_idx_target]
+                )
+            elif target_type == NODE_BLOCK:
+                local_idx_target = block_map.get(target)
+                edge_index[("pragma", "applies_to", "block")].append(
+                    [local_idx_source, local_idx_target]
+                )
+        elif flow == FLOW_BLOCK:
+            source_type = node_type_map[source]
+            target_type = node_type_map[target]
+            if source_type == NODE_BLOCK and target_type == NODE_BLOCK:
+                local_idx_source = block_map.get(source)
+                local_idx_target = block_map.get(target)
+                edge_index[("block", "control", "block")].append(
+                    [local_idx_source, local_idx_target]
+                )
+            elif source_type == NODE_BLOCK and target_type == NODE_INSTRUCTION:
+                local_idx_source = block_map.get(source)
+                local_idx_target = inst_map.get(target)
+                edge_index[("block", "contains", "instruction")].append(
+                    [local_idx_source, local_idx_target]
+                )
+            elif source_type == NODE_INSTRUCTION and target_type == NODE_BLOCK:
+                local_idx_source = inst_map.get(source)
+                local_idx_target = block_map.get(target)
+                edge_index[("instruction", "in_block", "block")].append(
                     [local_idx_source, local_idx_target]
                 )
 

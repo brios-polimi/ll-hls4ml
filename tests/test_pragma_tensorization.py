@@ -136,6 +136,51 @@ class PragmaTensorizationTests(unittest.TestCase):
             np.array([[0], [0]]),
         )
 
+    def test_tensorizes_named_blocks_and_loop_pragma_edges(self):
+        graph = {
+            "nodes": [
+                {"id": 0, "type": 0, "text": "br"},
+                {
+                    "id": 1,
+                    "type": 4,
+                    "text": "llvm.basic_block",
+                    "features": {
+                        "name": ["ReuseLoop"],
+                        "is_source_loop": ["true"],
+                    },
+                },
+                {
+                    "id": 2,
+                    "type": 3,
+                    "text": "pragma.pipeline",
+                    "features": {
+                        "schema_version": ["2"],
+                        "arguments_json": [json.dumps({"ii": ["1"]})],
+                    },
+                },
+            ],
+            "links": [
+                {"source": 1, "target": 0, "flow": 4, "position": 0},
+                {"source": 0, "target": 1, "flow": 4, "position": 0},
+                {"source": 2, "target": 1, "flow": 3, "position": 0},
+            ],
+        }
+
+        data, _ = _json_to_hetero(graph, {"br": 1}, inference_mode=True)
+
+        np.testing.assert_array_equal(
+            data["block"].x.numpy(),
+            np.array([[0, 1, 1]], dtype=np.float32),
+        )
+        np.testing.assert_array_equal(
+            data[("pragma", "applies_to", "block")].edge_index.numpy(),
+            np.array([[0], [0]]),
+        )
+        np.testing.assert_array_equal(
+            data[("block", "contains", "instruction")].edge_index.numpy(),
+            np.array([[0], [0]]),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
