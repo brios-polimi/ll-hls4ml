@@ -1,10 +1,13 @@
 """PyG HeteroData dataset over preprocessed .pt files."""
 from collections import defaultdict
+import json
 from pathlib import Path
 
 import torch
 from torch.utils.data import Dataset
 from torch_geometric.data import HeteroData
+
+from ll_hls4ml.io.schema import LABEL_KEYS
 
 
 class HeteroGraphDataset(Dataset):
@@ -24,6 +27,23 @@ class HeteroGraphDataset(Dataset):
         self.root = Path(root)
         self.transform = transform
         self.paths = self._index(types, max_per_type, silent)
+        self.targets = self._load_targets()
+
+    def _load_targets(self) -> torch.Tensor | None:
+        """Load per-tensor labels without deserializing graph tensors, if available."""
+        index_path = self.root / "labels.json"
+        if not index_path.exists():
+            return None
+        try:
+            with index_path.open() as handle:
+                index = json.load(handle)
+            if index["label_keys"] != LABEL_KEYS:
+                return None
+            labels = index["labels"]
+            values = [labels[path.relative_to(self.root).as_posix()] for path in self.paths]
+        except (KeyError, OSError, ValueError, json.JSONDecodeError):
+            return None
+        return torch.tensor(values, dtype=torch.float)
 
     def _index(self, types: list[str] | None, max_per_type: dict[str, int] | int | None, silent: bool) -> list[Path]:
         paths = []

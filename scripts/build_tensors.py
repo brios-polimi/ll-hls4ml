@@ -27,22 +27,23 @@ def main():
     vocab_path = Path(args.vocab) if args.vocab else cfg.vocab_path
 
     if vocab_path.exists():
-        vocab, _max_pos, _counts = load_vocab(vocab_path)
+        vocab, max_pos, _counts = load_vocab(vocab_path)
         print(f"Loaded vocab from {vocab_path}")
     else:
         print("Vocab not found; scanning graphs...")
-        vocab, _max_pos, _ = vocab_scan(cfg.graph_dir, kernel_subset=args.kernel)
+        vocab, max_pos, _ = vocab_scan(cfg.graph_dir, kernel_subset=args.kernel)
 
     create_graph_tensors(
         cfg.graph_dir,
         cfg.tensor_dir,
         vocab,
+        max_pos,
         kernel_subset=args.kernel,
         archive_subset=args.archive,
         max_archives=args.max_archives,
         n_workers=args.workers,
     )
-    print(f"Tensors written under {cfg.tensor_dir}")
+    print(f"Tensors and labels index written under {cfg.tensor_dir}")
 
 
 if __name__ == "__main__":

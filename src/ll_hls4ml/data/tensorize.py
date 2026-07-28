@@ -44,6 +44,47 @@ from ll_hls4ml.io.discovery import iter_graph_paths
 from ll_hls4ml.io.load_json import load_graph_json
 
 
+_LABEL_INDEX_NAME = "labels.json"
+_PRAGMA_NUMERIC_INDICES = {
+    name: index for index, name in enumerate(PRAGMA_NUMERIC_ARGUMENTS)
+}
+_PRAGMA_CATEGORICAL_INDICES = {
+    token: index for index, token in enumerate(PRAGMA_CATEGORICAL_ARGUMENTS)
+}
+_PRAGMA_NUMERIC_OFFSET = 1
+_PRAGMA_NUMERIC_MASK_OFFSET = _PRAGMA_NUMERIC_OFFSET + len(PRAGMA_NUMERIC_ARGUMENTS)
+_PRAGMA_CATEGORICAL_OFFSET = _PRAGMA_NUMERIC_MASK_OFFSET + len(PRAGMA_NUMERIC_ARGUMENTS)
+
+
+def _update_label_index(
+    pt_dir: Path,
+    records: list[tuple[Path, list[float] | None]],
+) -> None:
+    """Merge labels from this tensorization run into the tensor sidecar index."""
+    index_path = pt_dir / _LABEL_INDEX_NAME
+    index = {"label_keys": LABEL_KEYS, "labels": {}}
+    if index_path.exists():
+        with index_path.open() as handle:
+            existing = json.load(handle)
+        if existing.get("label_keys") == LABEL_KEYS:
+            index["labels"].update(existing.get("labels", {}))
+
+    for out_path, labels in records:
+        relative_path = out_path.relative_to(pt_dir).as_posix()
+        if labels is None:
+            index["labels"].pop(relative_path, None)
+        else:
+            index["labels"][relative_path] = labels
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", dir=pt_dir, prefix=".labels-", suffix=".json", delete=False
+    ) as handle:
+        json.dump(index, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+        temp_path = Path(handle.name)
+    temp_path.replace(index_path)
+
+
 def _single_feature(node: dict, name: str) -> str:
     values = node.get("features", {}).get(name)
     if not isinstance(values, list) or len(values) != 1:
@@ -84,16 +125,6 @@ def pragma_embedding(node: dict) -> np.ndarray:
     if node["text"] not in PRAGMA_ARGUMENT_DIRECTIVES:
         return embedding
 
-    numeric_offset = 1
-    numeric_mask_offset = numeric_offset + len(PRAGMA_NUMERIC_ARGUMENTS)
-    categorical_offset = numeric_mask_offset + len(PRAGMA_NUMERIC_ARGUMENTS)
-    numeric_indices = {
-        name: index for index, name in enumerate(PRAGMA_NUMERIC_ARGUMENTS)
-    }
-    categorical_indices = {
-        token: index for index, token in enumerate(PRAGMA_CATEGORICAL_ARGUMENTS)
-    }
-
     for raw_key, raw_values in arguments.items():
         key = str(raw_key)
         if not isinstance(raw_values, list):
@@ -105,7 +136,7 @@ def pragma_embedding(node: dict) -> np.ndarray:
             continue
         for raw_value in raw_values:
             value = str(raw_value)
-            numeric_index = numeric_indices.get(key)
+            numeric_index = _PRAGMA_NUMERIC_INDICES.get(key)
             if numeric_index is not None:
                 number = _scaled_number(value)
                 if number is None:
@@ -114,12 +145,12 @@ def pragma_embedding(node: dict) -> np.ndarray:
                         f"{value!r} on node {node.get('id')} "
                         f"({node.get('text', 'pragma.unknown')})"
                     )
-                embedding[numeric_offset + numeric_index] = number
-                embedding[numeric_mask_offset + numeric_index] = 1.0
+                embedding[_PRAGMA_NUMERIC_OFFSET + numeric_index] = number
+                embedding[_PRAGMA_NUMERIC_MASK_OFFSET + numeric_index] = 1.0
                 continue
-            categorical_index = categorical_indices.get((key, value.lower()))
+            categorical_index = _PRAGMA_CATEGORICAL_INDICES.get((key, value.lower()))
             if categorical_index is not None:
-                embedding[categorical_offset + categorical_index] = 1.0
+                embedding[_PRAGMA_CATEGORICAL_OFFSET + categorical_index] = 1.0
 
     if embedding.shape != (1 + PRAGMA_ARGUMENT_SIZE,):
         raise AssertionError("Pragma feature schema size is inconsistent")
@@ -144,18 +175,19 @@ def block_embedding(node: dict) -> np.ndarray:
 
 def _process_one(
     vocab: dict,
+    max_pos: int,
     inference_mode: bool,
     paths: tuple[Path, Path],
-) -> set[str]:
+) -> tuple[set[str], list[float] | None]:
     import torch
 
     graph_path, out_path = paths
-    out_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         graph_data = load_graph_json(graph_path)
-        data, unknown_types = _json_to_hetero(graph_data, vocab, inference_mode)
+        data, unknown_types = _json_to_hetero(graph_data, vocab, max_pos, inference_mode)
         torch.save(data, out_path)
-        return unknown_types
+        labels = None if inference_mode else data.y.tolist()
+        return unknown_types, labels
     except Exception as e:
         raise RuntimeError(f"Error processing graph {graph_path}: {e}") from e
 
@@ -164,6 +196,7 @@ def create_graph_tensors(
     graph_dir: str | Path,
     pt_dir: str | Path,
     instruction_vocab: dict,
+    max_pos: int | None = None,
     kernel_subset: str | list[str] | None = None,
     archive_subset: str | None = None,
     max_archives: int | None = None,
@@ -206,8 +239,10 @@ def create_graph_tensors(
         )
         for graph_path in graph_paths
     ]
+    for output_dir in {out_path.parent for _, out_path in work}:
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-    worker = partial(_process_one, instruction_vocab, inference_mode)
+    worker = partial(_process_one, instruction_vocab, max_pos, inference_mode)
     temp_on_mounted_filesystem = (
         Path(tempfile.gettempdir()).as_posix().startswith("/mnt/")
     )
@@ -222,22 +257,29 @@ def create_graph_tensors(
         pool = None
     else:
         pool = ProcessPoolExecutor(max_workers=workers)
-        results = pool.map(worker, work)
+        results = pool.map(worker, work, chunksize=32)
 
     try:
-        for result in tqdm.tqdm(
-            results,
-            total=len(work),
-            desc="Processing graph files into PyTorch tensors",
+        label_records = []
+        for (_graph_path, out_path), (result, labels) in zip(
+            work,
+            tqdm.tqdm(
+                results,
+                total=len(work),
+                desc="Processing graph files into PyTorch tensors",
+            ),
         ):
             normalized = {
                 re.sub(r'\.\d+(?="|\b)', '', type_name)
                 for type_name in result
             }
             unknown_types.update(normalized)
+            label_records.append((out_path, labels))
     finally:
         if pool is not None:
             pool.shutdown()
+
+    _update_label_index(pt_dir, label_records)
 
     if unknown_types:
         print("Types not parsed by embedder:")
@@ -245,7 +287,12 @@ def create_graph_tensors(
             print(f"{count:>6}  {t}")
 
 
-def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: bool):
+def _json_to_hetero(
+    graph_data: dict,
+    instruction_vocab: dict,
+    max_pos: int | None = None,
+    inference_mode: bool = False,
+):
     import torch
     from torch_geometric.data import HeteroData
 
@@ -352,6 +399,8 @@ def _json_to_hetero(graph_data: dict, instruction_vocab: dict, inference_mode: b
             raise ValueError(f"Invalid edge with invalid source/target/flow: {edge}")
             
         position = safe_int(edge.get("position", 0))
+        if max_pos is not None and position > max_pos:
+            raise ValueError(f"Invalid edge with max pos too high: {position} > {max_pos}")
         local_idx_source = None
         local_idx_target = None
 
@@ -681,8 +730,9 @@ def type_embedding(type_str):
         emb[FRAC_OFF] = (width - int_bits) / width
         emb[SIGNED_OFF] = not (m.group(1) == "u" or m.group(4) == "false")
 
-        quant = AP_QUANT_MAP.get(m.group(5), 0)
-        overflow = AP_OVERFLOW_MAP.get(m.group(6), 0)
+        # defaults are AP_TRN and AP_WRAP per https://docs.amd.com/r/2023.1-English/ug1399-vitis-hls/Fixed-Point-Identifier-Summary
+        quant = AP_QUANT_MAP.get(m.group(5), "TRN")
+        overflow = AP_OVERFLOW_MAP.get(m.group(6), "WRAP")
         
 
         # one-hot assignments here

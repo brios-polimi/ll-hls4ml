@@ -1,6 +1,7 @@
 """Target normalization and wa-hls4ml benchmark metrics."""
 
 import torch
+from torch.utils.data import Subset
 
 from ll_hls4ml.io.schema import LABEL_KEYS
 
@@ -10,7 +11,15 @@ def compute_target_z_stats(dataset, std_floor: float = 1e-3) -> tuple[torch.Tens
 
     Returns tensors of shape (len(LABEL_KEYS)) for mean and std.
     """
-    log_ys = torch.log1p(torch.stack([graph.y for graph in dataset], dim=0))
+    targets = getattr(dataset, "targets", None)
+    if targets is None and isinstance(dataset, Subset):
+        base_targets = getattr(dataset.dataset, "targets", None)
+        if base_targets is not None:
+            targets = base_targets[torch.as_tensor(dataset.indices, dtype=torch.long)]
+    if targets is None:
+        targets = torch.stack([graph.y for graph in dataset], dim=0)
+
+    log_ys = torch.log1p(targets)
     y_means = log_ys.mean(dim=0)
     y_stds = torch.clamp(log_ys.std(dim=0), min=std_floor)
     return y_means, y_stds

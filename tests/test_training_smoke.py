@@ -103,6 +103,8 @@ class TrainingSmokeTests(unittest.TestCase):
                 n_workers=1,
             )
             dataset = HeteroGraphDataset(tensor_dir, types=["smoke"])
+            self.assertTrue((tensor_dir / "labels.json").exists())
+            self.assertEqual(dataset.targets.shape, (8, 6))
             y_means, y_stds = compute_target_z_stats(dataset)
             loader = make_loader(
                 dataset,

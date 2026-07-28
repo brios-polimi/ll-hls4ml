@@ -16,6 +16,10 @@ from ll_hls4ml.data.tensorize import (
     type_embedding,
 )
 from ll_hls4ml.io.schema import (
+    FLOW_CONTROL,
+    FLOW_DATA,
+    FLOW_CALL,
+    FLOW_PRAGMA,
     FLOW_BLOCK,
     NODE_BLOCK,
     NODE_CONSTANT,
@@ -166,11 +170,11 @@ def extract_graph_features(graph_data):
         target_type = nodes[target].get("type", -1)
 
         known_edge_type = False
-        if flow == 0:
+        if flow == FLOW_CONTROL:
             if source_type == 0 and target_type == 0:
                 flow_counts[flow_types[0]] += 1
                 known_edge_type = True
-        elif flow == 1:
+        elif flow == FLOW_DATA:
             if source_type == 0 and target_type == 1:
                 flow_counts[flow_types[1]] += 1
                 known_edge_type = True
@@ -180,11 +184,11 @@ def extract_graph_features(graph_data):
             elif source_type == 2 and target_type == 0:
                 flow_counts[flow_types[3]] += 1
                 known_edge_type = True
-        elif flow == 2:
+        elif flow == FLOW_CALL:
             if source_type == 0 and target_type == 0:
                 flow_counts[flow_types[4]] += 1
                 known_edge_type = True
-        elif flow == 3:
+        elif flow == FLOW_PRAGMA:
             if source_type == NODE_PRAGMA and target_type == 0:
                 flow_counts[flow_types[5]] += 1
                 known_edge_type = True

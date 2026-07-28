@@ -3,6 +3,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch_geometric.utils import degree
 from torch_geometric.data import HeteroData
 from torch_geometric.nn import GATv2Conv, HeteroConv
 from torch_geometric.nn import global_add_pool, global_max_pool, global_mean_pool
@@ -75,7 +76,7 @@ class CDFGConvLayer(nn.Module):
     def __init__(
         self,
         hidden_dim: int,
-        aggr: str = "mean",
+        aggr: str = "add",
         dropout: float = 0.0,
     ):
         super().__init__()
@@ -92,7 +93,7 @@ class CDFGConvLayer(nn.Module):
                 )
                 for et in EDGE_TYPES
             },
-            aggr="mean",
+            aggr="add",
         )
         self.dropout = nn.Dropout(dropout)
         self.norm = nn.ModuleDict(
@@ -125,7 +126,7 @@ class CDFGRGCN(nn.Module):
         num_layers: int = 3,
         dropout: float = 0.1,
         pool: str = "mean",
-        aggr: str = "mean",
+        aggr: str = "add",
         node_vocab_sizes: dict[str, int] | None = None,
     ):
         super().__init__()
@@ -184,6 +185,13 @@ class CDFGRGCN(nn.Module):
             "max": global_max_pool,
         }[self.pool]
 
+        if __debug__:
+            for nt in NODE_TYPES:
+                b = data[nt].batch
+                if b.numel() > 0 and b.max().item() >= data.num_graphs:
+                    torch.save(data, f"/tmp/bad_batch_{nt}.pt")
+                    raise RuntimeError(f"{nt}: batch idx {b.max().item()} >= num_graphs {data.num_graphs}")
+
         pooled = torch.cat(
             [
                 pool_fn(h_dict[nt], data[nt].batch, size=data.num_graphs)
@@ -195,14 +203,12 @@ class CDFGRGCN(nn.Module):
         # bounded graph-size signal without letting large graphs dominate.
         node_counts = torch.stack(
             [
-                torch.bincount(
-                    data[nt].batch,
-                    minlength=data.num_graphs,
-                )
+                degree(data[nt].batch, num_nodes=data.num_graphs, dtype=pooled.dtype)
                 for nt in NODE_TYPES
             ],
             dim=-1,
-        ).to(dtype=pooled.dtype)
+        )
+
         graph_features = torch.cat(
             [pooled, torch.log1p(node_counts)],
             dim=-1,

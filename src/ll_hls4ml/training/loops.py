@@ -236,6 +236,8 @@ def fit(
     ckpt_path = checkpoint_dir / f"{experiment_name}_checkpoint.pt"
     backup_path = checkpoint_dir / f"{experiment_name}_backup.pt"
 
+    model.to(device)
+    
     if resume_from_backup:
         checkpoint = torch.load(resume_from_backup, map_location=device, weights_only=True)
         model.load_state_dict(checkpoint["model"])
@@ -246,7 +248,6 @@ def fit(
     else:
         start_epoch = 1
 
-    model = model.to(device)
     if distributed:
         model = wrap_ddp(model, device)
 
@@ -329,7 +330,7 @@ def fit(
                     print(f"Early stopping triggered after {epoch} epochs.")
                     should_stop[0] = 1
 
-        if main and epoch % 10 == 0:
+        if main and epoch % 1 == 0:
             _save_checkpoint(epoch, model, optimizer, scheduler, backup_path)
             print(f"Model saved to {backup_path}")
 
