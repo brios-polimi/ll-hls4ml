@@ -395,7 +395,7 @@ def fit(
                     print(f"Early stopping triggered after {epoch} epochs.")
                     should_stop[0] = 1
 
-        if main and epoch % 1 == 0:
+        if main and epoch % 5 == 0:
             _save_checkpoint(
                 epoch,
                 model,
