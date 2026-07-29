@@ -17,6 +17,12 @@ from ll_hls4ml.io.schema import (
     PRAGMA_VOCAB_SIZE,
 )
 from ll_hls4ml.data.tensorize import EMBED_SIZE
+from ll_hls4ml.models.readout import (
+    GlobalFeatureEncoder,
+    GraphContextEncoder,
+    SplitRegressionHead,
+    multi_pool,
+)
 
 class MultilayerDense(nn.Module):
     def __init__(self, in_dim, out_dim, n_layers):
@@ -65,6 +71,7 @@ class CDFGInputProjection(nn.Module):
         self.pragma_arg_proj = MultilayerDense(
             PRAGMA_ARGUMENT_SIZE, hidden_dim, n_layers
         )
+        self.pragma_proj = MultilayerDense(2 * hidden_dim, hidden_dim, n_layers)
 
     def forward(self, x_dict):
         h_dict = {}
@@ -78,9 +85,14 @@ class CDFGInputProjection(nn.Module):
         h_dict["constant"] = self.constant_emb(x_dict["constant"])
         h_dict["block"] = self.block_emb(x_dict["block"])
         pragma = x_dict["pragma"]
-        h_dict["pragma"] = (
-            self.pragma_emb(pragma[:, 0].long())
-            + self.pragma_arg_proj(pragma[:, 1:].float())
+        h_dict["pragma"] = self.pragma_proj(
+            torch.cat(
+                [
+                    self.pragma_emb(pragma[:, 0].long()),
+                    self.pragma_arg_proj(pragma[:, 1:].float()),
+                ],
+                dim=-1,
+            )
         )
 
         return h_dict
@@ -99,20 +111,35 @@ class MLP(nn.Module):
         dropout: float = 0.1,
         pool: str = "mean",
         node_aggr: str = "concat",  # concat | sum | mean
+        use_global_features: bool = False,
+        use_context: bool = False,
+        split_heads: bool = False,
+        context_mode: str = "core",
+        hurdle_heads: bool = False,
+        hurdle_prediction_mode: str = "expected",
     ):
         super().__init__()
+        if hurdle_heads and not split_heads:
+            raise ValueError("hurdle_heads requires split_heads=True")
 
         self.register_buffer("y_means", y_means.clone())
         self.register_buffer("y_stds", y_stds.clone())
         self.instruction_vocab_size = instruction_vocab_size
 
-        self.pool_fn = {
-            "mean": global_mean_pool,
-            "sum": global_add_pool,
-            "max": global_max_pool,
-        }[pool]
+        self.pool = pool
+        self.pool_fn = (
+            {
+                "mean": global_mean_pool,
+                "sum": global_add_pool,
+                "max": global_max_pool,
+            }.get(pool)
+        )
         self.node_aggr = node_aggr
+        self.use_global_features = use_global_features
+        self.use_context = use_context
         self.output_dim = len(LABEL_KEYS)
+        self.hurdle_heads = hurdle_heads
+        self.hurdle_prediction_mode = hurdle_prediction_mode
 
         self.node_encoder = CDFGInputProjection(instruction_vocab_size, EMBED_SIZE, hidden_dim, num_var_embed_layers)
 
@@ -125,16 +152,47 @@ class MLP(nn.Module):
             ])
         self.mlp = nn.Sequential(*layers)
 
+        if pool == "multi":
+            if node_aggr != "concat":
+                raise ValueError("multi pooling requires node_aggr='concat'")
+            self.readout_proj = nn.ModuleDict(
+                {
+                    node_type: MultilayerDense(
+                        4 * hidden_dim + 1, hidden_dim, 2
+                    )
+                    for node_type in NODE_TYPES
+                }
+            )
+        else:
+            self.readout_proj = None
+
         if node_aggr == "concat":
             classifier_in = hidden_dim * len(NODE_TYPES)
         else:
             classifier_in = hidden_dim
 
-        self.classifier = nn.Sequential(
-            nn.Linear(classifier_in, hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, self.output_dim),
+        if use_global_features:
+            self.global_features = GlobalFeatureEncoder(
+                instruction_vocab_size, hidden_dim
+            )
+            classifier_in += hidden_dim
+        if use_context:
+            self.context_encoder = GraphContextEncoder(hidden_dim, context_mode)
+            classifier_in += hidden_dim
+        self.classifier = (
+            SplitRegressionHead(
+                classifier_in,
+                hidden_dim,
+                dropout,
+                hurdle_heads=hurdle_heads,
+            )
+            if split_heads
+            else nn.Sequential(
+                nn.Linear(classifier_in, hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_dim, self.output_dim),
+            )
         )
 
     def forward(self, data: HeteroData):
@@ -155,9 +213,16 @@ class MLP(nn.Module):
         pooled = []
         for nt in NODE_TYPES:
             h = self.mlp(h_dict[nt])
-            pooled.append(
-                self.pool_fn(h, data[nt].batch, size=data.num_graphs)
-            )
+            if self.pool == "multi":
+                pooled.append(
+                    self.readout_proj[nt](
+                        multi_pool(h, data[nt].batch, data.num_graphs)
+                    )
+                )
+            else:
+                pooled.append(
+                    self.pool_fn(h, data[nt].batch, size=data.num_graphs)
+                )
 
         if self.node_aggr == "concat":
             graph_emb = torch.cat(pooled, dim=-1)
@@ -168,4 +233,9 @@ class MLP(nn.Module):
         else:
             raise ValueError(f"Unknown node_aggr: {self.node_aggr}")
 
-        return self.classifier(graph_emb)
+        shortcuts = [graph_emb]
+        if self.use_global_features:
+            shortcuts.append(self.global_features(data))
+        if self.use_context:
+            shortcuts.append(self.context_encoder(data))
+        return self.classifier(torch.cat(shortcuts, dim=-1))

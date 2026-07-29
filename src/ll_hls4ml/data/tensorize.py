@@ -7,6 +7,7 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import lru_cache, partial
 import json
 import math
+import multiprocessing
 import os
 from pathlib import Path
 import re
@@ -24,6 +25,8 @@ from ll_hls4ml.io.schema import (
     FLOW_CONTROL,
     FLOW_DATA,
     FLOW_PRAGMA,
+    GRAPH_CONTEXT_CATEGORICAL_VOCABS,
+    GRAPH_CONTEXT_NUMERIC_KEYS,
     NODE_CONSTANT,
     NODE_BLOCK,
     NODE_INSTRUCTION,
@@ -58,23 +61,28 @@ _PRAGMA_CATEGORICAL_OFFSET = _PRAGMA_NUMERIC_MASK_OFFSET + len(PRAGMA_NUMERIC_AR
 
 def _update_label_index(
     pt_dir: Path,
-    records: list[tuple[Path, list[float] | None]],
+    records: list[tuple[Path, list[float] | None, dict]],
 ) -> None:
     """Merge labels from this tensorization run into the tensor sidecar index."""
     index_path = pt_dir / _LABEL_INDEX_NAME
-    index = {"label_keys": LABEL_KEYS, "labels": {}}
+    index = {"label_keys": LABEL_KEYS, "labels": {}, "metadata": {}}
     if index_path.exists():
         with index_path.open() as handle:
             existing = json.load(handle)
         if existing.get("label_keys") == LABEL_KEYS:
             index["labels"].update(existing.get("labels", {}))
+            index["metadata"].update(existing.get("metadata", {}))
 
-    for out_path, labels in records:
+    for out_path, labels, metadata in records:
         relative_path = out_path.relative_to(pt_dir).as_posix()
         if labels is None:
             index["labels"].pop(relative_path, None)
         else:
             index["labels"][relative_path] = labels
+        if metadata:
+            index["metadata"][relative_path] = metadata
+        else:
+            index["metadata"].pop(relative_path, None)
 
     with tempfile.NamedTemporaryFile(
         mode="w", dir=pt_dir, prefix=".labels-", suffix=".json", delete=False
@@ -173,21 +181,87 @@ def block_embedding(node: dict) -> np.ndarray:
     )
 
 
+def constant_literal_embedding(node: dict) -> np.ndarray:
+    """Encode scalar LLVM literals while leaving symbolic constants masked."""
+    full_text = node.get("features", {}).get("full_text", [])
+    if not isinstance(full_text, list) or len(full_text) != 1:
+        return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
+    match = SCALAR_LITERAL_RE.match(str(full_text[0]).strip())
+    if not match:
+        return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
+    try:
+        value = float(match.group(1))
+    except ValueError:
+        return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
+    if not math.isfinite(value):
+        return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
+    integer_value = int(value)
+    absolute_integer = abs(integer_value)
+    is_power_of_two = (
+        value == integer_value
+        and absolute_integer > 0
+        and absolute_integer & (absolute_integer - 1) == 0
+    )
+    return np.asarray(
+        [
+            1.0,
+            math.copysign(math.log1p(abs(value)), value),
+            value == 0,
+            value == 1,
+            value == -1,
+            is_power_of_two,
+        ],
+        dtype=np.float32,
+    )
+
+
+def synthesis_metadata(graph_data: dict) -> dict:
+    """Return non-target synthesis context from either graph metadata location."""
+    metadata = dict(graph_data.get("synthesis_metadata") or {})
+    labels = graph_data.get("labels") or {}
+    for key in (
+        *GRAPH_CONTEXT_CATEGORICAL_VOCABS,
+        *GRAPH_CONTEXT_NUMERIC_KEYS,
+        "dataset_split",
+    ):
+        if key not in metadata and key in labels:
+            metadata[key] = labels[key]
+    return metadata
+
+
+def graph_context_embedding(metadata: dict) -> tuple[np.ndarray, np.ndarray]:
+    categorical = np.asarray(
+        [
+            vocabulary.get(str(metadata.get(key, "")), 0)
+            for key, vocabulary in GRAPH_CONTEXT_CATEGORICAL_VOCABS.items()
+        ],
+        dtype=np.int64,
+    )
+    numeric = []
+    for key in GRAPH_CONTEXT_NUMERIC_KEYS:
+        value = _scaled_number(str(metadata.get(key, "")))
+        numeric.append(0.0 if value is None else value)
+    return categorical, np.asarray(numeric, dtype=np.float32)
+
+
 def _process_one(
     vocab: dict,
     max_pos: int,
     inference_mode: bool,
+    metadata_by_graph_id: dict[str, dict] | None,
     paths: tuple[Path, Path],
-) -> tuple[set[str], list[float] | None]:
+) -> tuple[set[str], list[float] | None, dict]:
     import torch
 
     graph_path, out_path = paths
     try:
         graph_data = load_graph_json(graph_path)
+        if metadata_by_graph_id and graph_path.stem in metadata_by_graph_id:
+            graph_data["synthesis_metadata"] = metadata_by_graph_id[graph_path.stem]
         data, unknown_types = _json_to_hetero(graph_data, vocab, max_pos, inference_mode)
         torch.save(data, out_path)
         labels = None if inference_mode else data.y.tolist()
-        return unknown_types, labels
+        return unknown_types, labels, synthesis_metadata(graph_data)
     except Exception as e:
         raise RuntimeError(f"Error processing graph {graph_path}: {e}") from e
 
@@ -202,6 +276,7 @@ def create_graph_tensors(
     max_archives: int | None = None,
     inference_mode: bool = False,
     n_workers: int | None = None,
+    metadata_by_graph_id: dict[str, dict] | None = None,
 ):
     """
     Walk graph_dir and convert JSON files to PyG HeteroData, mirroring structure in pt_dir.
@@ -242,7 +317,13 @@ def create_graph_tensors(
     for output_dir in {out_path.parent for _, out_path in work}:
         output_dir.mkdir(parents=True, exist_ok=True)
 
-    worker = partial(_process_one, instruction_vocab, max_pos, inference_mode)
+    worker = partial(
+        _process_one,
+        instruction_vocab,
+        max_pos,
+        inference_mode,
+        metadata_by_graph_id,
+    )
     temp_on_mounted_filesystem = (
         Path(tempfile.gettempdir()).as_posix().startswith("/mnt/")
     )
@@ -256,12 +337,20 @@ def create_graph_tensors(
         results = map(worker, work)
         pool = None
     else:
-        pool = ProcessPoolExecutor(max_workers=workers)
+        multiprocessing_context = (
+            multiprocessing.get_context("spawn")
+            if os.name != "nt"
+            else None
+        )
+        pool = ProcessPoolExecutor(
+            max_workers=workers,
+            mp_context=multiprocessing_context,
+        )
         results = pool.map(worker, work, chunksize=32)
 
     try:
         label_records = []
-        for (_graph_path, out_path), (result, labels) in zip(
+        for (_graph_path, out_path), (result, labels, metadata) in zip(
             work,
             tqdm.tqdm(
                 results,
@@ -274,7 +363,7 @@ def create_graph_tensors(
                 for type_name in result
             }
             unknown_types.update(normalized)
-            label_records.append((out_path, labels))
+            label_records.append((out_path, labels, metadata))
     finally:
         if pool is not None:
             pool.shutdown()
@@ -347,7 +436,8 @@ def _json_to_hetero(
             features["variable"].append(type_emb)
             var_map[node_id] = len(var_map)
         elif node_type == NODE_CONSTANT:
-            type_emb = type_embedding(node_text)
+            type_emb = type_embedding(node_text).copy()
+            type_emb[LITERAL_OFF:] = constant_literal_embedding(n)
             if type_emb[TYPE_SIZE - 1]:
                 unknown_types.add(node_text)
             features["constant"].append(type_emb)
@@ -385,6 +475,15 @@ def _json_to_hetero(
         if features["block"]
         else np.empty((0, BLOCK_FEATURE_SIZE), dtype=np.float32),
         dtype=torch.float,
+    )
+
+    metadata = synthesis_metadata(graph_data)
+    categorical_context, numeric_context = graph_context_embedding(metadata)
+    data.graph_context_categorical = torch.from_numpy(
+        categorical_context.reshape(1, -1)
+    )
+    data.graph_context_numeric = torch.from_numpy(
+        numeric_context.reshape(1, -1)
     )
 
 
@@ -512,7 +611,7 @@ def _json_to_hetero(
 # ---- regexes compiled once ----
 # %"class.hls::stream<nnet::array<ap_fixed<37, 8, AP_TRN, AP_WRAP, 0>, 32>, 0>"
 STREAM_RE = re.compile(
-    r'^(?:%"class\.)?hls::stream<\s*(.*)(?:,\s*(\d+))?>"?'
+    r'^(?:%"class\.)?hls::stream<\s*(.+),\s*(\d+)\s*>"?$'
 )
 
 # nnet::array<ap_fixed<20, 10, AP_TRN, AP_WRAP, 0>
@@ -522,7 +621,12 @@ NNET_ARRAY_RE = re.compile(
 
 # %"class.ap_shift_reg<ap_ufixed<4, 1, AP_RND_CONV, AP_SAT>, 9>"*
 SHIFT_REG_RE = re.compile(
-    r'^(?:%"class\.)?ap_shift_reg<\s*(.*)(?:,\s*(\d+))?>"?'
+    r'^(?:%"class\.)?ap_shift_reg<\s*(.+),\s*(\d+)\s*>"?$'
+)
+
+SCALAR_LITERAL_RE = re.compile(
+    r"^(?:i\d+|half|float|double)\s+"
+    r"([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)$"
 )
 
 # i32, i57, float, double
@@ -589,6 +693,7 @@ QUANT_SIZE     = 8
 OVERFLOW_SIZE  = 5
 ARRAY_LEN_SIZE = 1
 PTR_DEPTH_SIZE = 1
+CONSTANT_LITERAL_SIZE = 6
 
 TYPE_OFF      = 0
 IS_AP_OFF     = TYPE_OFF      + TYPE_SIZE
@@ -600,10 +705,12 @@ QUANT_OFF     = SIGNED_OFF    + SIGNED_SIZE
 OVERFLOW_OFF  = QUANT_OFF     + QUANT_SIZE
 ARRAY_LEN_OFF = OVERFLOW_OFF  + OVERFLOW_SIZE
 PTR_DEPTH_OFF = ARRAY_LEN_OFF + ARRAY_LEN_SIZE
+LITERAL_OFF   = PTR_DEPTH_OFF + PTR_DEPTH_SIZE
 
 EMBED_SIZE = sum([
     TYPE_SIZE, IS_AP_SIZE, IS_AC_SIZE, BITS_SIZE, FRAC_SIZE,
-    SIGNED_SIZE, QUANT_SIZE, OVERFLOW_SIZE, ARRAY_LEN_SIZE, PTR_DEPTH_SIZE
+    SIGNED_SIZE, QUANT_SIZE, OVERFLOW_SIZE, ARRAY_LEN_SIZE, PTR_DEPTH_SIZE,
+    CONSTANT_LITERAL_SIZE,
 ])
 
 
@@ -731,8 +838,8 @@ def type_embedding(type_str):
         emb[SIGNED_OFF] = not (m.group(1) == "u" or m.group(4) == "false")
 
         # defaults are AP_TRN and AP_WRAP per https://docs.amd.com/r/2023.1-English/ug1399-vitis-hls/Fixed-Point-Identifier-Summary
-        quant = AP_QUANT_MAP.get(m.group(5), "TRN")
-        overflow = AP_OVERFLOW_MAP.get(m.group(6), "WRAP")
+        quant = AP_QUANT_MAP[m.group(5) or "TRN"]
+        overflow = AP_OVERFLOW_MAP[m.group(6) or "WRAP"]
         
 
         # one-hot assignments here

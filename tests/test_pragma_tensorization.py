@@ -3,7 +3,15 @@ import unittest
 
 import numpy as np
 
-from ll_hls4ml.data.tensorize import _json_to_hetero, pragma_embedding
+from ll_hls4ml.data.tensorize import (
+    ARRAY_LEN_OFF,
+    LITERAL_OFF,
+    OVERFLOW_OFF,
+    QUANT_OFF,
+    _json_to_hetero,
+    pragma_embedding,
+    type_embedding,
+)
 from ll_hls4ml.io.schema import (
     PRAGMA_CATEGORICAL_ARGUMENTS,
     PRAGMA_FEATURE_SIZE,
@@ -25,6 +33,58 @@ def pragma_node(arguments):
 
 
 class PragmaTensorizationTests(unittest.TestCase):
+    def test_ap_fixed_shorthand_uses_truncate_and_wrap_defaults(self):
+        embedding = type_embedding('%"struct.ap_fixed<8, 1>"')
+        self.assertEqual(embedding[QUANT_OFF + 5], 1)
+        self.assertEqual(embedding[OVERFLOW_OFF + 3], 1)
+        self.assertEqual(embedding[QUANT_OFF], 0)
+        self.assertEqual(embedding[OVERFLOW_OFF], 0)
+
+    def test_shift_register_length_and_constant_literal_are_retained(self):
+        shift = type_embedding(
+            '%"class.ap_shift_reg<ap_ufixed<4, 1, AP_RND_CONV, AP_SAT>, 9>"'
+        )
+        self.assertAlmostEqual(shift[ARRAY_LEN_OFF], np.log2(9))
+
+        graph = {
+            "nodes": [
+                {
+                    "id": 0,
+                    "type": 2,
+                    "text": "i64",
+                    "features": {"full_text": ["i64 64"]},
+                }
+            ],
+            "links": [],
+        }
+        data, _ = _json_to_hetero(graph, {}, inference_mode=True)
+        literal = data["constant"].x[0, LITERAL_OFF:].numpy()
+        self.assertEqual(literal[0], 1)
+        self.assertAlmostEqual(literal[1], np.log1p(64), places=6)
+        self.assertEqual(literal[-1], 1)
+
+    def test_graph_context_is_tensorized(self):
+        graph = {
+            "nodes": [],
+            "links": [],
+            "synthesis_metadata": {
+                "backend": "vitis",
+                "target_part": "xcu250-figd2104-2L-e",
+                "vivado_version": "2023.2",
+                "hls4ml_version": "0.8.1",
+                "target_clock": "5.0",
+            },
+        }
+        data, _ = _json_to_hetero(graph, {}, inference_mode=True)
+        np.testing.assert_array_equal(
+            data.graph_context_categorical.numpy(),
+            np.array([[1, 2, 3, 5]]),
+        )
+        self.assertAlmostEqual(
+            data.graph_context_numeric.item(),
+            np.log1p(5),
+        )
+
     def test_encodes_directive_numeric_mask_and_categorical_arguments(self):
         embedding = pragma_embedding(
             pragma_node(

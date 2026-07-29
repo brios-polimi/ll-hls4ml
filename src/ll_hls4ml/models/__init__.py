@@ -1,10 +1,14 @@
 from ll_hls4ml.models.registry import build, list_models
-from ll_hls4ml.models.rgcn import CDFGConvLayer, CDFGRGCN, CDFGInputProjection
+from ll_hls4ml.models.hetero_gat import (
+    CDFGConvLayer,
+    CDFGHeteroGAT,
+    CDFGInputProjection,
+)
 
 __all__ = [
     "build",
     "list_models",
     "CDFGConvLayer",
-    "CDFGRGCN",
+    "CDFGHeteroGAT",
     "CDFGInputProjection",
 ]

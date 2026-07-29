@@ -144,6 +144,21 @@ PRAGMA_CATEGORICAL_ARGUMENTS = (
     ("impl", "memory"),
     ("impl", "dsp"),
     ("impl", "fabric"),
+    # Operation/resource kinds that materially affect allocation and binding.
+    ("instances", "mul"),
+    ("instances", "add"),
+    ("instances", "sub"),
+    ("instances", "div"),
+    ("op", "mul"),
+    ("op", "add"),
+    ("op", "sub"),
+    ("op", "fadd"),
+    ("op", "fsub"),
+    ("op", "fmul"),
+    ("op", "udiv"),
+    ("op", "sdiv"),
+    ("op", "fdiv"),
+    ("op", "sqrt"),
 )
 PRAGMA_ARGUMENT_SIZE = (
     2 * len(PRAGMA_NUMERIC_ARGUMENTS)
@@ -190,6 +205,35 @@ LABEL_KEYS = [
     #"interval_min",
     #"target_clock",
 ]
+
+# Graph-level causal synthesis context. Index zero is always unknown so new
+# tool/device versions remain loadable without pretending they are known.
+GRAPH_CONTEXT_CATEGORICAL_VOCABS = {
+    "backend": {"vitis": 1, "bambu": 2, "VivadoAccelerator": 3},
+    "target_part": {
+        "xcu200-fsgd2104-2-e": 1,
+        "xcu250-figd2104-2L-e": 2,
+        "xczu9eg-ffvb1156-2-e": 3,
+        "xc7z020clg400-1": 4,
+    },
+    "vivado_version": {
+        "2019.1": 1,
+        "2020.1": 2,
+        "2023.2": 3,
+        "2024.2": 4,
+    },
+    "hls4ml_version": {
+        "0.5.0": 1,
+        "0.6.0": 2,
+        "0.7.0": 3,
+        "0.8.0": 4,
+        "0.8.1": 5,
+        "0.9.0": 6,
+        "1.0.0": 7,
+        "1.1.0": 8,
+    },
+}
+GRAPH_CONTEXT_NUMERIC_KEYS = ("target_clock",)
 
 
 def safe_int(x):

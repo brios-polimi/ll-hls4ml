@@ -16,6 +16,7 @@ from tqdm import tqdm
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
 from ll_hls4ml.training.targets import (
+    apply_hurdle_prediction,
     compute_target_z_stats,
     normalize_target,
     wahls4ml_metrics,
@@ -96,13 +97,23 @@ def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module
     raise ValueError("Leave-family-out training currently requires one optimizer group")
 
 
-def _save_checkpoint(epoch, model, optimizer, scheduler, path):
-    torch.save({
+def _save_checkpoint(
+    epoch,
+    model,
+    optimizer,
+    scheduler,
+    path,
+    training_state: dict | None = None,
+):
+    checkpoint = {
         "epoch": epoch,
         "model": unwrap_model(model).state_dict(),
         "optimizer": optimizer.state_dict(),
         "scheduler": scheduler.state_dict() if scheduler else None,
-    }, path)
+    }
+    if training_state is not None:
+        checkpoint["training_state"] = training_state
+    torch.save(checkpoint, path)
 
 
 def train_one_epoch(
@@ -180,7 +191,18 @@ def validate_one_epoch(
             pred = evaluation_model(batch)
             loss = criterion(pred, target)
 
-            all_preds.append(pred)
+            all_preds.append(
+                apply_hurdle_prediction(
+                    pred,
+                    base_model.y_means,
+                    base_model.y_stds,
+                    mode=getattr(
+                        base_model,
+                        "hurdle_prediction_mode",
+                        "expected",
+                    ),
+                )
+            )
             all_targets.append(target)
 
             n = batch.num_graphs
@@ -221,6 +243,7 @@ def fit(
     checkpoint_dir: str | Path | None = None,
     resume_from_backup: str | Path | None = None,
     distributed: bool = False,
+    early_stopping_metric: str = "loss",
 ):
     """
     Train model with optional early stopping.
@@ -237,7 +260,15 @@ def fit(
     backup_path = checkpoint_dir / f"{experiment_name}_backup.pt"
 
     model.to(device)
-    
+    if isinstance(criterion, torch.nn.Module):
+        criterion.to(device)
+
+    history = []
+    if patience > 0:
+        patience_counter = 0
+        best_metric = float("-inf") if mode == "max" else float("inf")
+        best_epoch = 0
+
     if resume_from_backup:
         checkpoint = torch.load(resume_from_backup, map_location=device, weights_only=True)
         model.load_state_dict(checkpoint["model"])
@@ -245,6 +276,16 @@ def fit(
         if scheduler is not None and checkpoint["scheduler"] is not None:
             scheduler.load_state_dict(checkpoint["scheduler"])
         start_epoch = checkpoint["epoch"] + 1
+        training_state = checkpoint.get("training_state", {})
+        history = list(training_state.get("history", []))
+        if patience > 0:
+            patience_counter = int(
+                training_state.get("patience_counter", 0)
+            )
+            best_metric = float(
+                training_state.get("best_metric", best_metric)
+            )
+            best_epoch = int(training_state.get("best_epoch", 0))
     else:
         start_epoch = 1
 
@@ -256,11 +297,6 @@ def fit(
         if isinstance(train_loader.sampler, DistributedSampler)
         else None
     )
-
-    if patience > 0:
-        patience_counter = 0
-        best_metric = float("-inf") if mode == "max" else float("inf")
-        best_epoch = 0
 
     if main:
         print(f"Training {epochs} epochs...")
@@ -289,6 +325,21 @@ def fit(
             model, val_loader, criterion, device,
             pbar=pbar, distributed=distributed,
         )
+        if main:
+            history.append(
+                {
+                    "epoch": epoch,
+                    "train_loss": float(train_loss),
+                    **{
+                        f"val_{name}": (
+                            float(value.mean().item())
+                            if isinstance(value, torch.Tensor)
+                            else float(value)
+                        )
+                        for name, value in val_metrics.items()
+                    },
+                }
+            )
 
         if pbar is not None:
             pbar.set_postfix({
@@ -314,7 +365,9 @@ def fit(
         should_stop.zero_()
 
         if patience > 0 and main:
-            current_metric = val_metrics["loss"]
+            current_metric = val_metrics[early_stopping_metric]
+            if isinstance(current_metric, torch.Tensor):
+                current_metric = current_metric.mean().item()
             is_improvement = (
                 current_metric > best_metric if mode == "max" else current_metric < best_metric
             )
@@ -323,7 +376,19 @@ def fit(
                 best_metric = current_metric
                 best_epoch = epoch
                 patience_counter = 0
-                _save_checkpoint(epoch, model, optimizer, scheduler, ckpt_path)
+                _save_checkpoint(
+                    epoch,
+                    model,
+                    optimizer,
+                    scheduler,
+                    ckpt_path,
+                    training_state={
+                        "history": history,
+                        "best_metric": best_metric,
+                        "best_epoch": best_epoch,
+                        "patience_counter": patience_counter,
+                    },
+                )
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
@@ -331,7 +396,25 @@ def fit(
                     should_stop[0] = 1
 
         if main and epoch % 1 == 0:
-            _save_checkpoint(epoch, model, optimizer, scheduler, backup_path)
+            _save_checkpoint(
+                epoch,
+                model,
+                optimizer,
+                scheduler,
+                backup_path,
+                training_state={
+                    "history": history,
+                    "best_metric": (
+                        best_metric if patience > 0 else None
+                    ),
+                    "best_epoch": (
+                        best_epoch if patience > 0 else epoch
+                    ),
+                    "patience_counter": (
+                        patience_counter if patience > 0 else 0
+                    ),
+                },
+            )
             print(f"Model saved to {backup_path}")
 
         if distributed:
@@ -346,7 +429,8 @@ def fit(
         if main:
             print(
                 f"Best model restored from epoch {best_epoch} "
-                f"with validation loss {best_metric:.4f}"
+                f"with validation {early_stopping_metric} "
+                f"{best_metric:.4f}"
             )
 
     if patience == 0 and main:
@@ -355,6 +439,10 @@ def fit(
     if distributed:
         dist.barrier()
 
+    base_model = unwrap_model(model)
+    base_model.training_history = history
+    base_model.best_epoch = best_epoch if patience > 0 else epoch
+    base_model.best_metric = best_metric if patience > 0 else None
     return model
 
 

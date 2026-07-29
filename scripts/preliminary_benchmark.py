@@ -19,9 +19,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import ExtraTreesRegressor
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
@@ -32,6 +33,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
+from ll_hls4ml.data.tensorize import EMBED_SIZE, LITERAL_OFF
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.io.load_json import load_graph_json
 from ll_hls4ml.io.schema import (
@@ -130,6 +132,25 @@ def _split_indices(dataset: HeteroGraphDataset, seed: int):
         index for index in range(len(dataset))
         if dataset.type_of(index) == "exemplar"
     ]
+    official = {"train": [], "validation": [], "synthetic_test": []}
+    for index in synthetic:
+        split = str(dataset.metadata_of(index).get("dataset_split", "")).lower()
+        key = {
+            "train": "train",
+            "val": "validation",
+            "validation": "validation",
+            "test": "synthetic_test",
+        }.get(split)
+        if key is not None:
+            official[key].append(index)
+    if sum(map(len, official.values())) == len(synthetic) and all(
+        official.values()
+    ):
+        return {
+            **{name: sorted(indices) for name, indices in official.items()},
+            "exemplar": sorted(exemplar),
+        }
+
     families = [dataset.type_of(index) for index in synthetic]
     train_indices, holdout_indices = train_test_split(
         synthetic,
@@ -184,6 +205,7 @@ def _tensor_features(data, instruction_vocab_size: int) -> dict[str, float]:
     instruction_denominator = max(len(instruction), 1)
     for index, count in enumerate(instruction_histogram):
         features[f"instruction_id_{index}_ratio"] = count / instruction_denominator
+        features[f"instruction_id_{index}_log_count"] = np.log1p(count)
 
     pragma = data["pragma"].x[:, 0].long().numpy()
     pragma_histogram = np.bincount(
@@ -192,6 +214,7 @@ def _tensor_features(data, instruction_vocab_size: int) -> dict[str, float]:
     pragma_denominator = max(len(pragma), 1)
     for index, count in enumerate(pragma_histogram):
         features[f"pragma_id_{index}_ratio"] = count / pragma_denominator
+        features[f"pragma_id_{index}_log_count"] = np.log1p(count)
 
     for node_type in ("variable", "constant"):
         values = data[node_type].x.float().numpy()
@@ -203,9 +226,35 @@ def _tensor_features(data, instruction_vocab_size: int) -> dict[str, float]:
                 features[f"{node_type}_feature_{index}_max"] = float(
                     values[:, index].max()
                 )
+                features[f"{node_type}_feature_{index}_std"] = float(
+                    values[:, index].std()
+                )
+                features[f"{node_type}_feature_{index}_signed_log_sum"] = float(
+                    np.sign(values[:, index].sum())
+                    * np.log1p(abs(values[:, index].sum()))
+                )
             else:
                 features[f"{node_type}_feature_{index}_mean"] = 0.0
                 features[f"{node_type}_feature_{index}_max"] = 0.0
+                features[f"{node_type}_feature_{index}_std"] = 0.0
+                features[f"{node_type}_feature_{index}_signed_log_sum"] = 0.0
+
+    pragma_arguments = data["pragma"].x[:, 1:].float().numpy()
+    for index in range(pragma_arguments.shape[1]):
+        values = pragma_arguments[:, index]
+        features[f"pragma_argument_{index}_mean"] = (
+            float(values.mean()) if len(values) else 0.0
+        )
+        features[f"pragma_argument_{index}_max"] = (
+            float(values.max()) if len(values) else 0.0
+        )
+
+    context_categorical = data.graph_context_categorical.view(-1).numpy()
+    for index, value in enumerate(context_categorical):
+        features[f"context_categorical_{index}_{int(value)}"] = 1.0
+    context_numeric = data.graph_context_numeric.view(-1).numpy()
+    for index, value in enumerate(context_numeric):
+        features[f"context_numeric_{index}"] = float(value)
 
     total_edges = 0
     for edge_type in EDGE_TYPES:
@@ -260,36 +309,162 @@ def _evaluate_classical(
     seed: int,
 ) -> list[Evaluation]:
     metadata = {"dataset_index", "kernel_family", "tensor_path", *LABEL_KEYS}
-    feature_columns = [column for column in frame.columns if column not in metadata]
+    all_feature_columns = [
+        column for column in frame.columns if column not in metadata
+    ]
+    context_feature_sets = {
+        "graph": [
+            column
+            for column in all_feature_columns
+            if not column.startswith("context_")
+        ],
+        "core_context": [
+            column
+            for column in all_feature_columns
+            if not (
+                column.startswith("context_categorical_2_")
+                or column.startswith("context_categorical_3_")
+            )
+        ],
+        "all_context": all_feature_columns,
+    }
+    graph_features = context_feature_sets["graph"]
+    size_features = [
+        column
+        for column in graph_features
+        if (
+            column in {
+                "total_nodes",
+                "log_total_nodes",
+                "total_edges",
+                "log_total_edges",
+            }
+            or (
+                (column.endswith("_count") or column.endswith("_ratio"))
+                and not column.startswith(("instruction_id_", "pragma_id_"))
+            )
+        )
+    ]
+    ablation_feature_sets = {
+        "graph_no_pragmas": [
+            column for column in graph_features if "pragma" not in column
+        ],
+        "graph_no_pragma_arguments": [
+            column
+            for column in graph_features
+            if not column.startswith("pragma_argument_")
+        ],
+        "graph_no_pragma_edges": [
+            column
+            for column in graph_features
+            if not column.startswith("edge_pragma__applies_to")
+        ],
+        "graph_no_type_features": [
+            column
+            for column in graph_features
+            if not column.startswith(("variable_feature_", "constant_feature_"))
+        ],
+        "graph_no_literal_features": [
+            column
+            for column in graph_features
+            if not any(
+                column.startswith(f"constant_feature_{index}_")
+                for index in range(LITERAL_OFF, EMBED_SIZE)
+            )
+        ],
+        "graph_no_edges": [
+            column
+            for column in graph_features
+            if not column.startswith("edge_")
+            and column not in {"total_edges", "log_total_edges"}
+        ],
+        "graph_size_only": size_features,
+        "graph_opcodes_size": [
+            column
+            for column in graph_features
+            if column in size_features or column.startswith("instruction_id_")
+        ],
+    }
+    feature_sets = {**context_feature_sets, **ablation_feature_sets}
     indexed = frame.set_index("dataset_index")
-    train_x = indexed.loc[splits["train"], feature_columns].to_numpy(np.float32)
-    train_x = np.nan_to_num(train_x, nan=0.0, posinf=0.0, neginf=0.0)
     train_y = indexed.loc[splits["train"], LABEL_KEYS].to_numpy(np.float32)
     log_train_y = np.log1p(train_y)
     target_scaler = StandardScaler().fit(log_train_y)
     standardized_y = target_scaler.transform(log_train_y)
 
-    models = {
-        "median": None,
-        "ridge": make_pipeline(StandardScaler(), Ridge(alpha=10.0)),
-        "extra_trees": ExtraTreesRegressor(
-            n_estimators=400,
-            min_samples_leaf=2,
-            max_features=0.8,
-            n_jobs=-1,
-            random_state=seed,
-        ),
-        "rbf_svr": make_pipeline(
-            StandardScaler(),
-            MultiOutputRegressor(
-                SVR(C=10.0, epsilon=0.05, gamma="scale"),
-                n_jobs=-1,
-            ),
-        ),
-    }
     median = np.median(train_y, axis=0, keepdims=True)
     evaluations: list[Evaluation] = []
-    for name, model in models.items():
+    model_specs = [("median", None, "graph")]
+    for feature_name in context_feature_sets:
+        model_specs.extend(
+            [
+                (
+                    f"ridge_{feature_name}",
+                    make_pipeline(StandardScaler(), Ridge(alpha=10.0)),
+                    feature_name,
+                ),
+                (
+                    f"extra_trees_{feature_name}",
+                    ExtraTreesRegressor(
+                        n_estimators=400,
+                        min_samples_leaf=2,
+                        max_features=0.8,
+                        n_jobs=-1,
+                        random_state=seed,
+                    ),
+                    feature_name,
+                ),
+                (
+                    f"rbf_svr_{feature_name}",
+                    make_pipeline(
+                        StandardScaler(),
+                        MultiOutputRegressor(
+                            SVR(C=10.0, epsilon=0.05, gamma="scale"),
+                            n_jobs=-1,
+                        ),
+                    ),
+                    feature_name,
+                ),
+                (
+                    f"tabular_mlp_{feature_name}",
+                    make_pipeline(
+                        StandardScaler(),
+                        MLPRegressor(
+                            hidden_layer_sizes=(128, 64),
+                            activation="relu",
+                            early_stopping=True,
+                            validation_fraction=0.15,
+                            n_iter_no_change=20,
+                            max_iter=500,
+                            random_state=seed,
+                        ),
+                    ),
+                    feature_name,
+                ),
+            ]
+        )
+    for feature_name in ablation_feature_sets:
+        model_specs.append(
+            (
+                f"rbf_svr_{feature_name}",
+                make_pipeline(
+                    StandardScaler(),
+                    MultiOutputRegressor(
+                        SVR(C=10.0, epsilon=0.05, gamma="scale"),
+                        n_jobs=-1,
+                    ),
+                ),
+                feature_name,
+            )
+        )
+    for name, model, feature_name in model_specs:
+        feature_columns = feature_sets[feature_name]
+        train_x = indexed.loc[
+            splits["train"], feature_columns
+        ].to_numpy(np.float32)
+        train_x = np.nan_to_num(
+            train_x, nan=0.0, posinf=0.0, neginf=0.0
+        )
         print(f"Fitting {name}...", flush=True)
         if model is not None:
             model.fit(train_x, standardized_y)
@@ -310,6 +485,66 @@ def _evaluate_classical(
             evaluations.append(
                 Evaluation(
                     model=name,
+                    split=split_name,
+                    predictions=np.clip(predictions, 0, None).astype(np.float32),
+                    targets=targets,
+                    inference_seconds_per_sample=elapsed / len(indices),
+                )
+            )
+
+    feature_columns = feature_sets["graph"]
+    train_x = indexed.loc[splits["train"], feature_columns].to_numpy(np.float32)
+    train_x = np.nan_to_num(train_x, nan=0.0, posinf=0.0, neginf=0.0)
+    input_scaler = StandardScaler().fit(train_x)
+    train_x_scaled = input_scaler.transform(train_x)
+    regressors = []
+    classifiers = {}
+    for target_index in range(len(LABEL_KEYS)):
+        positive = train_y[:, target_index] > 0
+        fit_rows = (
+            positive if target_index in (2, 3) else np.ones(len(train_y), dtype=bool)
+        )
+        regressor = SVR(C=10.0, epsilon=0.05, gamma="scale")
+        regressor.fit(
+            train_x_scaled[fit_rows],
+            standardized_y[fit_rows, target_index],
+        )
+        regressors.append(regressor)
+        if target_index in (2, 3):
+            classifier = LogisticRegression(
+                class_weight="balanced",
+                max_iter=1000,
+                random_state=seed,
+            )
+            classifier.fit(train_x_scaled, positive)
+            classifiers[target_index] = classifier
+
+    for split_name in ("synthetic_test", "exemplar"):
+        indices = splits[split_name]
+        x = indexed.loc[indices, feature_columns].to_numpy(np.float32)
+        x = np.nan_to_num(x, nan=0.0, posinf=0.0, neginf=0.0)
+        x = input_scaler.transform(x)
+        targets = indexed.loc[indices, LABEL_KEYS].to_numpy(np.float32)
+        started = time.perf_counter()
+        prediction_scaled = np.column_stack(
+            [regressor.predict(x) for regressor in regressors]
+        )
+        positive_probability = {
+            index: classifier.predict_proba(x)[:, 1]
+            for index, classifier in classifiers.items()
+        }
+        raw_positive = np.expm1(
+            target_scaler.inverse_transform(prediction_scaled)
+        )
+        elapsed = time.perf_counter() - started
+        for mode in ("expected", "threshold"):
+            predictions = raw_positive.copy()
+            for target_index, probability in positive_probability.items():
+                multiplier = probability if mode == "expected" else probability >= 0.5
+                predictions[:, target_index] *= multiplier
+            evaluations.append(
+                Evaluation(
+                    model=f"logistic_hurdle_rbf_{mode}_graph",
                     split=split_name,
                     predictions=np.clip(predictions, 0, None).astype(np.float32),
                     targets=targets,
@@ -387,9 +622,9 @@ def _evaluate_neural(
         "dropout": 0.15,
         "pool": "mean",
     }
-    if model_name == "rgcn":
+    if model_name in {"hetero_gat", "rgcn"}:
         model_kwargs.update(
-            {"edge_pos_vocab_size": max_position, "aggr": "mean"}
+            {"edge_pos_vocab_size": max_position, "aggr": "sum"}
         )
     else:
         model_kwargs.update(
@@ -639,7 +874,7 @@ def _write_report(
         return "not run"
 
     mlp_pragma_delta = pragma_delta("pooled_mlp", "pooled_mlp_no_pragmas")
-    rgcn_pragma_delta = pragma_delta("rgcn", "rgcn_no_pragmas")
+    gat_pragma_delta = pragma_delta("hetero_gat", "hetero_gat_no_pragmas")
     best_synthetic = (
         synthetic.groupby("model")["smape"].mean().sort_values().index[0]
     )
@@ -652,7 +887,29 @@ def _write_report(
         for directive, count in pragma_audit["directive_counts"].items()
         if directive not in PRAGMA_VOCAB
     }
-    report = f"""# Preliminary five-family benchmark
+    neural_models = {
+        "pooled_mlp",
+        "pooled_mlp_no_pragmas",
+        "hetero_gat",
+        "hetero_gat_no_pragmas",
+    } & available_models
+    neural_finding = (
+        "Neural runs are included, so comparisons with the tabular baselines "
+        "measure whether message passing adds value beyond graph-wide statistics."
+        if neural_models
+        else
+        "Neural runs were intentionally omitted. These results establish a "
+        "tabular reference and cannot by themselves support a verdict about the GNN."
+    )
+    pragma_summary = (
+        "The graph-level pragma audit was skipped for this run."
+        if config["pragma_audit_skipped"]
+        else (
+            f"The audit found {pragma_audit['graphs_without_pragmas']} graphs "
+            "without injected pragma nodes."
+        )
+    )
+    report = f"""# Tensor-v2 eight-family benchmark
 
 Generated: {time.strftime("%Y-%m-%d %H:%M:%S %Z")}
 
@@ -670,10 +927,9 @@ encoding, and pragma injection are all research variables that may change.
 - ll-hls4ml state: `{json.dumps(config["ll_hls4ml_git"])}` 
 - hls4ml_pipeline state: `{json.dumps(config["pipeline_git"])}` 
 
-The synthetic test contains held-out samples from 2layer, 3layer, Conv1D, and
-Conv2D. Exemplar is never used for training or validation and is treated as an
-external inductive set, matching the paper's distinction in spirit. These are
-locally generated splits, not the benchmark's official sample IDs.
+The synthetic train, validation, and test memberships come from the dataset's
+official split labels. Exemplar is never used for fitting or model selection and
+is treated as a deliberately shifted external set.
 
 ## Synthetic test summary
 
@@ -685,20 +941,15 @@ locally generated splits, not the benchmark's official sample IDs.
 
 ## Main findings
 
-- `{best_synthetic}` is the strongest current synthetic-test baseline. The
-  simple classical models outperform both neural architectures, so further
-  model scaling is not justified yet.
-- Every model fails on exemplar (`{best_exemplar}` is merely the least bad).
-  This is evidence of severe family/domain shift, not a useful wa-hls4ml
-  headline comparison.
+- `{best_synthetic}` is the strongest synthetic-test model in this run;
+  `{best_exemplar}` has the lowest exemplar macro SMAPE.
+- {neural_finding}
+- Exemplar also changes kernel family, tool versions, and synthesis-context
+  combinations. Its score therefore measures compound domain shift rather than
+  isolated structural generalization.
 - Adding pragmas changes synthetic macro SMAPE by {mlp_pragma_delta}
-  points for the pooled MLP and {rgcn_pragma_delta} points for the R-GCN
-  relative to their no-pragma ablations. Negative means pragmas help. The
-  synthetic effect is modest and does not carry consistently to exemplar, so
-  one seed cannot establish that the injected representation generalizes.
-- The correct next investment is data/schema validation and group-aware
-  evaluation, followed by coverage of the missing kernel families. It is not a
-  larger GNN.
+  points for the pooled MLP and {gat_pragma_delta} points for the heterogeneous GAT
+  relative to their no-pragma ablations. Negative means pragmas help.
 
 ### Synthetic-test SMAPE by target
 
@@ -714,13 +965,13 @@ Paper-style RPE box plots and log-log prediction scatter plots are in `figures/`
 
 ## Pragma audit
 
+- {pragma_summary}
 - Graphs checked: {pragma_audit["graphs_checked"]}
-- Graphs without injected pragma nodes: {pragma_audit["graphs_without_pragmas"]}
 - Injection anchors: `{json.dumps(pragma_audit["anchor_reason_counts"])}`
 - Directives not represented distinctly by the current tensor vocabulary:
   `{json.dumps(unknown_directives)}`
 
-The MLP consumes pragma IDs through a pooled pragma embedding. The R-GCN uses the
+The MLP consumes pragma IDs through a pooled pragma embedding. The heterogeneous GAT uses the
 same embedding, sends pragma-node messages to anchored instruction/variable
 nodes, and also pools the resulting pragma representation. The `*_no_pragmas`
 runs zero pragma features and remove pragma edges; their difference from the
@@ -738,11 +989,11 @@ distinct tensor ID; future unknown directives will still collapse to UNK.
   Positive values mean underprediction and negative values mean overprediction.
 - DSP and BRAM contain genuine zeros, so RPE and SMAPE use the paper's `+1`
   denominator convention.
-- Exemplar performance is the more relevant generalization warning, but the
-  present sample is small and the training families are incomplete.
+- Exemplar performance is a useful generalization warning, but it should be
+  reported separately from in-distribution synthetic-test performance.
 - Do not compare these numbers directly with the published headline results
-  until official split membership, all intended families, graph provenance, and
-  target definitions are aligned.
+  unless graph provenance, synthesis contexts, and target definitions are also
+  aligned.
 
 ## Data-retention consequence
 
@@ -769,11 +1020,23 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=7)
     parser.add_argument("--batch-size", type=int, default=2)
     parser.add_argument("--skip-neural", action="store_true")
+    parser.add_argument("--skip-pragma-audit", action="store_true")
+    parser.add_argument("--skip-plots", action="store_true")
     parser.add_argument(
         "--neural-models",
         nargs="+",
-        choices=("pooled_mlp", "pooled_mlp_no_pragmas", "rgcn", "rgcn_no_pragmas"),
-        default=("pooled_mlp", "pooled_mlp_no_pragmas", "rgcn", "rgcn_no_pragmas"),
+        choices=(
+            "pooled_mlp",
+            "pooled_mlp_no_pragmas",
+            "hetero_gat",
+            "hetero_gat_no_pragmas",
+        ),
+        default=(
+            "pooled_mlp",
+            "pooled_mlp_no_pragmas",
+            "hetero_gat",
+            "hetero_gat_no_pragmas",
+        ),
     )
     args = parser.parse_args()
 
@@ -790,8 +1053,6 @@ def main() -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
     dataset = HeteroGraphDataset(tensor_root, types=FAMILIES, silent=False)
     vocabulary, max_position, _ = load_vocab(Path(args.vocab))
-    if max(int(dataset[index]["instruction"].x.max()) for index in range(len(dataset))) >= len(vocabulary):
-        raise ValueError("Tensor instruction IDs exceed the selected vocabulary")
 
     splits = _split_indices(dataset, args.seed)
     manifest = _split_manifest(dataset, splits, tensor_root)
@@ -812,6 +1073,8 @@ def main() -> None:
         "torch_version": torch.__version__,
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
         "pipeline_git": _git_state(_REPO_ROOT.parent / "hls4ml_pipeline"),
+        "pragma_audit_skipped": args.skip_pragma_audit,
+        "plots_skipped": args.skip_plots,
     }
     (output_dir / "resolved_config.json").write_text(
         json.dumps(config, indent=2)
@@ -837,8 +1100,8 @@ def main() -> None:
         model_specs = (
             ("mlp", "pooled_mlp", False),
             ("mlp", "pooled_mlp_no_pragmas", True),
-            ("rgcn", "rgcn", False),
-            ("rgcn", "rgcn_no_pragmas", True),
+            ("hetero_gat", "hetero_gat", False),
+            ("hetero_gat", "hetero_gat_no_pragmas", True),
         )
         for model_name, output_name, without_pragmas in model_specs:
             if output_name not in args.neural_models:
@@ -863,8 +1126,20 @@ def main() -> None:
     metrics = _metrics_frame(evaluations)
     metrics.to_csv(output_dir / "metrics.csv", index=False)
     _save_predictions(evaluations, dataset, splits, output_dir)
-    _save_plots(evaluations, output_dir)
-    pragma_audit = _pragma_audit(graph_root, dataset)
+    if not args.skip_plots:
+        _save_plots(evaluations, output_dir)
+    pragma_audit = (
+        {
+            "graphs_checked": 0,
+            "graphs_without_pragmas": 0,
+            "directive_counts": {},
+            "anchor_reason_counts": {},
+            "injector_counts": {},
+            "known_tensor_pragma_vocab": PRAGMA_VOCAB,
+        }
+        if args.skip_pragma_audit
+        else _pragma_audit(graph_root, dataset)
+    )
     (output_dir / "pragma_audit.json").write_text(
         json.dumps(pragma_audit, indent=2)
     )

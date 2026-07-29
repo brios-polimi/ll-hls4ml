@@ -22,6 +22,7 @@ class TrainingSmokeTests(unittest.TestCase):
         from ll_hls4ml.training.loaders import make_loader
         from ll_hls4ml.training.loops import fit, validate_one_epoch
         from ll_hls4ml.training.targets import compute_target_z_stats
+        from ll_hls4ml.training.targets import LogHuberHurdleLoss
 
         graph = {
             "nodes": [
@@ -117,7 +118,17 @@ class TrainingSmokeTests(unittest.TestCase):
 
             for name, extra in (
                 ("mlp", {}),
-                ("rgcn", {"edge_pos_vocab_size": 2}),
+                (
+                    "hetero_gat",
+                    {
+                        "edge_pos_vocab_size": 2,
+                        "pool": "multi",
+                        "use_global_features": True,
+                        "use_context": True,
+                        "split_heads": True,
+                        "hurdle_heads": True,
+                    },
+                ),
             ):
                 model = build(
                     name,
@@ -130,12 +141,17 @@ class TrainingSmokeTests(unittest.TestCase):
                     **extra,
                 )
                 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+                criterion = (
+                    LogHuberHurdleLoss(y_means, y_stds)
+                    if extra.get("hurdle_heads")
+                    else torch.nn.HuberLoss()
+                )
                 model = fit(
                     model,
                     loader,
                     loader,
                     epochs=1,
-                    criterion=torch.nn.HuberLoss(),
+                    criterion=criterion,
                     optimizer=optimizer,
                     scheduler=None,
                     device=device,
@@ -147,7 +163,7 @@ class TrainingSmokeTests(unittest.TestCase):
                 metrics = validate_one_epoch(
                     model,
                     loader,
-                    torch.nn.HuberLoss(),
+                    criterion,
                     device,
                 )
                 self.assertTrue(torch.isfinite(metrics["r2"]).all())
@@ -202,11 +218,21 @@ class TrainingSmokeTests(unittest.TestCase):
                 result["sizes"],
                 {"train": 6, "validation": 1, "test": 1, "exemplar": 2},
             )
+            self.assertEqual(
+                {
+                    row["kernel_family"]
+                    for row in result["metrics"]
+                },
+                {"all", "smoke", "exemplar"},
+            )
             self.assertTrue((result_dir / "metrics.csv").is_file())
             self.assertTrue((result_dir / "predictions.csv").is_file())
             self.assertTrue((result_dir / "split_manifest.json").is_file())
             self.assertTrue((result_dir / "figures" / "test__rpe.png").is_file())
             self.assertTrue((result_dir / "figures" / "test__scatter.png").is_file())
+
+            if os.environ.get("LL_HLS4ML_SKIP_DDP_SMOKE") == "1":
+                return
 
             ddp_config = json.loads(config_path.read_text())
             ddp_config.update(

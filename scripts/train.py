@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import csv
 import hashlib
 import json
 import os
+import random
 import subprocess
 import sys
 import time
@@ -16,7 +18,8 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.utils.data import Subset
+import yaml
+from torch.utils.data import Subset, WeightedRandomSampler
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/ll-hls4ml-matplotlib")
 
@@ -24,7 +27,10 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
-from ll_hls4ml.data.splits import random_train_val_test_split
+from ll_hls4ml.data.splits import (
+    benchmark_train_val_test_split,
+    random_train_val_test_split,
+)
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.models.registry import build
 from ll_hls4ml.training import compute_target_z_stats, make_loader
@@ -37,6 +43,9 @@ from ll_hls4ml.training.distributed import (
 )
 from ll_hls4ml.training.loops import _json_converter, fit
 from ll_hls4ml.training.targets import (
+    apply_hurdle_prediction,
+    LogHuberLoss,
+    LogHuberHurdleLoss,
     denormalize_target,
     relative_percentage_error,
     wahls4ml_metrics_raw,
@@ -63,11 +72,20 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         "num_layers": config.get("num_layers", 3),
         "dropout": config.get("dropout", 0.1),
         "pool": config.get("pool", "mean"),
+        "use_global_features": config.get("use_global_features", False),
+        "use_context": config.get("use_context", False),
+        "split_heads": config.get("split_heads", False),
+        "context_mode": config.get("context_mode", "core"),
+        "hurdle_heads": config.get("hurdle_heads", False),
+        "hurdle_prediction_mode": config.get(
+            "hurdle_prediction_mode",
+            "expected",
+        ),
     }
-    model_name = config.get("model", "rgcn")
-    if model_name == "rgcn":
+    model_name = config.get("model", "hetero_gat")
+    if model_name in {"hetero_gat", "rgcn"}:
         common["edge_pos_vocab_size"] = max_pos
-        common["aggr"] = config.get("aggr", "mean")
+        common["aggr"] = config.get("aggr", "sum")
     elif model_name == "mlp":
         common["num_var_embed_layers"] = config.get("num_var_embed_layers", 2)
         common["node_aggr"] = config.get("node_aggr", "concat")
@@ -129,8 +147,18 @@ def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
     with torch.no_grad():
         for batch in loader:
             batch = batch.to(device)
-            prediction = denormalize_target(
+            normalized_prediction = apply_hurdle_prediction(
                 base_model(batch),
+                base_model.y_means,
+                base_model.y_stds,
+                mode=getattr(
+                    base_model,
+                    "hurdle_prediction_mode",
+                    "expected",
+                ),
+            )
+            prediction = denormalize_target(
+                normalized_prediction,
                 base_model.y_means,
                 base_model.y_stds,
             )
@@ -153,6 +181,7 @@ def _metric_rows(
     predictions: np.ndarray,
     targets: np.ndarray,
     inference_seconds_per_sample: float,
+    kernel_family: str = "all",
 ) -> list[dict]:
     metrics = wahls4ml_metrics_raw(
         torch.from_numpy(np.array(predictions, copy=True)),
@@ -167,6 +196,7 @@ def _metric_rows(
         rows.append(
             {
                 "split": split_name,
+                "kernel_family": kernel_family,
                 "target": target_name,
                 "r2": float(metrics["r2"][index]),
                 "smape": float(metrics["smape"][index]),
@@ -258,7 +288,10 @@ def _write_report(
     metric_rows: list[dict],
 ) -> None:
     evaluation_rows = [
-        row for row in metric_rows if row["split"] in {"test", "exemplar"}
+        row
+        for row in metric_rows
+        if row["split"] in {"test", "exemplar"}
+        and row["kernel_family"] == "all"
     ]
     table = [
         "| split | target | R² | SMAPE (%) | RMSE | median RPE (%) |",
@@ -269,6 +302,39 @@ def _write_report(
             f"| {row['split']} | {row['target']} | {row['r2']:.3f} | "
             f"{row['smape']:.2f} | "
             f"{row['rmse']:.2f} | {row['rpe_median']:.2f} |"
+        )
+    macro_table = [
+        "| split | macro R² | macro SMAPE (%) |",
+        "| --- | ---: | ---: |",
+    ]
+    for split_name in ("test", "exemplar"):
+        rows = [row for row in evaluation_rows if row["split"] == split_name]
+        macro_table.append(
+            f"| {split_name} | "
+            f"{np.mean([row['r2'] for row in rows]):.3f} | "
+            f"{np.mean([row['smape'] for row in rows]):.2f} |"
+        )
+    family_table = [
+        "| test family | samples | macro R² | macro SMAPE (%) |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    test_families = sorted(
+        {
+            row["kernel_family"]
+            for row in metric_rows
+            if row["split"] == "test" and row["kernel_family"] != "all"
+        }
+    )
+    for family in test_families:
+        rows = [
+            row
+            for row in metric_rows
+            if row["split"] == "test" and row["kernel_family"] == family
+        ]
+        family_table.append(
+            f"| {family} | {rows[0]['n_samples']} | "
+            f"{np.mean([row['r2'] for row in rows]):.3f} | "
+            f"{np.mean([row['smape'] for row in rows]):.2f} |"
         )
     report = f"""# {experiment_name}
 
@@ -284,7 +350,13 @@ Single-model wa-hls4ml-style evaluation generated by `scripts/train.py`.
 
 ## Evaluation metrics
 
+{chr(10).join(macro_table)}
+
 {chr(10).join(table)}
+
+## Test metrics by kernel family
+
+{chr(10).join(family_table)}
 
 Per-target test and exemplar metrics are in `metrics.csv`. Exact split
 membership is in `split_manifest.json`, per-sample predictions are in
@@ -299,12 +371,22 @@ compiler/graph provenance, targets, and evaluation splits are aligned.
 def main() -> None:
     run_started = time.perf_counter()
     parser = argparse.ArgumentParser(description="Train an HLS surrogate model")
-    parser.add_argument("--config", required=True, help="Path to JSON training config")
+    parser.add_argument(
+        "--config",
+        required=True,
+        help="Path to a YAML or JSON training config",
+    )
+    parser.add_argument(
+        "--evaluate-checkpoint",
+        type=Path,
+        default=None,
+        help="Skip fitting and evaluate this checkpoint with the current config",
+    )
     args = parser.parse_args()
 
     config_file = Path(args.config).resolve()
     with config_file.open() as handle:
-        config = json.load(handle)
+        config = yaml.safe_load(handle)
     config_dir = config_file.parent
 
     _rank, world_size, local_rank = setup_from_env()
@@ -312,7 +394,11 @@ def main() -> None:
     main_process = is_main_process()
 
     seed = config.get("seed", 42)
+    random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
     if torch.cuda.is_available():
         device = torch.device(f"cuda:{local_rank}" if distributed else "cuda")
     else:
@@ -355,7 +441,12 @@ def main() -> None:
         max_per_type=None,
         silent=not main_process,
     )
-    train_ds, val_ds, test_ds = random_train_val_test_split(
+    split_fn = (
+        random_train_val_test_split
+        if config.get("split_strategy") == "random"
+        else benchmark_train_val_test_split
+    )
+    train_ds, val_ds, test_ds = split_fn(
         dataset,
         val_fraction=config.get("val_fraction", 0.15),
         test_fraction=config.get("test_fraction", 0.15),
@@ -370,12 +461,31 @@ def main() -> None:
 
     batch_size = config.get("batch_size", 4)
     num_workers = config.get("num_workers")
+    train_sampler = None
+    if config.get("family_balanced_sampling", False):
+        family_counts = Counter(
+            dataset.type_of(index) for index in train_ds.indices
+        )
+        weights = torch.tensor(
+            [
+                1.0 / family_counts[dataset.type_of(index)]
+                for index in train_ds.indices
+            ],
+            dtype=torch.double,
+        )
+        train_sampler = WeightedRandomSampler(
+            weights,
+            num_samples=len(weights),
+            replacement=True,
+            generator=torch.Generator().manual_seed(seed),
+        )
     train_loader = make_loader(
         train_ds,
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers,
         distributed=distributed,
+        sampler=train_sampler,
     )
     val_loader = make_loader(
         val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
@@ -393,7 +503,23 @@ def main() -> None:
         lr=config.get("learning_rate", 1e-3),
         weight_decay=config.get("weight_decay", 0.0),
     )
-    criterion = nn.HuberLoss(delta=config.get("huber_delta", 1.0))
+    loss_name = config.get("loss", "log_huber")
+    if loss_name == "log_huber_hurdle":
+        criterion = LogHuberHurdleLoss(
+            unwrap_model(model).y_means,
+            unwrap_model(model).y_stds,
+            delta=config.get("log_huber_delta", 0.35),
+            classification_weight=config.get(
+                "hurdle_classification_weight", 0.25
+            ),
+        )
+    elif loss_name == "log_huber":
+        criterion = LogHuberLoss(
+            unwrap_model(model).y_stds,
+            delta=config.get("log_huber_delta", 0.35),
+        )
+    else:
+        criterion = nn.HuberLoss(delta=config.get("huber_delta", 1.0))
 
     checkpoint_dir = _config_path(
         config.get("checkpoint_dir", "../artifacts/checkpoints"),
@@ -424,7 +550,7 @@ def main() -> None:
     )
     resolved_config = {
         **config,
-        "model": config.get("model", "rgcn"),
+        "model": config.get("model", "hetero_gat"),
         "kernel_types": kernel_types,
         "tensor_dir": str(tensor_dir),
         "vocab_path": str(vocab_path),
@@ -437,6 +563,11 @@ def main() -> None:
         ),
         "resume_checkpoint_path": (
             str(resume_checkpoint_path) if resume_checkpoint_path else None
+        ),
+        "evaluation_checkpoint_path": (
+            str(args.evaluate_checkpoint.resolve())
+            if args.evaluate_checkpoint
+            else None
         ),
         "results_dir": str(results_dir),
         "run_dir": str(run_dir),
@@ -458,24 +589,40 @@ def main() -> None:
         )
 
     try:
-        model = fit(
-            model,
-            train_loader,
-            val_loader,
-            epochs=config.get("epochs", 200),
-            criterion=criterion,
-            optimizer=optimizer,
-            scheduler=None,
-            device=device,
-            patience=config.get("patience", 30),
-            mode="min",
-            restore_best_weights=True,
-            verbose=config.get("verbose", 5),
-            experiment_name=experiment_name,
-            checkpoint_dir=checkpoint_dir,
-            resume_from_backup=resume_checkpoint_path,
-            distributed=distributed,
-        )
+        if args.evaluate_checkpoint is not None:
+            if distributed:
+                raise ValueError(
+                    "--evaluate-checkpoint is only supported in one process"
+                )
+            checkpoint = torch.load(
+                args.evaluate_checkpoint.resolve(),
+                map_location=device,
+                weights_only=True,
+            )
+            model.load_state_dict(checkpoint["model"])
+            model.to(device)
+        else:
+            model = fit(
+                model,
+                train_loader,
+                val_loader,
+                epochs=config.get("epochs", 200),
+                criterion=criterion,
+                optimizer=optimizer,
+                scheduler=None,
+                device=device,
+                patience=config.get("patience", 30),
+                mode="min",
+                restore_best_weights=True,
+                verbose=config.get("verbose", 5),
+                experiment_name=experiment_name,
+                checkpoint_dir=checkpoint_dir,
+                resume_from_backup=resume_checkpoint_path,
+                distributed=distributed,
+                early_stopping_metric=config.get(
+                    "early_stopping_metric", "smape"
+                ),
+            )
 
         if main_process:
             base_model = unwrap_model(model)
@@ -502,6 +649,23 @@ def main() -> None:
                         inference_latency,
                     )
                 )
+                families = np.asarray(
+                    [
+                        sample["kernel_family"]
+                        for sample in split_manifest[split_name]
+                    ]
+                )
+                for family in sorted(set(families)):
+                    family_mask = families == family
+                    metric_rows.extend(
+                        _metric_rows(
+                            split_name,
+                            predictions[family_mask],
+                            targets[family_mask],
+                            inference_latency,
+                            kernel_family=family,
+                        )
+                    )
                 prediction_rows.extend(
                     _prediction_rows(
                         split_name,
@@ -524,6 +688,13 @@ def main() -> None:
                 "sizes": sizes,
                 "target_log_mean": base_model.y_means.detach().cpu(),
                 "target_log_std": base_model.y_stds.detach().cpu(),
+                "training_history": getattr(
+                    base_model,
+                    "training_history",
+                    [],
+                ),
+                "best_epoch": getattr(base_model, "best_epoch", None),
+                "best_metric": getattr(base_model, "best_metric", None),
                 "metrics": metric_rows,
             }
             resolved_config["wall_seconds"] = time.perf_counter() - run_started

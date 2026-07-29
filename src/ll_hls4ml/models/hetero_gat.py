@@ -1,4 +1,4 @@
-"""Heterogeneous R-GCN for LLVM CDFG graphs."""
+"""Heterogeneous GATv2 model for LLVM CDFG graphs."""
 
 import torch
 import torch.nn as nn
@@ -18,6 +18,12 @@ from ll_hls4ml.io.schema import (
     PRAGMA_VOCAB_SIZE,
 )
 from ll_hls4ml.data.tensorize import EMBED_SIZE
+from ll_hls4ml.models.readout import (
+    GlobalFeatureEncoder,
+    GraphContextEncoder,
+    SplitRegressionHead,
+    multi_pool,
+)
 
 
 def _dense_projection(in_dim: int, hidden_dim: int) -> nn.Sequential:
@@ -47,6 +53,7 @@ class CDFGInputProjection(nn.Module):
             PRAGMA_VOCAB_SIZE, hidden_dim, padding_idx=0
         )
         self.pragma_arg_proj = _dense_projection(PRAGMA_ARGUMENT_SIZE, hidden_dim)
+        self.pragma_proj = _dense_projection(2 * hidden_dim, hidden_dim)
         self.variable_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.constant_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.block_proj = _dense_projection(BLOCK_FEATURE_SIZE, hidden_dim)
@@ -58,9 +65,14 @@ class CDFGInputProjection(nn.Module):
             "variable": self.variable_proj(x_dict["variable"].float()),
             "constant": self.constant_proj(x_dict["constant"].float()),
             "block": self.block_proj(x_dict["block"].float()),
-            "pragma": (
-                self.pragma_emb(x_dict["pragma"][:, 0].long())
-                + self.pragma_arg_proj(x_dict["pragma"][:, 1:].float())
+            "pragma": self.pragma_proj(
+                torch.cat(
+                    [
+                        self.pragma_emb(x_dict["pragma"][:, 0].long()),
+                        self.pragma_arg_proj(x_dict["pragma"][:, 1:].float()),
+                    ],
+                    dim=-1,
+                )
             ),
         }
         edge_emb_dict = {
@@ -76,7 +88,7 @@ class CDFGConvLayer(nn.Module):
     def __init__(
         self,
         hidden_dim: int,
-        aggr: str = "add",
+        aggr: str = "sum",
         dropout: float = 0.0,
     ):
         super().__init__()
@@ -89,11 +101,12 @@ class CDFGConvLayer(nn.Module):
                     concat=False,
                     edge_dim=hidden_dim if et in EDGE_TYPES_WITH_ATTR else None,
                     add_self_loops=False,
-                    aggr=aggr,
+                    # Attention already normalizes over the neighborhood.
+                    aggr="add",
                 )
                 for et in EDGE_TYPES
             },
-            aggr="add",
+            aggr=aggr,
         )
         self.dropout = nn.Dropout(dropout)
         self.norm = nn.ModuleDict(
@@ -113,8 +126,8 @@ class CDFGConvLayer(nn.Module):
         return updated
 
 
-class CDFGRGCN(nn.Module):
-    """Heterogeneous R-GCN for LLVM CDFG graphs with graph-level regression head."""
+class CDFGHeteroGAT(nn.Module):
+    """Relation-specific heterogeneous GATv2 graph regressor."""
 
     def __init__(
         self,
@@ -126,10 +139,18 @@ class CDFGRGCN(nn.Module):
         num_layers: int = 3,
         dropout: float = 0.1,
         pool: str = "mean",
-        aggr: str = "add",
+        aggr: str = "sum",
         node_vocab_sizes: dict[str, int] | None = None,
+        use_global_features: bool = False,
+        use_context: bool = False,
+        split_heads: bool = False,
+        context_mode: str = "core",
+        hurdle_heads: bool = False,
+        hurdle_prediction_mode: str = "expected",
     ):
         super().__init__()
+        if hurdle_heads and not split_heads:
+            raise ValueError("hurdle_heads requires split_heads=True")
         if instruction_vocab_size is None:
             if not node_vocab_sizes or "instruction" not in node_vocab_sizes:
                 raise ValueError("instruction_vocab_size is required")
@@ -139,7 +160,11 @@ class CDFGRGCN(nn.Module):
         self.hidden_dim = hidden_dim
         self.num_layers = num_layers
         self.pool = pool
+        self.use_global_features = use_global_features
+        self.use_context = use_context
         self.output_dim = len(LABEL_KEYS)
+        self.hurdle_heads = hurdle_heads
+        self.hurdle_prediction_mode = hurdle_prediction_mode
 
         self.input_proj = CDFGInputProjection(
             instruction_vocab_size, edge_pos_vocab_size, hidden_dim
@@ -148,15 +173,39 @@ class CDFGRGCN(nn.Module):
             CDFGConvLayer(hidden_dim, aggr=aggr, dropout=dropout)
             for _ in range(num_layers)
         ])
-        graph_stats_dim = len(NODE_TYPES)
-        self.classifier = nn.Sequential(
-            nn.Linear(
-                hidden_dim * len(NODE_TYPES) + graph_stats_dim,
+        if pool == "multi":
+            self.readout_proj = nn.ModuleDict(
+                {
+                    node_type: _dense_projection(4 * hidden_dim + 1, hidden_dim)
+                    for node_type in NODE_TYPES
+                }
+            )
+            classifier_in = hidden_dim * len(NODE_TYPES)
+        else:
+            self.readout_proj = None
+            classifier_in = hidden_dim * len(NODE_TYPES) + len(NODE_TYPES)
+        if use_global_features:
+            self.global_features = GlobalFeatureEncoder(
+                instruction_vocab_size, hidden_dim
+            )
+            classifier_in += hidden_dim
+        if use_context:
+            self.context_encoder = GraphContextEncoder(hidden_dim, context_mode)
+            classifier_in += hidden_dim
+        self.classifier = (
+            SplitRegressionHead(
+                classifier_in,
                 hidden_dim,
-            ),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, self.output_dim),
+                dropout,
+                hurdle_heads=hurdle_heads,
+            )
+            if split_heads
+            else nn.Sequential(
+                nn.Linear(classifier_in, hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(dropout),
+                nn.Linear(hidden_dim, self.output_dim),
+            )
         )
 
     def forward(self, data: HeteroData):
@@ -179,12 +228,6 @@ class CDFGRGCN(nn.Module):
         for layer in self.layers:
             h_dict = layer(h_dict, edge_index_dict, edge_emb_dict)
 
-        pool_fn = {
-            "mean": global_mean_pool,
-            "sum": global_add_pool,
-            "max": global_max_pool,
-        }[self.pool]
-
         if __debug__:
             for nt in NODE_TYPES:
                 b = data[nt].batch
@@ -192,25 +235,56 @@ class CDFGRGCN(nn.Module):
                     torch.save(data, f"/tmp/bad_batch_{nt}.pt")
                     raise RuntimeError(f"{nt}: batch idx {b.max().item()} >= num_graphs {data.num_graphs}")
 
-        pooled = torch.cat(
-            [
-                pool_fn(h_dict[nt], data[nt].batch, size=data.num_graphs)
-                for nt in NODE_TYPES
-            ],
-            dim=-1,
-        )
-        # Mean pooling captures composition but not scale. Log counts restore a
-        # bounded graph-size signal without letting large graphs dominate.
-        node_counts = torch.stack(
-            [
-                degree(data[nt].batch, num_nodes=data.num_graphs, dtype=pooled.dtype)
-                for nt in NODE_TYPES
-            ],
-            dim=-1,
-        )
-
-        graph_features = torch.cat(
-            [pooled, torch.log1p(node_counts)],
-            dim=-1,
-        )
+        if self.pool == "multi":
+            graph_features = torch.cat(
+                [
+                    self.readout_proj[node_type](
+                        multi_pool(
+                            h_dict[node_type],
+                            data[node_type].batch,
+                            data.num_graphs,
+                        )
+                    )
+                    for node_type in NODE_TYPES
+                ],
+                dim=-1,
+            )
+        else:
+            pool_fn = {
+                "mean": global_mean_pool,
+                "sum": global_add_pool,
+                "max": global_max_pool,
+            }[self.pool]
+            pooled = torch.cat(
+                [
+                    pool_fn(
+                        h_dict[node_type],
+                        data[node_type].batch,
+                        size=data.num_graphs,
+                    )
+                    for node_type in NODE_TYPES
+                ],
+                dim=-1,
+            )
+            node_counts = torch.stack(
+                [
+                    degree(
+                        data[node_type].batch,
+                        num_nodes=data.num_graphs,
+                        dtype=pooled.dtype,
+                    )
+                    for node_type in NODE_TYPES
+                ],
+                dim=-1,
+            )
+            graph_features = torch.cat(
+                [pooled, torch.log1p(node_counts)],
+                dim=-1,
+            )
+        shortcuts = [graph_features]
+        if self.use_global_features:
+            shortcuts.append(self.global_features(data))
+        if self.use_context:
+            shortcuts.append(self.context_encoder(data))
+        graph_features = torch.cat(shortcuts, dim=-1)
         return self.classifier(graph_features)

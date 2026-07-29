@@ -1,0 +1,37 @@
+experiment_name: 07_29_mlp_split_no_hurdle
+model: mlp
+tensor_dir: ../../data/tensors_v2
+vocab_path: ../artifacts/vocab/vocab.json
+checkpoint_dir: ../artifacts/checkpoints
+results_dir: ../artifacts/results
+kernel_types:
+  - 2layer
+  - 3layer
+  - conv1d
+  - conv2d
+  - dense_latency
+  - dense_resource
+  - rule4ml
+seed: 42
+split_strategy: official_or_stratified
+family_balanced_sampling: true
+batch_size: 4
+num_workers: 0
+epochs: 20
+patience: 20
+learning_rate: 0.001
+weight_decay: 0.0001
+hidden_dim: 64
+num_layers: 2
+num_var_embed_layers: 2
+dropout: 0.15
+pool: multi
+node_aggr: concat
+use_global_features: true
+use_context: false
+split_heads: true
+hurdle_heads: false
+loss: log_huber
+log_huber_delta: 0.35
+early_stopping_metric: smape
+verbose: 2

@@ -1,10 +1,10 @@
 {
-  "experiment_name": "07_28_rgcn_big",
-  "model": "rgcn",
+  "experiment_name": "hetero_gat_baseline",
+  "model": "hetero_gat",
   "tensor_dir": "../../data/tensors",
   "vocab_path": "../artifacts/vocab/vocab.json",
-  "checkpoint_dir": "../artifacts/results/07_28_rgcn_big/checkpoints",
-  "resume_checkpoint_path": "../artifacts/results/07_28_rgcn_big/checkpoints/07_28_rgcn_big_backup.pt",
+  "checkpoint_dir": "../artifacts/checkpoints",
+  "resume_checkpoint_path": null,
   "results_dir": "../artifacts/results",
   "seed": 42,
   "val_fraction": 0.15,
@@ -19,6 +19,6 @@
   "num_layers": 3,
   "dropout": 0.2,
   "pool": "mean",
-  "aggr": "add",
+  "aggr": "sum",
   "verbose": 2
 }

@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+import platform
 import tempfile
 
 from torch.utils.data.distributed import DistributedSampler
@@ -10,6 +11,8 @@ from torch_geometric.loader import DataLoader as PyGDataLoader
 
 def _default_num_workers(distributed: bool) -> int:
     if distributed or os.environ.get("KAGGLE_KERNEL_RUN_TYPE"):
+        return 0
+    if "microsoft" in platform.release().lower():
         return 0
     # Python 3.14 uses a forkserver on POSIX. Unix-domain sockets cannot be
     # created in WSL's Windows-mounted temp directories, so worker startup
@@ -21,16 +24,26 @@ def _default_num_workers(distributed: bool) -> int:
     return max(2, min(4, cpu_cores))
 
 
-def make_loader(ds, batch_size, shuffle=True, num_workers=None, distributed=False):
+def make_loader(
+    ds,
+    batch_size,
+    shuffle=True,
+    num_workers=None,
+    distributed=False,
+    sampler=None,
+):
     """
     Build a PyG DataLoader, optionally sharded with DistributedSampler.
 
     When ``distributed=True``, the train loader uses a DistributedSampler and
     ``shuffle`` is disabled (call ``loader.sampler.set_epoch(epoch)`` each epoch).
     """
-    sampler = None
     if distributed:
+        if sampler is not None:
+            raise ValueError("custom sampler is not supported with distributed loading")
         sampler = DistributedSampler(ds, shuffle=shuffle)
+        shuffle = False
+    elif sampler is not None:
         shuffle = False
 
     if num_workers is None:

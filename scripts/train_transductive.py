@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Torchrun entry point for transductive vs inductive R-GCN training."""
+"""Torchrun entry point for transductive vs inductive heterogeneous GAT training."""
 
 from __future__ import annotations
 
@@ -22,7 +22,9 @@ from ll_hls4ml.training.loops import _json_converter, transductive_vs_inductive_
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Transductive vs inductive R-GCN training")
+    parser = argparse.ArgumentParser(
+        description="Transductive vs inductive heterogeneous GAT training"
+    )
     parser.add_argument("--config", required=True, help="Path to JSON training config")
     args = parser.parse_args()
 
@@ -46,7 +48,7 @@ def main() -> None:
     tensor_dir = Path(config["tensor_dir"])
     vocab, max_pos, _ = load_vocab(tensor_dir / "vocab.json")
     model = build(
-        "rgcn",
+        "hetero_gat",
         instruction_vocab_size=len(vocab),
         edge_pos_vocab_size=max_pos,
         y_means=torch.zeros(len(LABEL_KEYS)),

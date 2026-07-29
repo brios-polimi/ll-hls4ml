@@ -1,9 +1,86 @@
 """Target normalization and wa-hls4ml benchmark metrics."""
 
 import torch
+import torch.nn as nn
 from torch.utils.data import Subset
 
 from ll_hls4ml.io.schema import LABEL_KEYS
+
+
+class LogHuberLoss(nn.Module):
+    """Huber loss with one fixed meaning in log1p space for every target."""
+
+    def __init__(self, y_stds: torch.Tensor, delta: float = 0.35):
+        super().__init__()
+        self.register_buffer("y_stds", y_stds.detach().clone())
+        self.delta = delta
+
+    def forward(
+        self,
+        normalized_prediction: torch.Tensor,
+        normalized_target: torch.Tensor,
+    ) -> torch.Tensor:
+        residual = (
+            normalized_prediction - normalized_target
+        ) * self.y_stds
+        absolute = residual.abs()
+        loss = torch.where(
+            absolute < self.delta,
+            0.5 * residual.square(),
+            self.delta * (absolute - 0.5 * self.delta),
+        )
+        return loss.mean()
+
+
+class LogHuberHurdleLoss(nn.Module):
+    """Log-space regression plus zero/nonzero heads for DSP and BRAM."""
+
+    hurdle_target_indices = (2, 3)
+
+    def __init__(
+        self,
+        y_means: torch.Tensor,
+        y_stds: torch.Tensor,
+        delta: float = 0.35,
+        classification_weight: float = 0.25,
+    ):
+        super().__init__()
+        self.register_buffer("y_means", y_means.detach().clone())
+        self.register_buffer("y_stds", y_stds.detach().clone())
+        self.delta = delta
+        self.classification_weight = classification_weight
+        self.classification = nn.BCEWithLogitsLoss()
+
+    def forward(
+        self,
+        prediction: torch.Tensor,
+        normalized_target: torch.Tensor,
+    ) -> torch.Tensor:
+        regression = prediction[:, : len(LABEL_KEYS)]
+        residual = (regression - normalized_target) * self.y_stds
+        absolute = residual.abs()
+        element_loss = torch.where(
+            absolute < self.delta,
+            0.5 * residual.square(),
+            self.delta * (absolute - 0.5 * self.delta),
+        )
+        target_log = normalized_target * self.y_stds + self.y_means
+        regression_mask = torch.ones_like(element_loss)
+        for target_index in self.hurdle_target_indices:
+            regression_mask[:, target_index] = (
+                target_log[:, target_index] > 0
+            )
+        regression_loss = (
+            element_loss * regression_mask
+        ).sum() / regression_mask.sum().clamp_min(1)
+        positive = (
+            target_log[:, self.hurdle_target_indices] > 0
+        ).to(regression.dtype)
+        classification_loss = self.classification(
+            prediction[:, len(LABEL_KEYS):],
+            positive,
+        )
+        return regression_loss + self.classification_weight * classification_loss
 
 def compute_target_z_stats(dataset, std_floor: float = 1e-3) -> tuple[torch.Tensor, torch.Tensor]:
     """
@@ -33,6 +110,31 @@ def normalize_target(y: torch.Tensor, y_means: torch.Tensor, y_stds: torch.Tenso
 def denormalize_target(pred: torch.Tensor, y_means: torch.Tensor, y_stds: torch.Tensor) -> torch.Tensor:
     """Denormalize model outputs back to original scales."""
     return torch.expm1(pred * y_stds + y_means)
+
+
+def apply_hurdle_prediction(
+    prediction: torch.Tensor,
+    y_means: torch.Tensor,
+    y_stds: torch.Tensor,
+    mode: str = "expected",
+) -> torch.Tensor:
+    """Apply optional DSP/BRAM hurdle outputs and return normalized values."""
+    regression = prediction[:, : len(LABEL_KEYS)]
+    if prediction.shape[-1] == len(LABEL_KEYS):
+        return regression
+    if prediction.shape[-1] != len(LABEL_KEYS) + 2:
+        raise ValueError(f"Unexpected prediction width: {prediction.shape[-1]}")
+    raw = denormalize_target(regression, y_means, y_stds).clamp_min(0)
+    probability = prediction[:, len(LABEL_KEYS):].sigmoid()
+    if mode == "expected":
+        multiplier = probability
+    elif mode == "threshold":
+        multiplier = (probability >= 0.5).to(raw.dtype)
+    else:
+        raise ValueError(f"Unknown hurdle prediction mode: {mode}")
+    raw = raw.clone()
+    raw[:, 2:4] *= multiplier
+    return (torch.log1p(raw) - y_means) / y_stds
 
 
 def wahls4ml_metrics_raw(

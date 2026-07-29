@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import torch.nn as nn
 
-from ll_hls4ml.models.rgcn import CDFGRGCN
+from ll_hls4ml.models.hetero_gat import CDFGHeteroGAT
 from ll_hls4ml.models.mlp import MLP
 
 MODELS: dict[str, type[nn.Module]] = {
-    "rgcn": CDFGRGCN,
+    "hetero_gat": CDFGHeteroGAT,
+    # Compatibility alias for existing configs and recorded experiments.
+    "rgcn": CDFGHeteroGAT,
     "mlp": MLP,
 }
 

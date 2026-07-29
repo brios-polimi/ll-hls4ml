@@ -2,6 +2,7 @@
 """Convert CDFG JSON graphs to PyG HeteroData .pt tensors."""
 
 import argparse
+import json
 from pathlib import Path
 
 from ll_hls4ml.config import load_config
@@ -21,6 +22,11 @@ def main():
     parser.add_argument("--max-archives", type=int, default=None)
     parser.add_argument("--workers", type=int, default=None)
     parser.add_argument("--vocab", default=None, help="Vocab JSON path (default: from config)")
+    parser.add_argument(
+        "--metadata-index",
+        default=None,
+        help="Optional JSON mapping graph UUIDs to synthesis metadata",
+    )
     args = parser.parse_args()
 
     cfg = load_config(args.config)
@@ -33,6 +39,11 @@ def main():
         print("Vocab not found; scanning graphs...")
         vocab, max_pos, _ = vocab_scan(cfg.graph_dir, kernel_subset=args.kernel)
 
+    metadata_by_graph_id = None
+    if args.metadata_index:
+        with Path(args.metadata_index).open() as handle:
+            metadata_by_graph_id = json.load(handle)
+
     create_graph_tensors(
         cfg.graph_dir,
         cfg.tensor_dir,
@@ -42,6 +53,7 @@ def main():
         archive_subset=args.archive,
         max_archives=args.max_archives,
         n_workers=args.workers,
+        metadata_by_graph_id=metadata_by_graph_id,
     )
     print(f"Tensors and labels index written under {cfg.tensor_dir}")
 
