@@ -190,7 +190,7 @@ class TrainingSmokeTests(unittest.TestCase):
                         "batch_size": 4,
                         "num_workers": 0,
                         "epochs": 1,
-                        "patience": 0,
+                        "patience": 2,
                         "hidden_dim": 16,
                         "num_layers": 1,
                         "dropout": 0.0,
@@ -230,6 +230,31 @@ class TrainingSmokeTests(unittest.TestCase):
             self.assertTrue((result_dir / "split_manifest.json").is_file())
             self.assertTrue((result_dir / "figures" / "test__rpe.png").is_file())
             self.assertTrue((result_dir / "figures" / "test__scatter.png").is_file())
+            subprocess.run(
+                [
+                    sys.executable,
+                    str(repository / "scripts" / "train.py"),
+                    "--config",
+                    str(config_path),
+                    "--evaluate-checkpoint",
+                    str(
+                        root
+                        / "cli_checkpoints"
+                        / "cli_smoke_checkpoint.pt"
+                    ),
+                ],
+                check=True,
+                cwd=repository,
+                env=environment,
+            )
+            evaluated_result = json.loads(
+                (result_dir / "summary.json").read_text()
+            )
+            self.assertEqual(evaluated_result["best_epoch"], 1)
+            self.assertEqual(
+                [row["epoch"] for row in evaluated_result["training_history"]],
+                [1],
+            )
 
             if os.environ.get("LL_HLS4ML_SKIP_DDP_SMOKE") == "1":
                 return

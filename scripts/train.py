@@ -601,6 +601,16 @@ def main() -> None:
             )
             model.load_state_dict(checkpoint["model"])
             model.to(device)
+            training_state = checkpoint.get("training_state", {})
+            base_model = unwrap_model(model)
+            base_model.training_history = list(
+                training_state.get("history", [])
+            )
+            base_model.best_epoch = training_state.get(
+                "best_epoch",
+                checkpoint.get("epoch"),
+            )
+            base_model.best_metric = training_state.get("best_metric")
         else:
             model = fit(
                 model,
