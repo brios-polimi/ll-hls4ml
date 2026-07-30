@@ -83,9 +83,13 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         ),
     }
     model_name = config.get("model", "hetero_gat")
-    if model_name in {"hetero_gat", "rgcn"}:
+    if model_name in {"hetero_gat", "hetero_relational", "rgcn"}:
         common["edge_pos_vocab_size"] = max_pos
         common["aggr"] = config.get("aggr", "sum")
+        if model_name == "hetero_relational":
+            common["message_aggr"] = config.get("message_aggr", "mean")
+        else:
+            common["heads"] = config.get("heads", 1)
     elif model_name == "mlp":
         common["num_var_embed_layers"] = config.get("num_var_embed_layers", 2)
         common["node_aggr"] = config.get("node_aggr", "concat")

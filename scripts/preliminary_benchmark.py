@@ -622,7 +622,7 @@ def _evaluate_neural(
         "dropout": 0.15,
         "pool": "mean",
     }
-    if model_name in {"hetero_gat", "rgcn"}:
+    if model_name in {"hetero_gat", "hetero_relational", "rgcn"}:
         model_kwargs.update(
             {"edge_pos_vocab_size": max_position, "aggr": "sum"}
         )

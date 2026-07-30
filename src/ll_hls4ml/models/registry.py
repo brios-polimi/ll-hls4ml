@@ -5,10 +5,12 @@ from __future__ import annotations
 import torch.nn as nn
 
 from ll_hls4ml.models.hetero_gat import CDFGHeteroGAT
+from ll_hls4ml.models.hetero_relational import CDFGHeteroRelational
 from ll_hls4ml.models.mlp import MLP
 
 MODELS: dict[str, type[nn.Module]] = {
     "hetero_gat": CDFGHeteroGAT,
+    "hetero_relational": CDFGHeteroRelational,
     # Compatibility alias for existing configs and recorded experiments.
     "rgcn": CDFGHeteroGAT,
     "mlp": MLP,

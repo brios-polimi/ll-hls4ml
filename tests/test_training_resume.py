@@ -22,13 +22,16 @@ class TrainingResumeTests(unittest.TestCase):
             with (
                 patch(
                     "ll_hls4ml.training.loops.train_one_epoch",
-                    side_effect=[0.8, 0.7],
+                    side_effect=[0.8, 0.7, 0.6, 0.5, 0.4],
                 ),
                 patch(
                     "ll_hls4ml.training.loops.validate_one_epoch",
                     side_effect=[
                         {"loss": 0.8, "smape": torch.tensor([50.0])},
                         {"loss": 0.7, "smape": torch.tensor([40.0])},
+                        {"loss": 0.6, "smape": torch.tensor([35.0])},
+                        {"loss": 0.5, "smape": torch.tensor([30.0])},
+                        {"loss": 0.4, "smape": torch.tensor([25.0])},
                     ],
                 ),
             ):
@@ -36,7 +39,7 @@ class TrainingResumeTests(unittest.TestCase):
                     model,
                     train_loader=loader,
                     val_loader=loader,
-                    epochs=2,
+                    epochs=5,
                     criterion=torch.nn.MSELoss(),
                     optimizer=optimizer,
                     scheduler=None,
@@ -57,13 +60,13 @@ class TrainingResumeTests(unittest.TestCase):
             with (
                 patch(
                     "ll_hls4ml.training.loops.train_one_epoch",
-                    side_effect=[0.6, 0.5],
+                    side_effect=[0.3, 0.2],
                 ),
                 patch(
                     "ll_hls4ml.training.loops.validate_one_epoch",
                     side_effect=[
-                        {"loss": 0.6, "smape": torch.tensor([45.0])},
-                        {"loss": 0.5, "smape": torch.tensor([35.0])},
+                        {"loss": 0.3, "smape": torch.tensor([24.0])},
+                        {"loss": 0.2, "smape": torch.tensor([20.0])},
                     ],
                 ),
             ):
@@ -71,7 +74,7 @@ class TrainingResumeTests(unittest.TestCase):
                     resumed_model,
                     train_loader=loader,
                     val_loader=loader,
-                    epochs=4,
+                    epochs=7,
                     criterion=torch.nn.MSELoss(),
                     optimizer=resumed_optimizer,
                     scheduler=None,
@@ -86,10 +89,10 @@ class TrainingResumeTests(unittest.TestCase):
 
             self.assertEqual(
                 [row["epoch"] for row in resumed_model.training_history],
-                [1, 2, 3, 4],
+                [1, 2, 3, 4, 5, 6, 7],
             )
-            self.assertEqual(resumed_model.best_epoch, 4)
-            self.assertEqual(resumed_model.best_metric, 35.0)
+            self.assertEqual(resumed_model.best_epoch, 7)
+            self.assertEqual(resumed_model.best_metric, 20.0)
 
 
 if __name__ == "__main__":
