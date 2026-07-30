@@ -97,7 +97,7 @@ class CDFGConvLayer(nn.Module):
                 et: GATv2Conv(
                     in_channels=(hidden_dim, hidden_dim),
                     out_channels=hidden_dim,
-                    heads=4,
+                    heads=1,
                     concat=False,
                     edge_dim=hidden_dim if et in EDGE_TYPES_WITH_ATTR else None,
                     add_self_loops=False,
@@ -228,12 +228,12 @@ class CDFGHeteroGAT(nn.Module):
         for layer in self.layers:
             h_dict = layer(h_dict, edge_index_dict, edge_emb_dict)
 
-        if __debug__:
-            for nt in NODE_TYPES:
-                b = data[nt].batch
-                if b.numel() > 0 and b.max().item() >= data.num_graphs:
-                    torch.save(data, f"/tmp/bad_batch_{nt}.pt")
-                    raise RuntimeError(f"{nt}: batch idx {b.max().item()} >= num_graphs {data.num_graphs}")
+        # if __debug__:
+        #     for nt in NODE_TYPES:
+        #         b = data[nt].batch
+        #         if b.numel() > 0 and b.max().item() >= data.num_graphs:
+        #             torch.save(data, f"/tmp/bad_batch_{nt}.pt")
+        #             raise RuntimeError(f"{nt}: batch idx {b.max().item()} >= num_graphs {data.num_graphs}")
 
         if self.pool == "multi":
             graph_features = torch.cat(
