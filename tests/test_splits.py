@@ -1,6 +1,13 @@
 import unittest
+from pathlib import Path
 
-from ll_hls4ml.data.splits import benchmark_train_val_test_split
+from torch.utils.data import Subset
+
+from ll_hls4ml.data.splits import (
+    benchmark_train_val_test_split,
+    limit_subset_archives,
+    nested_group_train_subset,
+)
 
 
 class _Dataset:
@@ -54,6 +61,62 @@ class BenchmarkSplitTests(unittest.TestCase):
                 key = (dataset.type_of(index), dataset.metadata_of(index)["group_id"])
                 destinations.setdefault(key, set()).add(split_index)
         self.assertTrue(all(len(value) == 1 for value in destinations.values()))
+
+    def test_nested_group_scaling_uses_fixed_baseline_and_archive_expansion(self):
+        metadata = []
+        paths = []
+        for family in ("dense", "conv"):
+            for archive in range(1, 5):
+                for group in range(4):
+                    metadata.append(
+                        {
+                            "family": family,
+                            "group_id": f"{family}-{archive}-{group}",
+                        }
+                    )
+                    paths.append(
+                        Path(
+                            f"/tensors/{family}/archive_{archive}/"
+                            f"{group}.pt"
+                        )
+                    )
+        dataset = _Dataset(metadata)
+        dataset.paths = paths
+        full = Subset(dataset, range(len(dataset)))
+
+        subsets = {}
+        for scale, expected_per_family in (
+            (0.25, 2),
+            (0.5, 4),
+            (1.0, 8),
+            (2.0, 16),
+        ):
+            subset, report = nested_group_train_subset(
+                dataset,
+                full,
+                scale,
+                baseline_archives_per_family=2,
+                seed=11,
+            )
+            subsets[scale] = set(subset.indices)
+            self.assertEqual(
+                {
+                    family: values["selected_samples"]
+                    for family, values in report["families"].items()
+                },
+                {"conv": expected_per_family, "dense": expected_per_family},
+            )
+
+        self.assertTrue(subsets[0.25] < subsets[0.5])
+        self.assertTrue(subsets[0.5] < subsets[1.0])
+        self.assertTrue(subsets[1.0] < subsets[2.0])
+
+        limited, archives = limit_subset_archives(dataset, full, 2)
+        self.assertEqual(
+            set(archives["dense"]),
+            {"archive_1", "archive_2"},
+        )
+        self.assertEqual(len(limited), 16)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from dataclasses import dataclass
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -33,6 +32,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
+from ll_hls4ml.data.fingerprint import build_content_manifest
 from ll_hls4ml.data.tensorize import EMBED_SIZE, LITERAL_OFF
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.io.load_json import load_graph_json
@@ -114,13 +114,7 @@ def _git_state(repository: Path) -> dict[str, object]:
 
 
 def _snapshot_id(paths: list[Path], root: Path) -> str:
-    digest = hashlib.sha256()
-    for path in paths:
-        stat = path.stat()
-        digest.update(
-            f"{path.relative_to(root)}|{stat.st_size}|{stat.st_mtime_ns}\n".encode()
-        )
-    return digest.hexdigest()[:16]
+    return build_content_manifest(paths, root)["snapshot_sha256"]
 
 
 def _split_indices(dataset: HeteroGraphDataset, seed: int):
@@ -919,7 +913,7 @@ This is an engineering benchmark of the current tensor snapshot, not a final
 comparison with wa-hls4ml. The graph compiler, static-initializer cleanup, type
 encoding, and pragma injection are all research variables that may change.
 
-- Tensor snapshot: `{config["tensor_snapshot_id"]}`
+- Tensor content snapshot (SHA-256): `{config["tensor_snapshot_id"]}`
 - Families present: {", ".join(FAMILIES)}
 - Split counts: `{json.dumps(family_counts, sort_keys=True)}`
 - Seed: {config["seed"]}

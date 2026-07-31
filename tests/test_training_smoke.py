@@ -187,6 +187,9 @@ class TrainingSmokeTests(unittest.TestCase):
                         "seed": 42,
                         "val_fraction": 0.125,
                         "test_fraction": 0.125,
+                        "train_scale": 1.0,
+                        "baseline_archives_per_family": 1,
+                        "evaluation_archives_per_family": 1,
                         "batch_size": 4,
                         "num_workers": 0,
                         "epochs": 1,
@@ -228,6 +231,12 @@ class TrainingSmokeTests(unittest.TestCase):
             self.assertTrue((result_dir / "metrics.csv").is_file())
             self.assertTrue((result_dir / "predictions.csv").is_file())
             self.assertTrue((result_dir / "split_manifest.json").is_file())
+            self.assertTrue(
+                (result_dir / "data_scale_manifest.json").is_file()
+            )
+            self.assertTrue(
+                (result_dir / "tensor_manifest.json").is_file()
+            )
             self.assertTrue((result_dir / "figures" / "test__rpe.png").is_file())
             self.assertTrue((result_dir / "figures" / "test__scatter.png").is_file())
             subprocess.run(
