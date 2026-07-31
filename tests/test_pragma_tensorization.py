@@ -4,7 +4,8 @@ import unittest
 import numpy as np
 
 from ll_hls4ml.data.tensorize import (
-    ARRAY_LEN_OFF,
+    SPATIAL_LEN_OFF,
+    TEMPORAL_LEN_OFF,
     LITERAL_OFF,
     OVERFLOW_OFF,
     QUANT_OFF,
@@ -44,7 +45,7 @@ class PragmaTensorizationTests(unittest.TestCase):
         shift = type_embedding(
             '%"class.ap_shift_reg<ap_ufixed<4, 1, AP_RND_CONV, AP_SAT>, 9>"'
         )
-        self.assertAlmostEqual(shift[ARRAY_LEN_OFF], np.log2(9))
+        self.assertAlmostEqual(shift[TEMPORAL_LEN_OFF], np.log2(9))
 
         graph = {
             "nodes": [

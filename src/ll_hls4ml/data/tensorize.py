@@ -272,7 +272,7 @@ def create_graph_tensors(
     instruction_vocab: dict,
     max_pos: int | None = None,
     kernel_subset: str | list[str] | None = None,
-    archive_subset: str | None = None,
+    archive_subset: str | list[str] | None = None,
     max_archives: int | None = None,
     inference_mode: bool = False,
     n_workers: int | None = None,
@@ -290,20 +290,23 @@ def create_graph_tensors(
     graph_paths = [
         graph_path
         for _, graph_path in iter_graph_paths(
-            graph_dir, kernel_subset, max_archives
+            graph_dir,
+            kernel_subset,
+            None if archive_subset is not None else max_archives,
         )
     ]
     if archive_subset is not None:
-        if kernel_subset is None or not isinstance(kernel_subset, str):
-            raise ValueError("archive_subset requires one explicit kernel_subset")
+        archive_names = (
+            [archive_subset] if isinstance(archive_subset, str) else archive_subset
+        )
         graph_paths = [
             path
             for path in graph_paths
-            if path.relative_to(graph_dir / kernel_subset).parts[0] == archive_subset
+            if path.relative_to(graph_dir).parts[1] in archive_names
         ]
         if not graph_paths:
             raise ValueError(
-                f"No graphs found for {kernel_subset}/{archive_subset}"
+                f"No graphs found for kernels={kernel_subset}, archives={archive_names}"
             )
     work = [
         (
@@ -621,8 +624,9 @@ NNET_ARRAY_RE = re.compile(
 
 # %"class.ap_shift_reg<ap_ufixed<4, 1, AP_RND_CONV, AP_SAT>, 9>"*
 SHIFT_REG_RE = re.compile(
-    r'^(?:%"class\.)?ap_shift_reg<\s*(.+),\s*(\d+)\s*>"?$'
+    r'^(?:%"class\.)?ap_shift_reg<\s*(.+?)(?:,\s*(\d+)\s*)?>"?$'
 )
+
 
 SCALAR_LITERAL_RE = re.compile(
     r"^(?:i\d+|half|float|double)\s+"
@@ -683,17 +687,18 @@ AP_OVERFLOW_MAP = {
 
 
 # offsets in embedding
-TYPE_SIZE      = 11
-IS_AP_SIZE     = 1
-IS_AC_SIZE     = 1
-BITS_SIZE      = 1
-FRAC_SIZE      = 1
-SIGNED_SIZE    = 1
-QUANT_SIZE     = 8
-OVERFLOW_SIZE  = 5
-ARRAY_LEN_SIZE = 1
-PTR_DEPTH_SIZE = 1
-CONSTANT_LITERAL_SIZE = 6
+TYPE_SIZE               = 11
+IS_AP_SIZE              = 1
+IS_AC_SIZE              = 1
+BITS_SIZE               = 1
+FRAC_SIZE               = 1
+SIGNED_SIZE             = 1
+QUANT_SIZE              = 8
+OVERFLOW_SIZE           = 5
+SPATIAL_LEN_SIZE        = 1
+TEMPORAL_LEN_SIZE       = 1
+PTR_DEPTH_SIZE          = 1
+CONSTANT_LITERAL_SIZE   = 6
 
 TYPE_OFF      = 0
 IS_AP_OFF     = TYPE_OFF      + TYPE_SIZE
@@ -703,13 +708,14 @@ FRAC_OFF      = BITS_OFF      + BITS_SIZE
 SIGNED_OFF    = FRAC_OFF      + FRAC_SIZE
 QUANT_OFF     = SIGNED_OFF    + SIGNED_SIZE
 OVERFLOW_OFF  = QUANT_OFF     + QUANT_SIZE
-ARRAY_LEN_OFF = OVERFLOW_OFF  + OVERFLOW_SIZE
-PTR_DEPTH_OFF = ARRAY_LEN_OFF + ARRAY_LEN_SIZE
+SPATIAL_LEN_OFF = OVERFLOW_OFF + OVERFLOW_SIZE
+TEMPORAL_LEN_OFF = SPATIAL_LEN_OFF + SPATIAL_LEN_SIZE
+PTR_DEPTH_OFF = TEMPORAL_LEN_OFF + TEMPORAL_LEN_SIZE
 LITERAL_OFF   = PTR_DEPTH_OFF + PTR_DEPTH_SIZE
 
 EMBED_SIZE = sum([
     TYPE_SIZE, IS_AP_SIZE, IS_AC_SIZE, BITS_SIZE, FRAC_SIZE,
-    SIGNED_SIZE, QUANT_SIZE, OVERFLOW_SIZE, ARRAY_LEN_SIZE, PTR_DEPTH_SIZE,
+    SIGNED_SIZE, QUANT_SIZE, OVERFLOW_SIZE, SPATIAL_LEN_SIZE, TEMPORAL_LEN_SIZE, PTR_DEPTH_SIZE,
     CONSTANT_LITERAL_SIZE,
 ])
 
@@ -732,7 +738,8 @@ def type_embedding(type_str):
                              AC: TRN, RND, TRN_ZERO, RND_ZERO, RND_INF, RND_MIN_INF, RND_CONV, RND_CONV_ODD) TODO: Semantically line-up mappings between ap/ac
      overflow_m:    one-hot AP: SAT, SAT_ZERO, SAT_SYM, WRAP, WRAP_SM
                              AC: WRAP, SAT, SAT_ZERO, SAT_SYM)
-     array_length:  float (log2 of array length: e.g. [16 x %class.ac_fixed] -> 4.0) (accumulates length additively)
+     spatial_length:  float (log2 of spatial array lengths: e.g. [16 x %class.ac_fixed] -> 4.0) (accumulates length additively)
+     temporal_length: float (log2 of temporal array lengths)
      ptr_depth:     integer (*** -> 3)
     """
 
@@ -764,7 +771,7 @@ def type_embedding(type_str):
             break
 
         emb[5] = 1  # arr type
-        emb[ARRAY_LEN_OFF] += np.log2(arr_len)
+        emb[SPATIAL_LEN_OFF] += np.log2(arr_len)
 
         type_str = type_str[separator + 3:-1]
 
@@ -778,15 +785,15 @@ def type_embedding(type_str):
     nnet_array = NNET_ARRAY_RE.match(type_str)
     if nnet_array:
         emb[8] = 1
-        emb[ARRAY_LEN_OFF] += np.log2(int(nnet_array.group(2)))
+        emb[SPATIAL_LEN_OFF] += np.log2(int(nnet_array.group(2)))
         type_str = nnet_array.group(1) 
 
 
     shift_reg = SHIFT_REG_RE.match(type_str)
     if shift_reg:
         emb[9] = 1
-        if shift_reg.group(2):
-            emb[ARRAY_LEN_OFF] += np.log2(int(shift_reg.group(2)))
+        depth = int(shift_reg.group(2) or 32)
+        emb[TEMPORAL_LEN_OFF] = np.log2(depth)
         type_str = shift_reg.group(1)
 
 

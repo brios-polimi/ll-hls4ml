@@ -6,7 +6,8 @@ import networkx as nx
 import numpy as np
 
 from ll_hls4ml.data.tensorize import (
-    ARRAY_LEN_OFF,
+    SPATIAL_LEN_OFF,
+    TEMPORAL_LEN_OFF,
     BITS_OFF,
     FRAC_OFF,
     IS_AC_OFF,
@@ -72,7 +73,8 @@ def semantic_type_stats(nodes):
         "type_bits_max": float(embeddings[parsed_numeric, BITS_OFF].max()) if parsed_numeric.any() else 0.0,
         "type_signed_ratio": float(embeddings[parsed_numeric, SIGNED_OFF].mean()) if parsed_numeric.any() else 0.0,
         "type_fractional_ratio_mean": float(embeddings[fixed, FRAC_OFF].mean()) if fixed.any() else 0.0,
-        "type_array_log_length_mean": float(embeddings[arrays, ARRAY_LEN_OFF].mean()) if arrays.any() else 0.0,
+        "type_spatial_log_length_mean": float(embeddings[arrays, SPATIAL_LEN_OFF].mean()) if arrays.any() else 0.0,
+        "type_temporal_log_length_mean": float(embeddings[arrays, TEMPORAL_LEN_OFF].mean()) if arrays.any() else 0.0,
         "type_pointer_depth_mean": float(embeddings[pointers, PTR_DEPTH_OFF].mean()) if pointers.any() else 0.0,
     })
 

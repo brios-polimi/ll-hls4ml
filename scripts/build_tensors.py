@@ -4,20 +4,44 @@
 import argparse
 import json
 from pathlib import Path
+import re
 
 from ll_hls4ml.config import load_config
 from ll_hls4ml.data.tensorize import create_graph_tensors
 from ll_hls4ml.data.vocab import load_vocab, vocab_scan
 
 
+def _parse_archive_spec(spec: str) -> list[str]:
+    """Expand archive numbers/ranges to the directory names used on disk."""
+    archives = []
+    for part in spec.split(","):
+        part = part.strip()
+        match = re.fullmatch(r"(?:archive_)?(\d+)(?:-(?:archive_)?(\d+))?", part)
+        if match:
+            start = int(match.group(1))
+            end = int(match.group(2) or start)
+            if end < start:
+                raise ValueError(f"Invalid archive range: {part}")
+            archives.extend(f"archive_{number}" for number in range(start, end + 1))
+        else:
+            archives.append(part)
+    return list(dict.fromkeys(archives))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build PyG tensor files from CDFG JSON")
     parser.add_argument("--config", default=None)
-    parser.add_argument("--kernel", default=None, help="Single kernel type to process")
+    parser.add_argument(
+        "--kernel",
+        nargs="+",
+        action="extend",
+        default=None,
+        help="Kernel types to process (default: all)",
+    )
     parser.add_argument(
         "--archive",
         default=None,
-        help="Single archive directory to process (requires --kernel)",
+        help="Archive number/range (for example, 1-5) or directory name",
     )
     parser.add_argument("--max-archives", type=int, default=None)
     parser.add_argument("--workers", type=int, default=None)
@@ -30,6 +54,7 @@ def main():
     args = parser.parse_args()
 
     cfg = load_config(args.config)
+    archive_subset = _parse_archive_spec(args.archive) if args.archive else None
     vocab_path = Path(args.vocab) if args.vocab else cfg.vocab_path
 
     if vocab_path.exists():
@@ -50,7 +75,7 @@ def main():
         vocab,
         max_pos,
         kernel_subset=args.kernel,
-        archive_subset=args.archive,
+        archive_subset=archive_subset,
         max_archives=args.max_archives,
         n_workers=args.workers,
         metadata_by_graph_id=metadata_by_graph_id,
