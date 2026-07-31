@@ -41,7 +41,7 @@ def build_content_manifest(
     """Hash files and return a path-independent, content-stable manifest."""
     root = Path(root).resolve()
     unique_paths = sorted(
-        {Path(path).resolve() for path in paths},
+        {Path(path).absolute() for path in paths},
         key=lambda path: path.relative_to(root).as_posix(),
     )
     files = []

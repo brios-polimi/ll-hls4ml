@@ -1,6 +1,6 @@
 data_root: ../data
 graph_dir: ${data_root}/graphs
-tensor_dir: ${data_root}/tensors_v2
+tensor_dir: ${data_root}/tensors
 vocab_path: artifacts/vocab/vocab.json
 checkpoint_dir: artifacts/checkpoints
 exports_dir: artifacts/exports
