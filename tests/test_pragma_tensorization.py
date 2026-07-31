@@ -13,6 +13,7 @@ from ll_hls4ml.data.tensorize import (
     pragma_embedding,
     type_embedding,
 )
+from ll_hls4ml.features.graph_stats import semantic_type_stats
 from ll_hls4ml.io.schema import (
     PRAGMA_CATEGORICAL_ARGUMENTS,
     PRAGMA_FEATURE_SIZE,
@@ -63,6 +64,30 @@ class PragmaTensorizationTests(unittest.TestCase):
         self.assertEqual(literal[0], 1)
         self.assertAlmostEqual(literal[1], np.log1p(64), places=6)
         self.assertEqual(literal[-1], 1)
+
+    def test_spatial_and_temporal_lengths_are_aggregated_separately(self):
+        stats = semantic_type_stats(
+            [
+                {
+                    "type": 1,
+                    "text": (
+                        '%"struct.nnet::array<'
+                        'ap_fixed<20, 10, AP_TRN, AP_WRAP, 0>, 32>"'
+                    ),
+                },
+                {
+                    "type": 1,
+                    "text": (
+                        '%"class.ap_shift_reg<'
+                        'ap_ufixed<4, 1, AP_RND_CONV, AP_SAT>, 9>"'
+                    ),
+                },
+            ]
+        )
+        self.assertAlmostEqual(stats["type_spatial_log_length_mean"], 5.0)
+        self.assertAlmostEqual(
+            stats["type_temporal_log_length_mean"], np.log2(9)
+        )
 
     def test_graph_context_is_tensorized(self):
         graph = {

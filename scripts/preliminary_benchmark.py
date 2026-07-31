@@ -32,7 +32,6 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 
 from ll_hls4ml.data.dataset import HeteroGraphDataset
-from ll_hls4ml.data.fingerprint import build_content_manifest
 from ll_hls4ml.data.tensorize import EMBED_SIZE, LITERAL_OFF
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.io.load_json import load_graph_json
@@ -111,10 +110,6 @@ def _git_state(repository: Path) -> dict[str, object]:
         ).stdout
     )
     return {"commit": commit, "dirty": dirty}
-
-
-def _snapshot_id(paths: list[Path], root: Path) -> str:
-    return build_content_manifest(paths, root)["snapshot_sha256"]
 
 
 def _split_indices(dataset: HeteroGraphDataset, seed: int):
@@ -913,7 +908,7 @@ This is an engineering benchmark of the current tensor snapshot, not a final
 comparison with wa-hls4ml. The graph compiler, static-initializer cleanup, type
 encoding, and pragma injection are all research variables that may change.
 
-- Tensor content snapshot (SHA-256): `{config["tensor_snapshot_id"]}`
+- Tensor source revision: `{config.get("tensor_source_revision") or "not recorded"}`
 - Families present: {", ".join(FAMILIES)}
 - Split counts: `{json.dumps(family_counts, sort_keys=True)}`
 - Seed: {config["seed"]}
@@ -1010,6 +1005,10 @@ def main() -> None:
     parser.add_argument("--vocab", default="artifacts/vocab/default.json")
     parser.add_argument("--output-dir", default="artifacts/results/preliminary-five-family")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--tensor-source-revision",
+        help="Immutable source commit for the tensor dataset",
+    )
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--patience", type=int, default=7)
     parser.add_argument("--batch-size", type=int, default=2)
@@ -1062,7 +1061,7 @@ def main() -> None:
         "synthetic_families": SYNTHETIC_FAMILIES,
         "tensor_root": str(tensor_root),
         "graph_root": str(graph_root),
-        "tensor_snapshot_id": _snapshot_id(dataset.paths, tensor_root),
+        "tensor_source_revision": args.tensor_source_revision,
         "device": "cuda" if torch.cuda.is_available() else "cpu",
         "torch_version": torch.__version__,
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
@@ -1075,18 +1074,23 @@ def main() -> None:
     )
 
     frame_path = output_dir / "tabular_features.csv"
-    frame_snapshot_path = output_dir / "tabular_features.snapshot"
-    cached_snapshot = (
-        frame_snapshot_path.read_text().strip()
-        if frame_snapshot_path.exists()
+    frame_revision_path = output_dir / "tabular_features.revision"
+    cached_revision = (
+        frame_revision_path.read_text().strip()
+        if frame_revision_path.exists()
         else None
     )
-    if frame_path.exists() and cached_snapshot == config["tensor_snapshot_id"]:
+    if (
+        frame_path.exists()
+        and args.tensor_source_revision
+        and cached_revision == args.tensor_source_revision
+    ):
         frame = pd.read_csv(frame_path)
     else:
         frame = _build_tabular_frame(dataset, len(vocabulary))
         frame.to_csv(frame_path, index=False)
-        frame_snapshot_path.write_text(config["tensor_snapshot_id"] + "\n")
+        if args.tensor_source_revision:
+            frame_revision_path.write_text(args.tensor_source_revision + "\n")
 
     evaluations = _evaluate_classical(frame, splits, args.seed)
     if not args.skip_neural:

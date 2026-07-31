@@ -65,7 +65,17 @@ def semantic_type_stats(nodes):
 
     parsed_numeric = embeddings[:, BITS_OFF] > 0 if len(embeddings) else np.array([], dtype=bool)
     fixed = embeddings[:, TYPE_FLAGS["arb_fixed"]] > 0 if len(embeddings) else np.array([], dtype=bool)
-    arrays = embeddings[:, TYPE_FLAGS["array"]] > 0 if len(embeddings) else np.array([], dtype=bool)
+    spatial_containers = (
+        (embeddings[:, TYPE_FLAGS["array"]] > 0)
+        | (embeddings[:, TYPE_FLAGS["nnet_array"]] > 0)
+        if len(embeddings)
+        else np.array([], dtype=bool)
+    )
+    temporal_containers = (
+        embeddings[:, TYPE_FLAGS["shift_reg"]] > 0
+        if len(embeddings)
+        else np.array([], dtype=bool)
+    )
     pointers = embeddings[:, TYPE_FLAGS["pointer"]] > 0 if len(embeddings) else np.array([], dtype=bool)
 
     stats.update({
@@ -73,8 +83,8 @@ def semantic_type_stats(nodes):
         "type_bits_max": float(embeddings[parsed_numeric, BITS_OFF].max()) if parsed_numeric.any() else 0.0,
         "type_signed_ratio": float(embeddings[parsed_numeric, SIGNED_OFF].mean()) if parsed_numeric.any() else 0.0,
         "type_fractional_ratio_mean": float(embeddings[fixed, FRAC_OFF].mean()) if fixed.any() else 0.0,
-        "type_spatial_log_length_mean": float(embeddings[arrays, SPATIAL_LEN_OFF].mean()) if arrays.any() else 0.0,
-        "type_temporal_log_length_mean": float(embeddings[arrays, TEMPORAL_LEN_OFF].mean()) if arrays.any() else 0.0,
+        "type_spatial_log_length_mean": float(embeddings[spatial_containers, SPATIAL_LEN_OFF].mean()) if spatial_containers.any() else 0.0,
+        "type_temporal_log_length_mean": float(embeddings[temporal_containers, TEMPORAL_LEN_OFF].mean()) if temporal_containers.any() else 0.0,
         "type_pointer_depth_mean": float(embeddings[pointers, PTR_DEPTH_OFF].mean()) if pointers.any() else 0.0,
     })
 

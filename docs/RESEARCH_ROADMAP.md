@@ -44,10 +44,9 @@ redownloads and silent data drift.
 
 ### 2. Make derived artifacts identifiable
 
-Give vocabularies and tensors a short fingerprint derived from graph schema,
-feature schema, label keys, and preprocessing config. Store it inside each
-tensor or in a sidecar manifest. Refuse to mix incompatible tensors. Never infer
-compatibility merely from a `.pt` file existing.
+Identify released tensor datasets by their immutable repository commit. Keep
+the graph/feature schema and preprocessing code versioned alongside the release;
+do not add a second content-hashing pass over every tensor.
 
 Keep a dataset-release manifest containing project ID, kernel family, archive,
 graph path, label availability, toolchain identity, and optional checksum.
@@ -59,7 +58,7 @@ Use one config-driven runner for MLP and GNN baselines. Each run directory
 should contain:
 
 - resolved config and git commits for both repositories;
-- dataset/tensor manifest fingerprint;
+- immutable tensor dataset revision;
 - exact train/validation/test project IDs;
 - seed, device, package versions, target normalization from training only;
 - best checkpoint, per-target metrics, and per-sample predictions.
@@ -153,7 +152,7 @@ live separately for import and end-to-end checks.
 
 - A fresh environment can install the ML package and run a smoke experiment
   from one config.
-- Every reported number maps to a saved config, split, manifest fingerprint,
+- Every reported number maps to a saved config, split, immutable dataset revision,
   predictions file, and commit.
 - Re-running preprocessing cannot silently mix old and new feature schemas.
 - A missing cache fails clearly and never triggers an implicit broad download.

@@ -234,9 +234,6 @@ class TrainingSmokeTests(unittest.TestCase):
             self.assertTrue(
                 (result_dir / "data_scale_manifest.json").is_file()
             )
-            self.assertTrue(
-                (result_dir / "tensor_manifest.json").is_file()
-            )
             self.assertTrue((result_dir / "figures" / "test__rpe.png").is_file())
             self.assertTrue((result_dir / "figures" / "test__scatter.png").is_file())
             subprocess.run(
