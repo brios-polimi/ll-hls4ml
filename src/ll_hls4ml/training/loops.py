@@ -244,6 +244,7 @@ def fit(
     resume_from_backup: str | Path | None = None,
     distributed: bool = False,
     early_stopping_metric: str = "loss",
+    checkpoint_interval: int = 5,
 ):
     """
     Train model with optional early stopping.
@@ -395,7 +396,7 @@ def fit(
                     print(f"Early stopping triggered after {epoch} epochs.")
                     should_stop[0] = 1
 
-        if main and epoch % 5 == 0:
+        if main and checkpoint_interval > 0 and epoch % checkpoint_interval == 0:
             _save_checkpoint(
                 epoch,
                 model,
