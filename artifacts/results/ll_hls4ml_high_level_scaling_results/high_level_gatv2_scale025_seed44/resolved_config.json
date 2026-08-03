@@ -1,0 +1,29 @@
+{
+  "experiment_name": "high_level_gatv2_scale025_seed44",
+  "representation": "wa-hls4ml layer/config graph",
+  "encoder": "gatv2",
+  "scale_percent": 25,
+  "seed": 44,
+  "hidden_dim": 64,
+  "num_layers": 3,
+  "heads": 1,
+  "dropout": 0.15,
+  "batch_size": 64,
+  "learning_rate": 0.0005,
+  "weight_decay": 0.0001,
+  "epochs": 400,
+  "patience": 30,
+  "loss": "log_huber_hurdle",
+  "hurdle_prediction_mode": "threshold",
+  "source_manifest": "/home/brend/projects/ll-hls4ml/artifacts/results/ll_hls4ml_gatv2_scaling_results/kaggle_v2_gatv2_1head_scale025_seed42/split_manifest.json",
+  "high_level_cache": "/home/brend/projects/ll-hls4ml/artifacts/cache/wa_high_level_scale200.pt",
+  "target_contract": "ll-hls4ml post-logic tensor targets",
+  "device": "cuda",
+  "torch_version": "2.11.0+cu130",
+  "parameter_count": 54024,
+  "ll_hls4ml_git": {
+    "commit": "32c3042b1ca8aac70c32fefc1816abef075bac9b",
+    "dirty": true
+  },
+  "wall_seconds": 53.522622099997534
+}

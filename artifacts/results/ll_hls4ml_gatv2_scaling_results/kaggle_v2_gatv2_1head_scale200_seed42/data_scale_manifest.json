@@ -1,0 +1,217 @@
+{
+  "scale": 2.0,
+  "baseline_archives_per_family": 4,
+  "required_archives_per_family": 8,
+  "subset_seed": 42,
+  "families": {
+    "2layer": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 560,
+      "selected_groups": 560,
+      "available_samples": 560,
+      "selected_samples": 560
+    },
+    "3layer": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 560,
+      "selected_groups": 560,
+      "available_samples": 560,
+      "selected_samples": 560
+    },
+    "conv1d": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 242,
+      "selected_groups": 242,
+      "available_samples": 242,
+      "selected_samples": 242
+    },
+    "conv2d": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 134,
+      "selected_groups": 134,
+      "available_samples": 134,
+      "selected_samples": 134
+    },
+    "dense_latency": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 384,
+      "selected_groups": 384,
+      "available_samples": 384,
+      "selected_samples": 384
+    },
+    "dense_resource": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 288,
+      "selected_groups": 288,
+      "available_samples": 288,
+      "selected_samples": 288
+    },
+    "rule4ml": {
+      "archive_cohorts": [
+        "archive_1",
+        "archive_2",
+        "archive_3",
+        "archive_4",
+        "archive_5",
+        "archive_6",
+        "archive_7",
+        "archive_8"
+      ],
+      "available_groups": 560,
+      "selected_groups": 560,
+      "available_samples": 560,
+      "selected_samples": 560
+    }
+  },
+  "evaluation_archives_per_family": 4,
+  "validation_archive_cohorts": {
+    "2layer": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "3layer": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "conv1d": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "conv2d": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "dense_latency": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "dense_resource": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "rule4ml": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ]
+  },
+  "test_archive_cohorts": {
+    "2layer": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "3layer": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "conv1d": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "conv2d": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "dense_latency": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "dense_resource": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ],
+    "rule4ml": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ]
+  },
+  "exemplar_archive_cohorts": {
+    "exemplar": [
+      "archive_1",
+      "archive_2",
+      "archive_3",
+      "archive_4"
+    ]
+  }
+}

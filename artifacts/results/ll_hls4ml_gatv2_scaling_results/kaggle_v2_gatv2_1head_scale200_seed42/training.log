@@ -1,0 +1,141 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W802 11:26:07.267587520 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W802 11:26:25.629583023 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W802 11:26:25.631468110 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.72 MB
+    total size: 576.36 MB
+  3layer: 800
+    avg size: 1.09 MB
+    total size: 875.00 MB
+  conv1d: 346
+    avg size: 6.97 MB
+    total size: 2412.64 MB
+  conv2d: 194
+    avg size: 7.30 MB
+    total size: 1416.81 MB
+  dense_latency: 550
+    avg size: 7.37 MB
+    total size: 4051.79 MB
+  dense_resource: 414
+    avg size: 7.40 MB
+    total size: 3062.25 MB
+  rule4ml: 800
+    avg size: 6.72 MB
+    total size: 5374.98 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 3.08 MB
+    total size: 2463.90 MB
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hetero_gat.py:28: UserWarning: There exist node types ({'pragma'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.
+  self.conv = HeteroConv(
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hetero_gat.py:28: UserWarning: There exist node types ({'pragma'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.
+  self.conv = HeteroConv(
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch   1/400  train=0.3610  val=0.2836
+Epoch   2/400  train=0.2664  val=0.2231
+Epoch   4/400  train=0.1768  val=0.1476
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch   6/400  train=0.1603  val=0.1514
+Epoch   8/400  train=0.1548  val=0.1527
+Epoch  10/400  train=0.1438  val=0.1180
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  12/400  train=0.1358  val=0.1236
+Epoch  14/400  train=0.1291  val=0.1153
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  16/400  train=0.1271  val=0.0982
+Epoch  18/400  train=0.1223  val=0.1043
+Epoch  20/400  train=0.1220  val=0.1063
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  22/400  train=0.1191  val=0.1240
+Epoch  24/400  train=0.1159  val=0.1101
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  26/400  train=0.1170  val=0.0999
+Epoch  28/400  train=0.1149  val=0.0994
+Epoch  30/400  train=0.1146  val=0.0975
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  32/400  train=0.1120  val=0.0999
+Epoch  34/400  train=0.1118  val=0.1014
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  36/400  train=0.1115  val=0.1069
+Epoch  38/400  train=0.1093  val=0.1028
+Epoch  40/400  train=0.1098  val=0.1018
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  42/400  train=0.1081  val=0.0951
+Epoch  44/400  train=0.1079  val=0.0936
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  46/400  train=0.1069  val=0.0908
+Epoch  48/400  train=0.1078  val=0.0938
+Epoch  50/400  train=0.1075  val=0.1027
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  52/400  train=0.1069  val=0.0958
+Epoch  54/400  train=0.1050  val=0.0839
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  56/400  train=0.1053  val=0.0878
+Epoch  58/400  train=0.1022  val=0.1023
+Epoch  60/400  train=0.1062  val=0.0883
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  62/400  train=0.1032  val=0.0854
+Epoch  64/400  train=0.1034  val=0.0901
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  66/400  train=0.0993  val=0.0891
+Epoch  68/400  train=0.1004  val=0.0791
+Epoch  70/400  train=0.1016  val=0.0954
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  72/400  train=0.1009  val=0.0835
+Epoch  74/400  train=0.0996  val=0.0925
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  76/400  train=0.1004  val=0.0920
+Epoch  78/400  train=0.0991  val=0.0828
+Epoch  80/400  train=0.1005  val=0.0879
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  82/400  train=0.0984  val=0.0899
+Epoch  84/400  train=0.0979  val=0.0794
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  86/400  train=0.0974  val=0.0852
+Epoch  88/400  train=0.0969  val=0.0925
+Epoch  90/400  train=0.0984  val=0.0933
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  92/400  train=0.0968  val=0.0790
+Epoch  94/400  train=0.0962  val=0.0833
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch  96/400  train=0.0971  val=0.0805
+Epoch  98/400  train=0.0971  val=0.0802
+Epoch 100/400  train=0.0961  val=0.0894
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 102/400  train=0.0949  val=0.0810
+Epoch 104/400  train=0.0939  val=0.0887
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 106/400  train=0.0952  val=0.0868
+Epoch 108/400  train=0.0951  val=0.0774
+Epoch 110/400  train=0.0942  val=0.0814
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 112/400  train=0.0945  val=0.0784
+Epoch 114/400  train=0.0943  val=0.0824
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 116/400  train=0.0931  val=0.0846
+Epoch 118/400  train=0.0920  val=0.0780
+Epoch 120/400  train=0.0933  val=0.0809
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 122/400  train=0.0926  val=0.0799
+Epoch 124/400  train=0.0917  val=0.0807
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 126/400  train=0.0913  val=0.0835
+Epoch 128/400  train=0.0914  val=0.0787
+Epoch 130/400  train=0.0898  val=0.0755
+Model saved to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42/checkpoints/kaggle_v2_gatv2_1head_scale200_seed42_backup.pt
+Epoch 132/400  train=0.0911  val=0.0776
+Early stopping triggered after 133 epochs.
+Best model restored from epoch 103 with validation smape 27.8223
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/kaggle_v2_gatv2_1head_scale200_seed42

@@ -1,0 +1,293 @@
+[{"stream_name":"stderr","time":6.182433902,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.182482018,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.182488384,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.182492563,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stderr","time":6.725232923,"data":"0.00s - Debugger warning: It seems that frozen modules are being used, which may\n"}
+,{"stream_name":"stderr","time":6.72528419,"data":"0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off\n"}
+,{"stream_name":"stderr","time":6.725289769,"data":"0.00s - to python to disable frozen modules.\n"}
+,{"stream_name":"stderr","time":6.72529373,"data":"0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.\n"}
+,{"stream_name":"stdout","time":7.717860736,"data":"['trans_vs_ind_test_backup.pt']\n"}
+,{"stream_name":"stdout","time":9.757200497,"data":"Collecting torch-geometric\r\n"}
+,{"stream_name":"stdout","time":9.908882535,"data":"  Downloading torch_geometric-2.8.0.post1-py3-none-any.whl.metadata (64 kB)\r\n"}
+,{"stream_name":"stdout","time":10.009984487,"data":"\u001b[?25l     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/64.4 kB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K     \u001b[91m━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[90m╺\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m30.7/64.4 kB\u001b[0m \u001b[31m2.3 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K     \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m64.4/64.4 kB\u001b[0m \u001b[31m890.9 kB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n"}
+,{"stream_name":"stdout","time":10.010043596,"data":"\u001b[?25hRequirement already satisfied: aiohttp in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (3.13.5)\r\n"}
+,{"stream_name":"stdout","time":10.010051345,"data":"Requirement already satisfied: fsspec in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (2025.3.0)\r\n"}
+,{"stream_name":"stdout","time":10.010056751,"data":"Requirement already satisfied: jinja2 in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (3.1.6)\r\n"}
+,{"stream_name":"stdout","time":10.010061989,"data":"Requirement already satisfied: numpy in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (2.4.6)\r\n"}
+,{"stream_name":"stdout","time":10.010066655,"data":"Requirement already satisfied: psutil\u003e=5.8.0 in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (5.9.5)\r\n"}
+,{"stream_name":"stdout","time":10.010071647,"data":"Requirement already satisfied: pyparsing in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (3.3.2)\r\n"}
+,{"stream_name":"stdout","time":10.010077041,"data":"Requirement already satisfied: requests in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (2.32.4)\r\n"}
+,{"stream_name":"stdout","time":10.010110029,"data":"Requirement already satisfied: tqdm in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (4.67.3)\r\n"}
+,{"stream_name":"stdout","time":10.010117395,"data":"Requirement already satisfied: xxhash in /usr/local/lib/python3.12/dist-packages (from torch-geometric) (3.6.0)\r\n"}
+,{"stream_name":"stdout","time":10.010122541,"data":"Requirement already satisfied: aiohappyeyeballs\u003e=2.5.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (2.6.1)\r\n"}
+,{"stream_name":"stdout","time":10.010136554,"data":"Requirement already satisfied: aiosignal\u003e=1.4.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (1.4.0)\r\n"}
+,{"stream_name":"stdout","time":10.010140469,"data":"Requirement already satisfied: attrs\u003e=17.3.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (26.1.0)\r\n"}
+,{"stream_name":"stdout","time":10.010143954,"data":"Requirement already satisfied: frozenlist\u003e=1.1.1 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (1.8.0)\r\n"}
+,{"stream_name":"stdout","time":10.010147469,"data":"Requirement already satisfied: multidict\u003c7.0,\u003e=4.5 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (6.7.1)\r\n"}
+,{"stream_name":"stdout","time":10.010151489,"data":"Requirement already satisfied: propcache\u003e=0.2.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (0.4.1)\r\n"}
+,{"stream_name":"stdout","time":10.010156107,"data":"Requirement already satisfied: yarl\u003c2.0,\u003e=1.17.0 in /usr/local/lib/python3.12/dist-packages (from aiohttp-\u003etorch-geometric) (1.23.0)\r\n"}
+,{"stream_name":"stdout","time":10.060647466,"data":"Requirement already satisfied: MarkupSafe\u003e=2.0 in /usr/local/lib/python3.12/dist-packages (from jinja2-\u003etorch-geometric) (3.0.3)\r\n"}
+,{"stream_name":"stdout","time":10.060673868,"data":"Requirement already satisfied: charset_normalizer\u003c4,\u003e=2 in /usr/local/lib/python3.12/dist-packages (from requests-\u003etorch-geometric) (3.4.7)\r\n"}
+,{"stream_name":"stdout","time":10.060688163,"data":"Requirement already satisfied: idna\u003c4,\u003e=2.5 in /usr/local/lib/python3.12/dist-packages (from requests-\u003etorch-geometric) (3.11)\r\n"}
+,{"stream_name":"stdout","time":10.060692423,"data":"Requirement already satisfied: urllib3\u003c3,\u003e=1.21.1 in /usr/local/lib/python3.12/dist-packages (from requests-\u003etorch-geometric) (2.5.0)\r\n"}
+,{"stream_name":"stdout","time":10.060696753,"data":"Requirement already satisfied: certifi\u003e=2017.4.17 in /usr/local/lib/python3.12/dist-packages (from requests-\u003etorch-geometric) (2026.2.25)\r\n"}
+,{"stream_name":"stdout","time":10.060704299,"data":"Requirement already satisfied: typing-extensions\u003e=4.2 in /usr/local/lib/python3.12/dist-packages (from aiosignal\u003e=1.4.0-\u003eaiohttp-\u003etorch-geometric) (4.15.0)\r\n"}
+,{"stream_name":"stdout","time":10.111357126,"data":"Downloading torch_geometric-2.8.0.post1-py3-none-any.whl (1.3 MB)\r\n"}
+,{"stream_name":"stdout","time":10.314099058,"data":"\u001b[?25l   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.0/1.3 MB\u001b[0m \u001b[31m?\u001b[0m eta \u001b[36m-:--:--\u001b[0m\r\u001b[2K   \u001b[91m━━\u001b[0m\u001b[91m╸\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.1/1.3 MB\u001b[0m \u001b[31m4.9 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[91m━━━━━━━━━\u001b[0m\u001b[90m╺\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.3/1.3 MB\u001b[0m \u001b[31m4.4 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[91m━━━━━━━━━━━━━━━━\u001b[0m\u001b[90m╺\u001b[0m\u001b[90m━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m0.5/1.3 MB\u001b[0m \u001b[31m5.2 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m\u001b[90m╺\u001b[0m\u001b[90m━━━━━━━━━━━\u001b[0m \u001b[32m0.9/1.3 MB\u001b[0m \u001b[31m6.8 MB/s\u001b[0m eta \u001b[36m0:00:01\u001b[0m\r\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m1.3/1.3 MB\u001b[0m \u001b[31m7.9 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\r\n"}
+,{"stream_name":"stdout","time":12.28970408,"data":"\u001b[?25hInstalling collected packages: torch-geometric\r\n"}
+,{"stream_name":"stdout","time":13.34843602,"data":"Successfully installed torch-geometric-2.8.0.post1\r\n"}
+,{"stream_name":"stdout","time":16.726525356,"data":"Cloning into 'll-hls4ml'...\r\n"}
+,{"stream_name":"stdout","time":17.635858531,"data":"remote: Enumerating objects: 536, done.\u001b[K\r\n"}
+,{"stream_name":"stdout","time":17.635903994,"data":"remote: Counting objects:   0% (1/536)\u001b[K\rremote: Counting objects:   1% (6/536)\u001b[K\rremote: Counting objects:   2% (11/536)\u001b[K\rremote: Counting objects:   3% (17/536)\u001b[K\rremote: Counting objects:   4% (22/536)\u001b[K\rremote: Counting objects:   5% (27/536)\u001b[K\rremote: Counting objects:   6% (33/536)\u001b[K\rremote: Counting objects:   7% (38/536)\u001b[K\rremote: Counting objects:   8% (43/536)\u001b[K\rremote: Counting objects:   9% (49/536)\u001b[K\rremote: Counting objects:  10% (54/536)\u001b[K\rremote: Counting objects:  11% (59/536)\u001b[K\rremote: Counting objects:  12% (65/536)\u001b[K\rremote: Counting objects:  13% (70/536)\u001b[K\rremote: Counting objects:  14% (76/536)\u001b[K\rremote: Counting objects:  15% (81/536)\u001b[K\rremote: Counting objects:  16% (86/536)\u001b[K\rremote: Counting objects:  17% (92/536)\u001b[K\rremote: Counting objects:  18% (97/536)\u001b[K\rremote: Counting objects:  19% (102/536)\u001b[K\rremote: Counting objects:  20% (108/536)\u001b[K\rremote: Counting objects:  21% (113/536)\u001b[K\rremote: Counting objects:  22% (118/536)\u001b[K\rremote: Counting objects:  23% (124/536)\u001b[K\rremote: Counting objects:  24% (129/536)\u001b[K\rremote: Counting objects:  25% (134/536)\u001b[K\rremote: Counting objects:  26% (140/536)\u001b[K\rremote: Counting objects:  27% (145/536)\u001b[K\rremote: Counting objects:  28% (151/536)\u001b[K\rremote: Counting objects:  29% (156/536)\u001b[K\rremote: Counting objects:  30% (161/536)\u001b[K\rremote: Counting objects:  31% (167/536)\u001b[K\rremote: Counting objects:  32% (172/536)\u001b[K\rremote: Counting objects:  33% (177/536)\u001b[K\rremote: Counting objects:  34% (183/536)\u001b[K\rremote: Counting objects:  35% (188/536)\u001b[K\rremote: Counting objects:  36% (193/536)\u001b[K\rremote: Counting objects:  37% (199/536)\u001b[K\rremote: Counting objects:  38% (204/536)\u001b[K\rremote: Counting objects:  39% (210/536)\u001b[K\rremote: Counting objects:  40% (215/536)\u001b[K\rremote: Counting objects:  41% (220/536)\u001b[K\rremote: Counting objects:  42% (226/536)\u001b[K\rremote: Counting objects:  43% (231/536)\u001b[K\rremote: Counting objects:  44% (236/536)\u001b[K\rremote: Counting objects:  45% (242/536)\u001b[K\rremote: Counting objects:  46% (247/536)\u001b[K\rremote: Counting objects:  47% (252/536)\u001b[K\rremote: Counting objects:  48% (258/536)\u001b[K\rremote: Counting objects:  49% (263/536)\u001b[K\rremote: Counting objects:  50% (268/536)\u001b[K\rremote: Counting objects:  51% (274/536)\u001b[K\rremote: Counting objects:  52% (279/536)\u001b[K\rremote: Counting objects:  53% (285/536)\u001b[K\rremote: Counting objects:  54% (290/536)\u001b[K\rremote: Counting objects:  55% (295/536)\u001b[K\rremote: Counting objects:  56% (301/536)\u001b[K\rremote: Counting objects:  57% (306/536)\u001b[K\rremote: Counting objects:  58% (311/536)\u001b[K\rremote: Counting objects:  59% (317/536)\u001b[K\rremote: Counting objects:  60% (322/536)\u001b[K\rremote: Counting objects:  61% (327/536)\u001b[K\rremote: Counting objects:  62% (333/536)\u001b[K\rremote: Counting objects:  63% (338/536)\u001b[K\rremote: Counting objects:  64% (344/536)\u001b[K\rremote: Counting objects:  65% (349/536)\u001b[K\rremote: Counting objects:  66% (354/536)\u001b[K\rremote: Counting objects:  67% (360/536)\u001b[K\rremote: Counting objects:  68% (365/536)\u001b[K\rremote: Counting objects:  69% (370/536)\u001b[K\rremote: Counting objects:  70% (376/536)\u001b[K\rremote: Counting objects:  71% (381/536)\u001b[K\rremote: Counting objects:  72% (386/536)\u001b[K\rremote: Counting objects:  73% (392/536)\u001b[K\rremote: Counting objects:  74% (397/536)\u001b[K\rremote: Counting objects:  75% (402/536)\u001b[K\rremote: Counting objects:  76% (408/536)\u001b[K\rremote: Counting objects:  77% (413/536)\u001b[K\rremote: Counting objects:  78% (419/536)\u001b[K\rremote: Counting objects:  79% (424/536)\u001b[K\rremote: Counting objects:  80% (429/536)\u001b[K\rremote: Counting objects:  81% (435/536)\u001b[K\rremote: Counting objects:  82% (440/536)\u001b[K\rremote: Counting objects:  83% (445/536)\u001b[K\rremote: Counting objects:  84% (451/536)\u001b[K\rremote: Counting objects:  85% (456/536)\u001b[K\rremote: Counting objects:  86% (461/536)\u001b[K\rremote: Counting objects:  87% (467/536)\u001b[K\rremote: Counting objects:  88% (472/536)\u001b[K\rremote: Counting objects:  89% (478/536)\u001b[K\rremote: Counting objects:  90% (483/536)\u001b[K\rremote: Counting objects:  91% (488/536)\u001b[K\rremote: Counting objects:  92% (494/536)\u001b[K\rremote: Counting objects:  93% (499/536)\u001b[K\rremote: Counting objects:  94% (504/536)\u001b[K\rremote: Counting objects:  95% (510/536)\u001b[K\rremote: Counting objects:  96% (515/536)\u001b[K\rremote: Counting objects:  97% (520/536)\u001b[K\rremote: Counting objects:  98% (526/536)\u001b[K\rremote: Counting objects:  99% (531/536)\u001b[K\rremote: Counting objects: 100% (536/536)\u001b[K\rremote: Counting objects: 100% (536/536), done.\u001b[K\r\n"}
+,{"stream_name":"stdout","time":18.292577987,"data":"remote: Compressing objects:   0% (1/292)\u001b[K\rremote: Compressing objects:   1% (3/292)\u001b[K\rremote: Compressing objects:   2% (6/292)\u001b[K\rremote: Compressing objects:   3% (9/292)\u001b[K\rremote: Compressing objects:   4% (12/292)\u001b[K\rremote: Compressing objects:   5% (15/292)\u001b[K\rremote: Compressing objects:   6% (18/292)\u001b[K\rremote: Compressing objects:   7% (21/292)\u001b[K\rremote: Compressing objects:   8% (24/292)\u001b[K\rremote: Compressing objects:   9% (27/292)\u001b[K\rremote: Compressing objects:  10% (30/292)\u001b[K\rremote: Compressing objects:  11% (33/292)\u001b[K\rremote: Compressing objects:  12% (36/292)\u001b[K\rremote: Compressing objects:  13% (38/292)\u001b[K\rremote: Compressing objects:  14% (41/292)\u001b[K\rremote: Compressing objects:  15% (44/292)\u001b[K\rremote: Compressing objects:  16% (47/292)\u001b[K\rremote: Compressing objects:  17% (50/292)\u001b[K\rremote: Compressing objects:  18% (53/292)\u001b[K\rremote: Compressing objects:  19% (56/292)\u001b[K\rremote: Compressing objects:  20% (59/292)\u001b[K\rremote: Compressing objects:  21% (62/292)\u001b[K\rremote: Compressing objects:  22% (65/292)\u001b[K\rremote: Compressing objects:  23% (68/292)\u001b[K\rremote: Compressing objects:  24% (71/292)\u001b[K\rremote: Compressing objects:  25% (73/292)\u001b[K\rremote: Compressing objects:  26% (76/292)\u001b[K\rremote: Compressing objects:  27% (79/292)\u001b[K\rremote: Compressing objects:  28% (82/292)\u001b[K\rremote: Compressing objects:  29% (85/292)\u001b[K\rremote: Compressing objects:  30% (88/292)\u001b[K\rremote: Compressing objects:  31% (91/292)\u001b[K\rremote: Compressing objects:  32% (94/292)\u001b[K\rremote: Compressing objects:  33% (97/292)\u001b[K\rremote: Compressing objects:  34% (100/292)\u001b[K\rremote: Compressing objects:  35% (103/292)\u001b[K\rremote: Compressing objects:  36% (106/292)\u001b[K\rremote: Compressing objects:  37% (109/292)\u001b[K\rremote: Compressing objects:  38% (111/292)\u001b[K\rremote: Compressing objects:  39% (114/292)\u001b[K\rremote: Compressing objects:  40% (117/292)\u001b[K\rremote: Compressing objects:  41% (120/292)\u001b[K\rremote: Compressing objects:  42% (123/292)\u001b[K\rremote: Compressing objects:  43% (126/292)\u001b[K\rremote: Compressing objects:  44% (129/292)\u001b[K\rremote: Compressing objects:  45% (132/292)\u001b[K\rremote: Compressing objects:  46% (135/292)\u001b[K\rremote: Compressing objects:  47% (138/292)\u001b[K\rremote: Compressing objects:  48% (141/292)\u001b[K\rremote: Compressing objects:  49% (144/292)\u001b[K\rremote: Compressing objects:  50% (146/292)\u001b[K\rremote: Compressing objects:  51% (149/292)\u001b[K\rremote: Compressing objects:  52% (152/292)\u001b[K\rremote: Compressing objects:  53% (155/292)\u001b[K\rremote: Compressing objects:  54% (158/292)\u001b[K\rremote: Compressing objects:  55% (161/292)\u001b[K\rremote: Compressing objects:  56% (164/292)\u001b[K\rremote: Compressing objects:  57% (167/292)\u001b[K\rremote: Compressing objects:  58% (170/292)\u001b[K\rremote: Compressing objects:  59% (173/292)\u001b[K\rremote: Compressing objects:  60% (176/292)\u001b[K\rremote: Compressing objects:  61% (179/292)\u001b[K\rremote: Compressing objects:  62% (182/292)\u001b[K\rremote: Compressing objects:  63% (184/292)\u001b[K\rremote: Compressing objects:  64% (187/292)\u001b[K\rremote: Compressing objects:  65% (190/292)\u001b[K\rremote: Compressing objects:  66% (193/292)\u001b[K\rremote: Compressing objects:  67% (196/292)\u001b[K\rremote: Compressing objects:  68% (199/292)\u001b[K\rremote: Compressing objects:  69% (202/292)\u001b[K\rremote: Compressing objects:  70% (205/292)\u001b[K\rremote: Compressing objects:  71% (208/292)\u001b[K\rremote: Compressing objects:  72% (211/292)\u001b[K\rremote: Compressing objects:  73% (214/292)\u001b[K\rremote: Compressing objects:  74% (217/292)\u001b[K\rremote: Compressing objects:  75% (219/292)\u001b[K\rremote: Compressing objects:  76% (222/292)\u001b[K\rremote: Compressing objects:  77% (225/292)\u001b[K\rremote: Compressing objects:  78% (228/292)\u001b[K\rremote: Compressing objects:  79% (231/292)\u001b[K\rremote: Compressing objects:  80% (234/292)\u001b[K\rremote: Compressing objects:  81% (237/292)\u001b[K\rremote: Compressing objects:  82% (240/292)\u001b[K\rremote: Compressing objects:  83% (243/292)\u001b[K\rremote: Compressing objects:  84% (246/292)\u001b[K\rremote: Compressing objects:  85% (249/292)\u001b[K\rremote: Compressing objects:  86% (252/292)\u001b[K\rremote: Compressing objects:  87% (255/292)\u001b[K\rremote: Compressing objects:  88% (257/292)\u001b[K\rremote: Compressing objects:  89% (260/292)\u001b[K\rremote: Compressing objects:  90% (263/292)\u001b[K\rremote: Compressing objects:  91% (266/292)\u001b[K\rremote: Compressing objects:  92% (269/292)\u001b[K\rremote: Compressing objects:  93% (272/292)\u001b[K\rremote: Compressing objects:  94% (275/292)\u001b[K\rremote: Compressing objects:  95% (278/292)\u001b[K\rremote: Compressing objects:  96% (281/292)\u001b[K\rremote: Compressing objects:  97% (284/292)\u001b[K\rremote: Compressing objects:  98% (287/292)\u001b[K\rremote: Compressing objects:  99% (290/292)\u001b[K\rremote: Compressing objects: 100% (292/292)\u001b[K\rremote: Compressing objects: 100% (292/292), done.\u001b[K\r\n"}
+,{"stream_name":"stdout","time":18.850934803,"data":"Receiving objects:   0% (1/536)\rReceiving objects:   1% (6/536)\rReceiving objects:   2% (11/536)\rReceiving objects:   3% (17/536)\rReceiving objects:   4% (22/536)\rReceiving objects:   5% (27/536)\rReceiving objects:   6% (33/536)\rReceiving objects:   7% (38/536)\rReceiving objects:   8% (43/536)\rReceiving objects:   9% (49/536)\rReceiving objects:  10% (54/536)\rReceiving objects:  11% (59/536)\rReceiving objects:  12% (65/536)\rReceiving objects:  13% (70/536)\rReceiving objects:  14% (76/536)\rReceiving objects:  15% (81/536)\rReceiving objects:  16% (86/536)\rReceiving objects:  17% (92/536)\rReceiving objects:  18% (97/536)\rReceiving objects:  19% (102/536)\rReceiving objects:  20% (108/536)\rReceiving objects:  21% (113/536)\rReceiving objects:  22% (118/536)\rReceiving objects:  23% (124/536)\rReceiving objects:  24% (129/536)\rReceiving objects:  25% (134/536)\rReceiving objects:  26% (140/536)\rReceiving objects:  27% (145/536)\rReceiving objects:  28% (151/536)\rReceiving objects:  29% (156/536)\rReceiving objects:  30% (161/536)\rReceiving objects:  31% (167/536)\rReceiving objects:  32% (172/536)\rReceiving objects:  33% (177/536)\rReceiving objects:  34% (183/536)\rReceiving objects:  35% (188/536)\rReceiving objects:  36% (193/536)\rReceiving objects:  37% (199/536)\rReceiving objects:  38% (204/536)\rReceiving objects:  39% (210/536)\rReceiving objects:  40% (215/536)\rReceiving objects:  41% (220/536)\rReceiving objects:  42% (226/536)\rReceiving objects:  43% (231/536)\rReceiving objects:  44% (236/536)\rReceiving objects:  45% (242/536)\rReceiving objects:  46% (247/536)\rReceiving objects:  47% (252/536)\rReceiving objects:  48% (258/536)\rReceiving objects:  49% (263/536)\rReceiving objects:  50% (268/536)\rReceiving objects:  51% (274/536)\rReceiving objects:  52% (279/536)\rReceiving objects:  53% (285/536)\rReceiving objects:  54% (290/536)\rReceiving objects:  55% (295/536)\rReceiving objects:  56% (301/536)\rReceiving objects:  57% (306/536)\rReceiving objects:  58% (311/536)\rReceiving objects:  59% (317/536)\rReceiving objects:  60% (322/536)\rReceiving objects:  61% (327/536)\rReceiving objects:  62% (333/536)\rReceiving objects:  63% (338/536)\rReceiving objects:  64% (344/536)\rReceiving objects:  65% (349/536)\rReceiving objects:  66% (354/536)\rReceiving objects:  67% (360/536)\rReceiving objects:  68% (365/536)\rReceiving objects:  69% (370/536)\rReceiving objects:  70% (376/536)\rReceiving objects:  71% (381/536)\rReceiving objects:  72% (386/536)\rReceiving objects:  73% (392/536)\rReceiving objects:  74% (397/536)\rReceiving objects:  75% (402/536)\rReceiving objects:  76% (408/536)\rReceiving objects:  77% (413/536)\rReceiving objects:  78% (419/536)\rReceiving objects:  79% (424/536)\rReceiving objects:  80% (429/536)\rReceiving objects:  81% (435/536)\rReceiving objects:  82% (440/536)\rReceiving objects:  83% (445/536)\rReceiving objects:  84% (451/536)\rReceiving objects:  85% (456/536)\rReceiving objects:  86% (461/536)\rReceiving objects:  87% (467/536)\rReceiving objects:  88% (472/536)\rReceiving objects:  89% (478/536)\rReceiving objects:  90% (483/536)\rReceiving objects:  91% (488/536)\rReceiving objects:  92% (494/536)\rReceiving objects:  93% (499/536)\rReceiving objects:  94% (504/536)\rReceiving objects:  95% (510/536)\rReceiving objects:  96% (515/536)\rReceiving objects:  97% (520/536)\rReceiving objects:  98% (526/536)\rReceiving objects:  99% (531/536), 10.51 MiB | 20.64 MiB/s\rremote: Total 536 (delta 283), reused 452 (delta 199), pack-reused 0 (from 0)\u001b[K\r\n"}
+,{"stream_name":"stdout","time":18.85099496,"data":"Receiving objects: 100% (536/536), 10.51 MiB | 20.64 MiB/s\rReceiving objects: 100% (536/536), 13.15 MiB | 22.91 MiB/s, done.\r\n"}
+,{"stream_name":"stdout","time":18.901447767,"data":"Resolving deltas:   0% (0/283)\rResolving deltas:   1% (3/283)\rResolving deltas:   2% (6/283)\rResolving deltas:   3% (9/283)\rResolving deltas:   4% (12/283)\rResolving deltas:   5% (15/283)\rResolving deltas:   6% (17/283)\rResolving deltas:   7% (20/283)\rResolving deltas:   8% (23/283)\rResolving deltas:   9% (26/283)\rResolving deltas:  10% (29/283)\rResolving deltas:  11% (32/283)\rResolving deltas:  12% (34/283)\rResolving deltas:  13% (37/283)\rResolving deltas:  14% (40/283)\rResolving deltas:  15% (43/283)\rResolving deltas:  16% (46/283)\rResolving deltas:  17% (49/283)\rResolving deltas:  18% (51/283)\rResolving deltas:  19% (54/283)\rResolving deltas:  20% (57/283)\rResolving deltas:  21% (60/283)\rResolving deltas:  22% (63/283)\rResolving deltas:  23% (66/283)\rResolving deltas:  24% (68/283)\rResolving deltas:  25% (71/283)\rResolving deltas:  26% (74/283)\rResolving deltas:  27% (77/283)\rResolving deltas:  28% (80/283)\rResolving deltas:  29% (83/283)\rResolving deltas:  30% (85/283)\rResolving deltas:  31% (88/283)\rResolving deltas:  32% (91/283)\rResolving deltas:  33% (94/283)\rResolving deltas:  34% (97/283)\rResolving deltas:  35% (100/283)\rResolving deltas:  36% (102/283)\rResolving deltas:  37% (105/283)\rResolving deltas:  38% (108/283)\rResolving deltas:  39% (111/283)\rResolving deltas:  40% (114/283)\rResolving deltas:  41% (117/283)\rResolving deltas:  42% (119/283)\rResolving deltas:  43% (122/283)\rResolving deltas:  44% (125/283)\rResolving deltas:  45% (128/283)\rResolving deltas:  46% (131/283)\rResolving deltas:  47% (134/283)\rResolving deltas:  48% (136/283)\rResolving deltas:  49% (139/283)\rResolving deltas:  50% (142/283)\rResolving deltas:  51% (145/283)\rResolving deltas:  52% (148/283)\rResolving deltas:  53% (150/283)\rResolving deltas:  54% (153/283)\rResolving deltas:  55% (156/283)\rResolving deltas:  56% (159/283)\rResolving deltas:  57% (162/283)\rResolving deltas:  58% (165/283)\rResolving deltas:  59% (167/283)\rResolving deltas:  60% (170/283)\rResolving deltas:  61% (173/283)\rResolving deltas:  62% (176/283)\rResolving deltas:  63% (179/283)\rResolving deltas:  64% (182/283)\rResolving deltas:  65% (184/283)\rResolving deltas:  66% (187/283)\rResolving deltas:  67% (190/283)\rResolving deltas:  68% (193/283)\rResolving deltas:  69% (196/283)\rResolving deltas:  70% (199/283)\rResolving deltas:  71% (201/283)\rResolving deltas:  72% (204/283)\rResolving deltas:  73% (207/283)\rResolving deltas:  74% (210/283)\rResolving deltas:  75% (213/283)\rResolving deltas:  76% (216/283)\rResolving deltas:  77% (218/283)\rResolving deltas:  78% (221/283)\rResolving deltas:  79% (224/283)\rResolving deltas:  80% (227/283)\rResolving deltas:  81% (230/283)\rResolving deltas:  82% (233/283)\rResolving deltas:  83% (235/283)\rResolving deltas:  84% (238/283)\rResolving deltas:  85% (241/283)\rResolving deltas:  86% (244/283)\rResolving deltas:  87% (247/283)\rResolving deltas:  88% (250/283)\rResolving deltas:  89% (252/283)\rResolving deltas:  90% (255/283)\rResolving deltas:  91% (258/283)\rResolving deltas:  92% (261/283)\rResolving deltas:  93% (264/283)\rResolving deltas:  94% (267/283)\rResolving deltas:  95% (269/283)\rResolving deltas:  96% (272/283)\rResolving deltas:  97% (275/283)\rResolving deltas:  98% (278/283)\rResolving deltas:  99% (281/283)\rResolving deltas: 100% (283/283)\rResolving deltas: 100% (283/283), done.\r\n"}
+,{"stream_name":"stdout","time":39.08762717,"data":"Downloading tensor dataset...\n"}
+,{"stream_name":"stdout","time":474.957907612,"data":"Downloaded successful\n"}
+,{"stream_name":"stdout","time":476.891056589,"data":"W0725 12:51:30.057000 2026 torch/distributed/run.py:852] \r\n"}
+,{"stream_name":"stdout","time":476.89110124,"data":"W0725 12:51:30.057000 2026 torch/distributed/run.py:852] *****************************************\r\n"}
+,{"stream_name":"stdout","time":476.891110231,"data":"W0725 12:51:30.057000 2026 torch/distributed/run.py:852] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. \r\n"}
+,{"stream_name":"stdout","time":476.891117398,"data":"W0725 12:51:30.057000 2026 torch/distributed/run.py:852] *****************************************\r\n"}
+,{"stream_name":"stdout","time":487.519535698,"data":"Indexed 1623 graphs across 7 type(s)\r\n"}
+,{"stream_name":"stdout","time":487.519571352,"data":"  2layer: 300\r\n"}
+,{"stream_name":"stdout","time":487.519577523,"data":"    avg size: 0.69 MB\r\n"}
+,{"stream_name":"stdout","time":487.519582702,"data":"    total size: 208.27 MB\r\n"}
+,{"stream_name":"stdout","time":487.519588099,"data":"  3layer: 300\r\n"}
+,{"stream_name":"stdout","time":487.519593395,"data":"    avg size: 0.96 MB\r\n"}
+,{"stream_name":"stdout","time":487.519609126,"data":"    total size: 289.21 MB\r\n"}
+,{"stream_name":"stdout","time":487.519612495,"data":"  conv1d: 249\r\n"}
+,{"stream_name":"stdout","time":487.519615812,"data":"    avg size: 5.76 MB\r\n"}
+,{"stream_name":"stdout","time":487.519620899,"data":"    total size: 1435.00 MB\r\n"}
+,{"stream_name":"stdout","time":487.519625137,"data":"  conv2d: 200\r\n"}
+,{"stream_name":"stdout","time":487.519629286,"data":"    avg size: 5.91 MB\r\n"}
+,{"stream_name":"stdout","time":487.519633199,"data":"    total size: 1182.77 MB\r\n"}
+,{"stream_name":"stdout","time":487.51963731,"data":"  dense_latency: 214\r\n"}
+,{"stream_name":"stdout","time":487.51964162,"data":"    avg size: 6.09 MB\r\n"}
+,{"stream_name":"stdout","time":487.519646222,"data":"    total size: 1302.28 MB\r\n"}
+,{"stream_name":"stdout","time":487.519650488,"data":"  dense_resource: 160\r\n"}
+,{"stream_name":"stdout","time":487.519654583,"data":"    avg size: 6.07 MB\r\n"}
+,{"stream_name":"stdout","time":487.519658913,"data":"    total size: 971.37 MB\r\n"}
+,{"stream_name":"stdout","time":487.519663129,"data":"  rule4ml: 200\r\n"}
+,{"stream_name":"stdout","time":487.519667214,"data":"    avg size: 5.56 MB\r\n"}
+,{"stream_name":"stdout","time":487.519671407,"data":"    total size: 1111.15 MB\r\n"}
+,{"stream_name":"stdout","time":487.519675619,"data":"Indexed 300 graphs across 1 type(s)\r\n"}
+,{"stream_name":"stdout","time":487.519679857,"data":"  exemplar: 300\r\n"}
+,{"stream_name":"stdout","time":487.519684619,"data":"    avg size: 2.51 MB\r\n"}
+,{"stream_name":"stdout","time":487.519688801,"data":"    total size: 752.51 MB\r\n"}
+,{"stream_name":"stdout","time":490.009580462,"data":"/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/rgcn.py:79: UserWarning: There exist node types ({'pragma', 'constant'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.\r\n"}
+,{"stream_name":"stdout","time":490.009619651,"data":"  self.conv = HeteroConv(\r\n"}
+,{"stream_name":"stdout","time":490.110891631,"data":"/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/rgcn.py:79: UserWarning: There exist node types ({'constant', 'pragma'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.\r\n"}
+,{"stream_name":"stdout","time":490.110926254,"data":"  self.conv = HeteroConv(\r\n"}
+,{"stream_name":"stdout","time":490.72189033,"data":"Training 500 epochs...\r\n"}
+,{"stream_name":"stdout","time":577.4681325,"data":"Epoch   1/500  train=0.3206  val=0.2192\r\n"}
+,{"stream_name":"stdout","time":667.518955933,"data":"Epoch   2/500  train=0.2337  val=0.1952\r\n"}
+,{"stream_name":"stdout","time":845.464766424,"data":"Epoch   4/500  train=0.2049  val=0.1759\r\n"}
+,{"stream_name":"stdout","time":1024.703891048,"data":"Epoch   6/500  train=0.1759  val=0.1459\r\n"}
+,{"stream_name":"stdout","time":1200.166107127,"data":"Epoch   8/500  train=0.1610  val=0.1251\r\n"}
+,{"stream_name":"stdout","time":1376.842262994,"data":"Epoch  10/500  train=0.1487  val=0.1168\r\n"}
+,{"stream_name":"stdout","time":1376.93842268,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":1556.581135372,"data":"Epoch  12/500  train=0.1380  val=0.1107\r\n"}
+,{"stream_name":"stdout","time":1736.565197672,"data":"Epoch  14/500  train=0.1279  val=0.1072\r\n"}
+,{"stream_name":"stdout","time":1914.552145205,"data":"Epoch  16/500  train=0.1295  val=0.1003\r\n"}
+,{"stream_name":"stdout","time":2092.42261756,"data":"Epoch  18/500  train=0.1239  val=0.0917\r\n"}
+,{"stream_name":"stdout","time":2271.276370189,"data":"Epoch  20/500  train=0.1184  val=0.0961\r\n"}
+,{"stream_name":"stdout","time":2271.321657284,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":2448.918178411,"data":"Epoch  22/500  train=0.1129  val=0.0935\r\n"}
+,{"stream_name":"stdout","time":2626.759729549,"data":"Epoch  24/500  train=0.1168  val=0.0911\r\n"}
+,{"stream_name":"stdout","time":2804.823176121,"data":"Epoch  26/500  train=0.1107  val=0.0873\r\n"}
+,{"stream_name":"stdout","time":2981.137750041,"data":"Epoch  28/500  train=0.1128  val=0.0875\r\n"}
+,{"stream_name":"stdout","time":3158.476252934,"data":"Epoch  30/500  train=0.1085  val=0.0903\r\n"}
+,{"stream_name":"stdout","time":3158.521465919,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":3336.76162512,"data":"Epoch  32/500  train=0.1070  val=0.0928\r\n"}
+,{"stream_name":"stdout","time":3514.152570239,"data":"Epoch  34/500  train=0.1029  val=0.0887\r\n"}
+,{"stream_name":"stdout","time":3693.252295384,"data":"Epoch  36/500  train=0.1052  val=0.1021\r\n"}
+,{"stream_name":"stdout","time":3872.304592915,"data":"Epoch  38/500  train=0.1019  val=0.0832\r\n"}
+,{"stream_name":"stdout","time":4051.880665501,"data":"Epoch  40/500  train=0.1009  val=0.0875\r\n"}
+,{"stream_name":"stdout","time":4051.925962712,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":4230.060827066,"data":"Epoch  42/500  train=0.1039  val=0.0786\r\n"}
+,{"stream_name":"stdout","time":4409.392460687,"data":"Epoch  44/500  train=0.1027  val=0.0798\r\n"}
+,{"stream_name":"stdout","time":4589.54783386,"data":"Epoch  46/500  train=0.1024  val=0.0903\r\n"}
+,{"stream_name":"stdout","time":4768.280796025,"data":"Epoch  48/500  train=0.0991  val=0.0843\r\n"}
+,{"stream_name":"stdout","time":4944.626840231,"data":"Epoch  50/500  train=0.0988  val=0.0779\r\n"}
+,{"stream_name":"stdout","time":4944.722197193,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":5122.960423118,"data":"Epoch  52/500  train=0.0971  val=0.0821\r\n"}
+,{"stream_name":"stdout","time":5302.462026274,"data":"Epoch  54/500  train=0.0983  val=0.0831\r\n"}
+,{"stream_name":"stdout","time":5480.908853917,"data":"Epoch  56/500  train=0.0951  val=0.0794\r\n"}
+,{"stream_name":"stdout","time":5660.244876256,"data":"Epoch  58/500  train=0.0975  val=0.0795\r\n"}
+,{"stream_name":"stdout","time":5839.58338265,"data":"Epoch  60/500  train=0.0933  val=0.0804\r\n"}
+,{"stream_name":"stdout","time":5839.678282557,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":6019.209410241,"data":"Epoch  62/500  train=0.0903  val=0.0773\r\n"}
+,{"stream_name":"stdout","time":6198.815637554,"data":"Epoch  64/500  train=0.0878  val=0.0745\r\n"}
+,{"stream_name":"stdout","time":6377.973880072,"data":"Epoch  66/500  train=0.0940  val=0.0797\r\n"}
+,{"stream_name":"stdout","time":6556.623286724,"data":"Epoch  68/500  train=0.0927  val=0.0809\r\n"}
+,{"stream_name":"stdout","time":6735.550739147,"data":"Epoch  70/500  train=0.0927  val=0.0924\r\n"}
+,{"stream_name":"stdout","time":6735.594687808,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":6913.481307932,"data":"Epoch  72/500  train=0.0885  val=0.0768\r\n"}
+,{"stream_name":"stdout","time":7092.285810202,"data":"Epoch  74/500  train=0.0885  val=0.0799\r\n"}
+,{"stream_name":"stdout","time":7272.149624205,"data":"Epoch  76/500  train=0.0919  val=0.0786\r\n"}
+,{"stream_name":"stdout","time":7449.536746035,"data":"Epoch  78/500  train=0.0877  val=0.0818\r\n"}
+,{"stream_name":"stdout","time":7627.479117265,"data":"Epoch  80/500  train=0.0878  val=0.0723\r\n"}
+,{"stream_name":"stdout","time":7627.62376672,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":7808.403945006,"data":"Epoch  82/500  train=0.0886  val=0.0727\r\n"}
+,{"stream_name":"stdout","time":7985.496189044,"data":"Epoch  84/500  train=0.0873  val=0.0715\r\n"}
+,{"stream_name":"stdout","time":8166.493672311,"data":"Epoch  86/500  train=0.0870  val=0.0704\r\n"}
+,{"stream_name":"stdout","time":8346.459593974,"data":"Epoch  88/500  train=0.0866  val=0.0802\r\n"}
+,{"stream_name":"stdout","time":8524.581761292,"data":"Epoch  90/500  train=0.0840  val=0.0723\r\n"}
+,{"stream_name":"stdout","time":8524.623046619,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":8704.594992063,"data":"Epoch  92/500  train=0.0851  val=0.0738\r\n"}
+,{"stream_name":"stdout","time":8885.0407413,"data":"Epoch  94/500  train=0.0834  val=0.0751\r\n"}
+,{"stream_name":"stdout","time":9064.753571726,"data":"Epoch  96/500  train=0.0856  val=0.0720\r\n"}
+,{"stream_name":"stdout","time":9243.117909716,"data":"Epoch  98/500  train=0.0809  val=0.0760\r\n"}
+,{"stream_name":"stdout","time":9422.255205477,"data":"Epoch 100/500  train=0.0853  val=0.0759\r\n"}
+,{"stream_name":"stdout","time":9422.349113848,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":9600.057761636,"data":"Epoch 102/500  train=0.0882  val=0.0731\r\n"}
+,{"stream_name":"stdout","time":9780.307796539,"data":"Epoch 104/500  train=0.0864  val=0.1143\r\n"}
+,{"stream_name":"stdout","time":9958.203906928,"data":"Epoch 106/500  train=0.0831  val=0.0733\r\n"}
+,{"stream_name":"stdout","time":10138.741766274,"data":"Epoch 108/500  train=0.0894  val=0.0769\r\n"}
+,{"stream_name":"stdout","time":10316.846212948,"data":"Epoch 110/500  train=0.0846  val=0.0736\r\n"}
+,{"stream_name":"stdout","time":10316.888063785,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":10495.78868973,"data":"Epoch 112/500  train=0.0816  val=0.0727\r\n"}
+,{"stream_name":"stdout","time":10674.934503824,"data":"Epoch 114/500  train=0.0826  val=0.0852\r\n"}
+,{"stream_name":"stdout","time":10853.198630906,"data":"Epoch 116/500  train=0.0824  val=0.0815\r\n"}
+,{"stream_name":"stdout","time":11033.088245912,"data":"Epoch 118/500  train=0.0848  val=0.0728\r\n"}
+,{"stream_name":"stdout","time":11210.560847876,"data":"Epoch 120/500  train=0.0802  val=0.0766\r\n"}
+,{"stream_name":"stdout","time":11210.603182699,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":11390.54392381,"data":"Epoch 122/500  train=0.0819  val=0.0720\r\n"}
+,{"stream_name":"stdout","time":11569.503164753,"data":"Epoch 124/500  train=0.0796  val=0.0698\r\n"}
+,{"stream_name":"stdout","time":11748.600101416,"data":"Epoch 126/500  train=0.0803  val=0.0708\r\n"}
+,{"stream_name":"stdout","time":11926.757212155,"data":"Epoch 128/500  train=0.0811  val=0.0698\r\n"}
+,{"stream_name":"stdout","time":12103.368167706,"data":"Epoch 130/500  train=0.0858  val=0.0749\r\n"}
+,{"stream_name":"stdout","time":12103.407976161,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":12282.371891907,"data":"Epoch 132/500  train=0.0766  val=0.0726\r\n"}
+,{"stream_name":"stdout","time":12462.867358687,"data":"Epoch 134/500  train=0.0783  val=0.0688\r\n"}
+,{"stream_name":"stdout","time":12639.717412124,"data":"Epoch 136/500  train=0.0791  val=0.0722\r\n"}
+,{"stream_name":"stdout","time":12817.413877925,"data":"Epoch 138/500  train=0.0780  val=0.0695\r\n"}
+,{"stream_name":"stdout","time":12996.450562701,"data":"Epoch 140/500  train=0.0793  val=0.0924\r\n"}
+,{"stream_name":"stdout","time":12996.489492549,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":13175.318470349,"data":"Epoch 142/500  train=0.0806  val=0.0709\r\n"}
+,{"stream_name":"stdout","time":13354.408243559,"data":"Epoch 144/500  train=0.0777  val=0.0760\r\n"}
+,{"stream_name":"stdout","time":13532.353722372,"data":"Epoch 146/500  train=0.0751  val=0.0707\r\n"}
+,{"stream_name":"stdout","time":13710.862239515,"data":"Epoch 148/500  train=0.0774  val=0.0783\r\n"}
+,{"stream_name":"stdout","time":13889.474700906,"data":"Epoch 150/500  train=0.0747  val=0.0692\r\n"}
+,{"stream_name":"stdout","time":13889.51571876,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":14068.253547142,"data":"Epoch 152/500  train=0.0786  val=0.0684\r\n"}
+,{"stream_name":"stdout","time":14245.637482622,"data":"Epoch 154/500  train=0.0804  val=0.0698\r\n"}
+,{"stream_name":"stdout","time":14423.809392493,"data":"Epoch 156/500  train=0.0748  val=0.0710\r\n"}
+,{"stream_name":"stdout","time":14602.690351083,"data":"Epoch 158/500  train=0.0743  val=0.0667\r\n"}
+,{"stream_name":"stdout","time":14780.89935891,"data":"Epoch 160/500  train=0.0818  val=0.0690\r\n"}
+,{"stream_name":"stdout","time":14780.939638359,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":14961.344450347,"data":"Epoch 162/500  train=0.0773  val=0.0686\r\n"}
+,{"stream_name":"stdout","time":15140.016248497,"data":"Epoch 164/500  train=0.0775  val=0.0670\r\n"}
+,{"stream_name":"stdout","time":15319.384259066,"data":"Epoch 166/500  train=0.0767  val=0.0712\r\n"}
+,{"stream_name":"stdout","time":15497.799640898,"data":"Epoch 168/500  train=0.0768  val=0.0717\r\n"}
+,{"stream_name":"stdout","time":15675.912654198,"data":"Epoch 170/500  train=0.0761  val=0.0703\r\n"}
+,{"stream_name":"stdout","time":15675.953156782,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":15856.787108216,"data":"Epoch 172/500  train=0.0786  val=0.0706\r\n"}
+,{"stream_name":"stdout","time":16034.304959936,"data":"Epoch 174/500  train=0.0760  val=0.0694\r\n"}
+,{"stream_name":"stdout","time":16209.958606248,"data":"Epoch 176/500  train=0.0756  val=0.0698\r\n"}
+,{"stream_name":"stdout","time":16387.939448508,"data":"Epoch 178/500  train=0.0766  val=0.0688\r\n"}
+,{"stream_name":"stdout","time":16566.002738996,"data":"Epoch 180/500  train=0.0746  val=0.0773\r\n"}
+,{"stream_name":"stdout","time":16566.093471852,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":16745.116248425,"data":"Epoch 182/500  train=0.0777  val=0.0670\r\n"}
+,{"stream_name":"stdout","time":16925.377885676,"data":"Epoch 184/500  train=0.0766  val=0.0683\r\n"}
+,{"stream_name":"stdout","time":17103.002422839,"data":"Epoch 186/500  train=0.0752  val=0.0694\r\n"}
+,{"stream_name":"stdout","time":17283.50025863,"data":"Epoch 188/500  train=0.0687  val=0.0924\r\n"}
+,{"stream_name":"stdout","time":17463.355696956,"data":"Epoch 190/500  train=0.0731  val=0.0693\r\n"}
+,{"stream_name":"stdout","time":17463.395019901,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":17640.813920889,"data":"Epoch 192/500  train=0.0775  val=0.0733\r\n"}
+,{"stream_name":"stdout","time":17819.290124385,"data":"Epoch 194/500  train=0.0738  val=0.0720\r\n"}
+,{"stream_name":"stdout","time":17999.642620069,"data":"Epoch 196/500  train=0.0790  val=0.0708\r\n"}
+,{"stream_name":"stdout","time":18178.395554052,"data":"Epoch 198/500  train=0.0767  val=0.0688\r\n"}
+,{"stream_name":"stdout","time":18355.94492966,"data":"Epoch 200/500  train=0.0747  val=0.0669\r\n"}
+,{"stream_name":"stdout","time":18356.034900275,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":18533.505683077,"data":"Epoch 202/500  train=0.0740  val=0.0699\r\n"}
+,{"stream_name":"stdout","time":18713.454611915,"data":"Epoch 204/500  train=0.0742  val=0.0667\r\n"}
+,{"stream_name":"stdout","time":18892.64603482,"data":"Epoch 206/500  train=0.0758  val=0.0638\r\n"}
+,{"stream_name":"stdout","time":19072.331062157,"data":"Epoch 208/500  train=0.0775  val=0.0682\r\n"}
+,{"stream_name":"stdout","time":19250.412516847,"data":"Epoch 210/500  train=0.0758  val=0.0684\r\n"}
+,{"stream_name":"stdout","time":19250.451129443,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":19429.625646737,"data":"Epoch 212/500  train=0.0760  val=0.0665\r\n"}
+,{"stream_name":"stdout","time":19607.413189471,"data":"Epoch 214/500  train=0.0701  val=0.0702\r\n"}
+,{"stream_name":"stdout","time":19785.120192545,"data":"Epoch 216/500  train=0.0762  val=0.0748\r\n"}
+,{"stream_name":"stdout","time":19964.409701743,"data":"Epoch 218/500  train=0.0730  val=0.0634\r\n"}
+,{"stream_name":"stdout","time":20143.018963544,"data":"Epoch 220/500  train=0.0725  val=0.0664\r\n"}
+,{"stream_name":"stdout","time":20143.107478531,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":20321.655440536,"data":"Epoch 222/500  train=0.0713  val=0.0647\r\n"}
+,{"stream_name":"stdout","time":20499.947704535,"data":"Epoch 224/500  train=0.0712  val=0.0676\r\n"}
+,{"stream_name":"stdout","time":20678.137304586,"data":"Epoch 226/500  train=0.0752  val=0.0734\r\n"}
+,{"stream_name":"stdout","time":20856.073377793,"data":"Epoch 228/500  train=0.0741  val=0.0680\r\n"}
+,{"stream_name":"stdout","time":21032.503146364,"data":"Epoch 230/500  train=0.0697  val=0.0651\r\n"}
+,{"stream_name":"stdout","time":21032.538323475,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":21214.190165759,"data":"Epoch 232/500  train=0.0753  val=0.0890\r\n"}
+,{"stream_name":"stdout","time":21391.916423149,"data":"Epoch 234/500  train=0.0704  val=0.0731\r\n"}
+,{"stream_name":"stdout","time":21572.626156748,"data":"Epoch 236/500  train=0.0754  val=0.0657\r\n"}
+,{"stream_name":"stdout","time":21751.501971915,"data":"Epoch 238/500  train=0.0718  val=0.0667\r\n"}
+,{"stream_name":"stdout","time":21930.41836951,"data":"Epoch 240/500  train=0.0734  val=0.0669\r\n"}
+,{"stream_name":"stdout","time":21930.455924015,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":22108.54437585,"data":"Epoch 242/500  train=0.0705  val=0.0674\r\n"}
+,{"stream_name":"stdout","time":22288.100979305,"data":"Epoch 244/500  train=0.0723  val=0.0643\r\n"}
+,{"stream_name":"stdout","time":22466.365178976,"data":"Epoch 246/500  train=0.0705  val=0.0637\r\n"}
+,{"stream_name":"stdout","time":22645.515687597,"data":"Epoch 248/500  train=0.0758  val=0.0640\r\n"}
+,{"stream_name":"stdout","time":22824.796409665,"data":"Epoch 250/500  train=0.0716  val=0.0680\r\n"}
+,{"stream_name":"stdout","time":22824.83386424,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":23003.498841208,"data":"Epoch 252/500  train=0.0708  val=0.0652\r\n"}
+,{"stream_name":"stdout","time":23181.927333157,"data":"Epoch 254/500  train=0.0730  val=0.0678\r\n"}
+,{"stream_name":"stdout","time":23359.668776448,"data":"Epoch 256/500  train=0.0750  val=0.0651\r\n"}
+,{"stream_name":"stdout","time":23536.490765134,"data":"Epoch 258/500  train=0.0724  val=0.0822\r\n"}
+,{"stream_name":"stdout","time":23714.296327357,"data":"Epoch 260/500  train=0.0729  val=0.0643\r\n"}
+,{"stream_name":"stdout","time":23714.329551392,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":23893.958492444,"data":"Epoch 262/500  train=0.0734  val=0.0749\r\n"}
+,{"stream_name":"stdout","time":24071.221254874,"data":"Epoch 264/500  train=0.0675  val=0.0636\r\n"}
+,{"stream_name":"stdout","time":24251.07962413,"data":"Epoch 266/500  train=0.0706  val=0.0704\r\n"}
+,{"stream_name":"stdout","time":24431.114800356,"data":"Epoch 268/500  train=0.0709  val=0.0675\r\n"}
+,{"stream_name":"stdout","time":24609.972284756,"data":"Epoch 270/500  train=0.0738  val=0.0684\r\n"}
+,{"stream_name":"stdout","time":24610.005142893,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":24788.297969794,"data":"Epoch 272/500  train=0.0708  val=0.0666\r\n"}
+,{"stream_name":"stdout","time":24966.740040837,"data":"Epoch 274/500  train=0.0713  val=0.0727\r\n"}
+,{"stream_name":"stdout","time":25144.721467463,"data":"Epoch 276/500  train=0.0746  val=0.0713\r\n"}
+,{"stream_name":"stdout","time":25325.746139189,"data":"Epoch 278/500  train=0.0699  val=0.0609\r\n"}
+,{"stream_name":"stdout","time":25504.311038957,"data":"Epoch 280/500  train=0.0758  val=0.0634\r\n"}
+,{"stream_name":"stdout","time":25504.344452781,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":25682.625579233,"data":"Epoch 282/500  train=0.0683  val=0.0714\r\n"}
+,{"stream_name":"stdout","time":25859.60537729,"data":"Epoch 284/500  train=0.0666  val=0.0614\r\n"}
+,{"stream_name":"stdout","time":26036.546470032,"data":"Epoch 286/500  train=0.0686  val=0.0658\r\n"}
+,{"stream_name":"stdout","time":26213.881410588,"data":"Epoch 288/500  train=0.0704  val=0.0713\r\n"}
+,{"stream_name":"stdout","time":26393.113630336,"data":"Epoch 290/500  train=0.0726  val=0.0720\r\n"}
+,{"stream_name":"stdout","time":26393.149575984,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":26571.261244976,"data":"Epoch 292/500  train=0.0712  val=0.0629\r\n"}
+,{"stream_name":"stdout","time":26751.147386057,"data":"Epoch 294/500  train=0.0723  val=0.0638\r\n"}
+,{"stream_name":"stdout","time":26930.761690326,"data":"Epoch 296/500  train=0.0748  val=0.0637\r\n"}
+,{"stream_name":"stdout","time":27108.278983926,"data":"Epoch 298/500  train=0.0684  val=0.0750\r\n"}
+,{"stream_name":"stdout","time":27286.539611479,"data":"Epoch 300/500  train=0.0700  val=0.0647\r\n"}
+,{"stream_name":"stdout","time":27286.575471401,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":27465.523231291,"data":"Epoch 302/500  train=0.0706  val=0.0617\r\n"}
+,{"stream_name":"stdout","time":27644.721920901,"data":"Epoch 304/500  train=0.0721  val=0.0711\r\n"}
+,{"stream_name":"stdout","time":27824.789421691,"data":"Epoch 306/500  train=0.0711  val=0.0653\r\n"}
+,{"stream_name":"stdout","time":28004.082729778,"data":"Epoch 308/500  train=0.0709  val=0.0636\r\n"}
+,{"stream_name":"stdout","time":28183.4603642,"data":"Epoch 310/500  train=0.0729  val=0.0646\r\n"}
+,{"stream_name":"stdout","time":28183.495470422,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":28361.750918814,"data":"Epoch 312/500  train=0.0684  val=0.0622\r\n"}
+,{"stream_name":"stdout","time":28539.590905953,"data":"Epoch 314/500  train=0.0687  val=0.0768\r\n"}
+,{"stream_name":"stdout","time":28718.311245444,"data":"Epoch 316/500  train=0.0706  val=0.0662\r\n"}
+,{"stream_name":"stdout","time":28896.496742902,"data":"Epoch 318/500  train=0.0701  val=0.0637\r\n"}
+,{"stream_name":"stdout","time":29076.033982561,"data":"Epoch 320/500  train=0.0701  val=0.0708\r\n"}
+,{"stream_name":"stdout","time":29076.067921222,"data":"Model saved to /kaggle/working/results/07_25_rgcn_pragmas/checkpoints/07_25_rgcn_pragmas_backup.pt\r\n"}
+,{"stream_name":"stdout","time":29253.004984385,"data":"Epoch 322/500  train=0.0690  val=0.0620\r\n"}
+,{"stream_name":"stdout","time":29430.770637715,"data":"Epoch 324/500  train=0.0711  val=0.0746\r\n"}
+,{"stream_name":"stdout","time":29610.140945649,"data":"Epoch 326/500  train=0.0699  val=0.0626\r\n"}
+,{"stream_name":"stdout","time":29788.382897737,"data":"Epoch 328/500  train=0.0694  val=0.0629\r\n"}
+,{"stream_name":"stdout","time":29788.382935198,"data":"Early stopping triggered after 328 epochs.\r\n"}
+,{"stream_name":"stdout","time":29788.515592667,"data":"Best model restored from epoch 278 with validation loss 0.0609\r\n"}
+,{"stream_name":"stdout","time":29788.515620456,"data":"/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.\r\n"}
+,{"stream_name":"stdout","time":29788.5156434,"data":"  return func(*args, **kwargs)\r\n"}
+,{"stream_name":"stdout","time":29818.21349886,"data":"Wrote result bundle to /kaggle/working/results/07_25_rgcn_pragmas\r\n"}
+,{"stream_name":"stderr","time":29824.745040972,"data":"/usr/local/lib/python3.12/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":29824.7450745,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":29824.887364595,"data":"/usr/local/lib/python3.12/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":29824.887391014,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":29825.458348279,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to notebook\n"}
+,{"stream_name":"stderr","time":29825.777902985,"data":"[NbConvertApp] Writing 48560 bytes to __notebook__.ipynb\n"}
+,{"stream_name":"stderr","time":29828.047460098,"data":"[NbConvertApp] Converting notebook __notebook__.ipynb to html\n"}
+,{"stream_name":"stderr","time":29828.81651122,"data":"[NbConvertApp] Writing 318043 bytes to __results__.html\n"}
+]

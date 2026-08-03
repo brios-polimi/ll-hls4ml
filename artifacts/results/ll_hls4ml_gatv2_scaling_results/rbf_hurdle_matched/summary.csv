@@ -1,0 +1,17 @@
+scale,model,split,macro_smape
+25,logistic_hurdle_rbf_expected_graph,exemplar,106.93156178792317
+25,logistic_hurdle_rbf_expected_graph,test,37.674346605936684
+25,logistic_hurdle_rbf_threshold_graph,exemplar,106.20391209920247
+25,logistic_hurdle_rbf_threshold_graph,test,34.81233501434326
+50,logistic_hurdle_rbf_expected_graph,exemplar,93.57698059082031
+50,logistic_hurdle_rbf_expected_graph,test,33.276737213134766
+50,logistic_hurdle_rbf_threshold_graph,exemplar,92.55112902323405
+50,logistic_hurdle_rbf_threshold_graph,test,30.765602747599285
+100,logistic_hurdle_rbf_expected_graph,exemplar,83.04572296142578
+100,logistic_hurdle_rbf_expected_graph,test,29.174572944641113
+100,logistic_hurdle_rbf_threshold_graph,exemplar,82.89857610066731
+100,logistic_hurdle_rbf_threshold_graph,test,26.752094904581707
+200,logistic_hurdle_rbf_expected_graph,exemplar,83.5336201985677
+200,logistic_hurdle_rbf_expected_graph,test,26.755141576131184
+200,logistic_hurdle_rbf_threshold_graph,exemplar,83.6897341410319
+200,logistic_hurdle_rbf_threshold_graph,test,24.66522789001465

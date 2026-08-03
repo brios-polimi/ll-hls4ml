@@ -1,0 +1,3518 @@
+{
+  "train": [
+    {
+      "dataset_index": 330,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/a4d19761-4b0a-42ab-9d53-c66d8f00f10b.pt"
+    },
+    {
+      "dataset_index": 17,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/39438efd-c504-441b-86d9-2efed2a1e674.pt"
+    },
+    {
+      "dataset_index": 678,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/d5a14627ffa5ac99e92e5015fd44796d.pt"
+    },
+    {
+      "dataset_index": 22,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/5590ea59-2c02-4d35-a20c-960807b40207.pt"
+    },
+    {
+      "dataset_index": 310,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/40a8e82a-f9f5-4c4d-b727-a0478a1b75eb.pt"
+    },
+    {
+      "dataset_index": 385,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/153c06a9-71c3-493e-a71b-5e9adf9f50f8.pt"
+    },
+    {
+      "dataset_index": 442,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/f7ed2aa1-ce5f-49eb-9fbb-bb8a868580b7.pt"
+    },
+    {
+      "dataset_index": 31,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/6a7ab3f1-833f-4330-9401-1daee0b9b457.pt"
+    },
+    {
+      "dataset_index": 482,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/942bc5a5-808e-434f-b3fd-fbf77deeee6e.pt"
+    },
+    {
+      "dataset_index": 506,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/0ca740a3-feef-4ee0-91b6-46f493ae36b2.pt"
+    },
+    {
+      "dataset_index": 448,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/0998b578-42f4-4e2f-aeaf-80423cc5e355.pt"
+    },
+    {
+      "dataset_index": 243,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/81b951e6-b207-401a-ae0f-402574abc918.pt"
+    },
+    {
+      "dataset_index": 8,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/13197d1a-24e0-4b9a-abf2-028a7308c5a9.pt"
+    },
+    {
+      "dataset_index": 102,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/0531fe1b-e636-44ef-97b4-dfa2611005cd.pt"
+    },
+    {
+      "dataset_index": 613,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/216f00238b09a3abf19c0eea1e8cf8c6.pt"
+    },
+    {
+      "dataset_index": 97,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/fc46bb6b-c1c4-4798-9632-a11e15c03dfb.pt"
+    },
+    {
+      "dataset_index": 99,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/ff963fa4-5072-4900-ae48-221bf0e5a86c.pt"
+    },
+    {
+      "dataset_index": 382,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/136dd69c-7053-414c-8bfa-63a5b3929b8d.pt"
+    },
+    {
+      "dataset_index": 453,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/2666b93b-3a0a-4b91-b985-984d93136df7.pt"
+    },
+    {
+      "dataset_index": 454,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/27938a0d-3d4a-4c72-ac60-4294b3c29840.pt"
+    },
+    {
+      "dataset_index": 63,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b635d214-84b9-4a18-88cf-30832baf5a59.pt"
+    },
+    {
+      "dataset_index": 398,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/50259f11-a6b3-4851-9640-6aacda43c675.pt"
+    },
+    {
+      "dataset_index": 95,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/f60480b3-dec2-4931-979f-449431e7561f.pt"
+    },
+    {
+      "dataset_index": 47,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/8941442e-94ce-4218-b913-441f713a25f0.pt"
+    },
+    {
+      "dataset_index": 251,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9149b52d-a463-4e22-b8a3-e77984555621.pt"
+    },
+    {
+      "dataset_index": 262,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9f00e827-bc87-4368-9b2b-ceb3641fadff.pt"
+    },
+    {
+      "dataset_index": 671,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/c63e2a6582295344fbe9e1c6ece8e0a0.pt"
+    },
+    {
+      "dataset_index": 171,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/bbe2bf0e-a4f3-4888-b9b7-14f0373fb18a.pt"
+    },
+    {
+      "dataset_index": 193,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f1fa0476-2eb3-4fce-8070-80b3bcd31c66.pt"
+    },
+    {
+      "dataset_index": 161,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/9692cbc5-09c0-46fb-a1e9-7d9f3d308599.pt"
+    },
+    {
+      "dataset_index": 690,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/e4dd16eef182c240ed9fa83b8418bb5d.pt"
+    },
+    {
+      "dataset_index": 498,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/f0c576e5-dc6d-4198-8427-482343d4d8a8.pt"
+    },
+    {
+      "dataset_index": 127,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/3bd8a58d-5539-4287-a8d5-6aa3bfbb00b3.pt"
+    },
+    {
+      "dataset_index": 493,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/d64a96c8-6d04-455d-b566-19cc61698d68.pt"
+    },
+    {
+      "dataset_index": 475,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/7f635a8e-c8f6-472f-b691-65237a2f35ec.pt"
+    },
+    {
+      "dataset_index": 432,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/cca703ca-3e57-4db8-9d4b-aa6347cf507d.pt"
+    },
+    {
+      "dataset_index": 155,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/93465aa1-106a-41f6-bb96-0919e164cadf.pt"
+    },
+    {
+      "dataset_index": 663,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/b00aea7a22b1f54c6cfb728ea20d9048.pt"
+    },
+    {
+      "dataset_index": 374,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/cb7d0ea8-172b-4d52-a23c-0d822277a5dd.pt"
+    },
+    {
+      "dataset_index": 333,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/adefded1-0453-47f6-904b-ad98595f70d4.pt"
+    },
+    {
+      "dataset_index": 10,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/193f123f-9fe7-4326-a99f-46cbe91f2168.pt"
+    },
+    {
+      "dataset_index": 154,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/8f67864f-c9d4-45ad-8c91-a0d544c15b4c.pt"
+    },
+    {
+      "dataset_index": 679,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/d7b94ecf656c918028484434822b8852.pt"
+    },
+    {
+      "dataset_index": 620,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2b8cd655c4b32c156ea3a3f4d0ebf158.pt"
+    },
+    {
+      "dataset_index": 365,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/87bd6bca-96e5-48d4-a770-aa5cf0ac0b3c.pt"
+    },
+    {
+      "dataset_index": 350,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/08be0a03-d694-40e6-97e0-35e0962c0712.pt"
+    },
+    {
+      "dataset_index": 413,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/7766208b-d8e9-4390-8311-3a01b04b6115.pt"
+    },
+    {
+      "dataset_index": 501,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/f8404942-926e-4a43-b971-da3cc743f93c.pt"
+    },
+    {
+      "dataset_index": 531,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/46c56634-0933-47cc-9e72-89614aaa7251.pt"
+    },
+    {
+      "dataset_index": 294,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/e9725e62-5fb8-4574-bff9-8655afba495a.pt"
+    },
+    {
+      "dataset_index": 76,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/d0cc28ec-fd57-4ec7-8732-131212b3cb75.pt"
+    },
+    {
+      "dataset_index": 564,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/9a9a9339-a608-467c-91a9-1a3f6a783e95.pt"
+    },
+    {
+      "dataset_index": 622,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2fd49e43307d1e97e59c512483dbb821.pt"
+    },
+    {
+      "dataset_index": 607,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/0ed991e0a4e25ed19987f0cc9210b426.pt"
+    },
+    {
+      "dataset_index": 268,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/a88a21c1-2178-4de9-b309-4f84382d79e0.pt"
+    },
+    {
+      "dataset_index": 140,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/688a9df2-57d2-437c-898a-4420afffddda.pt"
+    },
+    {
+      "dataset_index": 425,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/ae675a17-862a-4080-83f9-8bb51be0a72f.pt"
+    },
+    {
+      "dataset_index": 491,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/c1579061-be87-46b0-afa4-20d0eb4bea36.pt"
+    },
+    {
+      "dataset_index": 208,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/1a503ed6-775b-4af2-9d99-dc8661dc9cea.pt"
+    },
+    {
+      "dataset_index": 176,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/c0408fb1-d997-4a14-b9cb-fcc363e2e63f.pt"
+    },
+    {
+      "dataset_index": 80,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/d8705803-c54c-4ad6-bdd4-bea949213cf1.pt"
+    },
+    {
+      "dataset_index": 187,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/da5f5523-56f7-4e1a-a652-18b5e56183ce.pt"
+    },
+    {
+      "dataset_index": 82,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/de3b20f9-b67e-4190-985b-c6382ef2d8fe.pt"
+    },
+    {
+      "dataset_index": 403,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/5ee9757e-e948-4118-9e8e-4418a61202fb.pt"
+    },
+    {
+      "dataset_index": 298,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/feecbff3-f6d2-43da-94a7-8dfae6c6b345.pt"
+    },
+    {
+      "dataset_index": 43,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/81ae65ee-db11-4ff1-835c-a62e010c7087.pt"
+    },
+    {
+      "dataset_index": 357,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/4b7a8124-c42e-4724-9b0e-c64400464e1b.pt"
+    },
+    {
+      "dataset_index": 327,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/944804b9-d822-48d0-b216-3e29178b06ef.pt"
+    },
+    {
+      "dataset_index": 163,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/a95aa36a-1dab-4163-adf6-b656c44e48be.pt"
+    },
+    {
+      "dataset_index": 685,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/dadb8e696c22f0bb3bf0849c237735ee.pt"
+    },
+    {
+      "dataset_index": 359,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/5ca2b14f-a52b-4a5e-abbf-b81ab40a9860.pt"
+    },
+    {
+      "dataset_index": 473,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/737c4740-c739-4e02-be39-dbe3cf482358.pt"
+    },
+    {
+      "dataset_index": 376,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/d1de256a-61bb-4329-b75e-8c207a7af0ee.pt"
+    },
+    {
+      "dataset_index": 417,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/8246dc25-9edc-4374-b488-e2071368a561.pt"
+    },
+    {
+      "dataset_index": 274,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/bd7b1de0-0728-4813-a20e-2217a437ae55.pt"
+    },
+    {
+      "dataset_index": 101,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/03c88eb3-30d1-4535-87dd-1d01d6269aef.pt"
+    },
+    {
+      "dataset_index": 307,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/2ed5ad7e-2bba-4aff-abf0-77301c2fcbbb.pt"
+    },
+    {
+      "dataset_index": 334,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/ba219a7b-16ed-4096-ab7e-22918cff5db5.pt"
+    },
+    {
+      "dataset_index": 188,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/de49f3f2-18eb-4b62-8a50-d53c64c45620.pt"
+    },
+    {
+      "dataset_index": 418,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/8507e558-4f0d-4304-be77-f0a9f4a34012.pt"
+    },
+    {
+      "dataset_index": 224,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/533c8e32-648d-44d9-9678-00935c447b02.pt"
+    },
+    {
+      "dataset_index": 53,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/9e52bee8-89a0-453b-84a3-b4b1bc4be36d.pt"
+    },
+    {
+      "dataset_index": 698,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ef5a1ee2a6b01fb277af5b139393c944.pt"
+    },
+    {
+      "dataset_index": 137,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/62878700-1b8b-452f-8cfd-c1c35028130d.pt"
+    },
+    {
+      "dataset_index": 610,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/185abbf195c85cb50f2e2f3698494035.pt"
+    },
+    {
+      "dataset_index": 592,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e3f6f73c-985e-45e2-8dfd-c8eeaf9b40da.pt"
+    },
+    {
+      "dataset_index": 57,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/a6f3883d-a274-4917-9573-6acdba6a8516.pt"
+    },
+    {
+      "dataset_index": 555,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/8d2bea12-85c5-4b4c-802c-3390a356a35e.pt"
+    },
+    {
+      "dataset_index": 509,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/12d641dd-5146-4c9f-911d-cf810823fff7.pt"
+    },
+    {
+      "dataset_index": 106,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/098f434f-1b68-491d-94cf-03f1cfe0cfa1.pt"
+    },
+    {
+      "dataset_index": 481,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/92382f52-c152-487a-a071-9bf2f4f412d5.pt"
+    },
+    {
+      "dataset_index": 276,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/c59c35a0-de0f-45cd-8054-a50f7675547a.pt"
+    },
+    {
+      "dataset_index": 81,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/d9527560-2ced-4bc1-acfa-f4366644c188.pt"
+    },
+    {
+      "dataset_index": 210,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/1becf3c5-7c0f-49df-bdca-22bd47ef0f94.pt"
+    },
+    {
+      "dataset_index": 579,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/bfc05050-5933-4357-afc0-782c3c9871d3.pt"
+    },
+    {
+      "dataset_index": 574,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/b19f2e4b-4590-4abd-a767-7530be27f889.pt"
+    },
+    {
+      "dataset_index": 115,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/247e4213-8ae5-462d-b957-a9f783755031.pt"
+    },
+    {
+      "dataset_index": 72,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/c98a718e-f3e3-440f-999b-0a1fb43b7612.pt"
+    },
+    {
+      "dataset_index": 455,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/27cee839-9d8e-49a9-9762-fee17302023c.pt"
+    },
+    {
+      "dataset_index": 29,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/690001da-fbc4-48f1-a309-4f5238ea8fc0.pt"
+    },
+    {
+      "dataset_index": 3,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/0bfcdb5a-365e-46a5-977a-d318d817490d.pt"
+    },
+    {
+      "dataset_index": 177,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/c1a49590-4bb5-4f0e-8f35-7b55a980a2ab.pt"
+    },
+    {
+      "dataset_index": 639,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/69644e7bf422cc30f106f262970947ed.pt"
+    },
+    {
+      "dataset_index": 218,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/3abec644-1b5d-4550-bd40-5005dcb4d66b.pt"
+    },
+    {
+      "dataset_index": 495,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/e54943a2-bc11-4f34-b000-797e1df792b0.pt"
+    },
+    {
+      "dataset_index": 18,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/3f6555e9-749a-41a4-a20e-5cc9bcf0a41e.pt"
+    },
+    {
+      "dataset_index": 68,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/bd841880-21ea-49ca-be9f-b88ad89f01e7.pt"
+    },
+    {
+      "dataset_index": 77,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/d18488ed-9367-45dc-9e7e-03a6dad1662e.pt"
+    },
+    {
+      "dataset_index": 349,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/04b9fc18-a2c5-44a1-b270-b4af8bd92913.pt"
+    },
+    {
+      "dataset_index": 430,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/c4bf7d33-025d-449e-a839-c5e10c2f4438.pt"
+    },
+    {
+      "dataset_index": 669,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/c26968f68714ae3b753593e66c7a2d4c.pt"
+    },
+    {
+      "dataset_index": 630,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/466d99f5bafd16bc2656bb493e26d3a3.pt"
+    },
+    {
+      "dataset_index": 20,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/4b2f8a68-f6b7-49a1-8c12-6329d0219096.pt"
+    },
+    {
+      "dataset_index": 361,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/673d440b-3fa8-45dc-8ea3-34cdd76a9cc4.pt"
+    },
+    {
+      "dataset_index": 464,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/50d81298-24e7-43e7-be5f-4cb83773976f.pt"
+    },
+    {
+      "dataset_index": 239,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/77b0c701-8e90-4393-bd79-18f161cd52e8.pt"
+    },
+    {
+      "dataset_index": 212,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/24487c63-4edf-464d-a59f-1d4857efa777.pt"
+    },
+    {
+      "dataset_index": 286,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/d64fc704-d23b-404e-9550-e03bd12390f1.pt"
+    },
+    {
+      "dataset_index": 157,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/93cfed7e-202c-4ade-9b29-9e3d51ce5ddf.pt"
+    },
+    {
+      "dataset_index": 700,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/f63305fde50b2f0143f70f53b0dcd777.pt"
+    },
+    {
+      "dataset_index": 521,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/317b26f4-5f81-4d40-a851-b24c3c44654c.pt"
+    },
+    {
+      "dataset_index": 230,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/62a95cf1-ebe5-49a4-8661-780139ba6b60.pt"
+    },
+    {
+      "dataset_index": 159,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/95cc6567-e2cb-48bd-9b36-15218e1dc8ac.pt"
+    },
+    {
+      "dataset_index": 254,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/930d85fc-76e7-45af-9203-3f553586a918.pt"
+    },
+    {
+      "dataset_index": 328,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/a1aaf6da-fa3f-4e2d-a8d6-8b688fdea33b.pt"
+    },
+    {
+      "dataset_index": 277,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/c638b6b1-3399-444a-8e74-5850480ae7f9.pt"
+    },
+    {
+      "dataset_index": 471,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/6264ad5f-a683-46c3-9671-f4bfb21c62d6.pt"
+    },
+    {
+      "dataset_index": 469,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/5e8509f2-ade9-4b0c-b8f8-eb0119701a4e.pt"
+    },
+    {
+      "dataset_index": 415,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/7bb9a774-9792-4539-b976-d6b1b2a46fe4.pt"
+    },
+    {
+      "dataset_index": 551,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/84384e9c-dbd4-42f2-9768-d6071fed7642.pt"
+    },
+    {
+      "dataset_index": 401,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/5cd0a6b1-e679-456c-9427-c459586bddf0.pt"
+    },
+    {
+      "dataset_index": 179,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/c81430db-c59e-43a4-8080-77d2adcbe6ec.pt"
+    },
+    {
+      "dataset_index": 308,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/39ca686c-2d2d-42fa-b145-c6ba2f8b4c01.pt"
+    },
+    {
+      "dataset_index": 296,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/f1316787-264b-4558-83f8-97dc77bdfb14.pt"
+    },
+    {
+      "dataset_index": 324,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/8411d399-b4c7-4e12-96ac-c5ae399beb9a.pt"
+    },
+    {
+      "dataset_index": 283,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/d4c7996c-ae8b-4c84-87fc-63de1a9d55f3.pt"
+    },
+    {
+      "dataset_index": 117,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/26b8c1f1-13db-4d65-986d-07833b337acd.pt"
+    },
+    {
+      "dataset_index": 390,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/21f06ec9-c308-4c71-aa33-813721911f76.pt"
+    },
+    {
+      "dataset_index": 51,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/8fd8d5b1-3241-4690-ae67-4e7880f7289f.pt"
+    },
+    {
+      "dataset_index": 568,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/a2d0b7bd-e241-47cf-9b48-c8d5b31a4dfb.pt"
+    },
+    {
+      "dataset_index": 37,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/7abbc3ca-907d-45e8-ae64-07d20a097d7b.pt"
+    },
+    {
+      "dataset_index": 483,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/9adf7fe9-4002-46ac-8d9f-9951b01f9ae2.pt"
+    },
+    {
+      "dataset_index": 537,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/52c0f586-1dea-422b-84cb-fcc178db7048.pt"
+    },
+    {
+      "dataset_index": 181,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/ca6a876b-0e9a-4b3c-9578-acce83b89e43.pt"
+    },
+    {
+      "dataset_index": 247,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/8a954d90-0bd3-4c11-ba3a-fba78f17ae0e.pt"
+    },
+    {
+      "dataset_index": 151,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/87537114-b1e4-4c76-ab50-355cd0124d54.pt"
+    },
+    {
+      "dataset_index": 652,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/8daacd710a3ede039ce2baa571befb89.pt"
+    },
+    {
+      "dataset_index": 530,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/45c61271-60eb-4ff5-ba6f-246ba575185f.pt"
+    },
+    {
+      "dataset_index": 452,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/20d4d456-33f5-467c-9cb8-7a5bb060bddf.pt"
+    },
+    {
+      "dataset_index": 488,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/b02245d7-4c51-4718-8119-88b8af7948e0.pt"
+    },
+    {
+      "dataset_index": 496,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/e8352ec2-064c-447c-b381-98287bc4f702.pt"
+    },
+    {
+      "dataset_index": 627,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/4374cec42bb64528a3cb10af8adce81f.pt"
+    },
+    {
+      "dataset_index": 348,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/fb0b7c45-852d-4c76-9942-4ba52aef2118.pt"
+    },
+    {
+      "dataset_index": 580,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/c50b7d06-2743-447e-8d30-7d44ffd86fa1.pt"
+    },
+    {
+      "dataset_index": 290,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/e0331ce3-a295-41a0-ae56-ab473976c15d.pt"
+    },
+    {
+      "dataset_index": 484,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/9e0f6611-cb07-4486-ae07-0cc1eeded502.pt"
+    },
+    {
+      "dataset_index": 480,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/91d3b8db-3dad-42a9-ae83-2c6c4533580b.pt"
+    },
+    {
+      "dataset_index": 585,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/cc933a28-ea40-4c6e-94eb-19bb770284e0.pt"
+    },
+    {
+      "dataset_index": 582,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/c547deb4-f314-4e7d-9e7b-88bda5d6f7ff.pt"
+    },
+    {
+      "dataset_index": 634,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/534e23fcd3f35736da75328245c761c8.pt"
+    },
+    {
+      "dataset_index": 256,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9421bcba-aa11-4638-97d1-9a26a8309e94.pt"
+    },
+    {
+      "dataset_index": 395,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/4325e22a-7bf5-466c-8183-1e5d2d85e4ae.pt"
+    },
+    {
+      "dataset_index": 625,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/382425a1b56ad3b61741d66488330243.pt"
+    },
+    {
+      "dataset_index": 35,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/78b37ae3-f8f1-40ce-8db0-2bb4e67b2b5e.pt"
+    },
+    {
+      "dataset_index": 33,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/6fdbe1c4-08f0-46fa-ac3d-070d8b7126e9.pt"
+    },
+    {
+      "dataset_index": 404,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/5f54232c-c9f2-46cc-9806-93875fa373f3.pt"
+    },
+    {
+      "dataset_index": 693,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/e79aed40917bd7b3ab43cf32f738c88d.pt"
+    },
+    {
+      "dataset_index": 245,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/85da7610-5409-4ed2-b342-2d09b3584690.pt"
+    },
+    {
+      "dataset_index": 648,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/84cad3c75f3f407feb52f8efb5c4a7eb.pt"
+    },
+    {
+      "dataset_index": 557,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/90c22023-a457-4031-8dcc-74aa8742c717.pt"
+    },
+    {
+      "dataset_index": 285,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/d606eca9-dbef-4186-b0ee-33d6a1aabcf6.pt"
+    },
+    {
+      "dataset_index": 215,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/3138616e-8384-41f6-b378-db5178cfa184.pt"
+    },
+    {
+      "dataset_index": 41,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/8082e305-d21d-46ad-bee9-433eb192f1c8.pt"
+    },
+    {
+      "dataset_index": 668,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/bf1e971cea70fb53fdca74ba81b9cf14.pt"
+    },
+    {
+      "dataset_index": 405,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/61e64dcb-4e3d-4410-88e3-2e494e292c5b.pt"
+    },
+    {
+      "dataset_index": 431,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/cc979fa0-337b-4f24-83c8-e6393e596ca8.pt"
+    },
+    {
+      "dataset_index": 232,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/652d7823-3b2f-48c4-b58a-bf36a9040d34.pt"
+    },
+    {
+      "dataset_index": 573,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/af019597-795a-45fb-af20-0492e247f185.pt"
+    },
+    {
+      "dataset_index": 586,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/d2f9b92b-36b8-4913-bf89-d73b70e688b6.pt"
+    },
+    {
+      "dataset_index": 355,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/31ddea2c-32e0-4d9b-85c1-1c5a118ff09a.pt"
+    },
+    {
+      "dataset_index": 132,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/4ca960b1-ac18-4d15-ae12-d7966776f8be.pt"
+    },
+    {
+      "dataset_index": 301,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/06f4e142-874c-464c-b830-43ff897b1009.pt"
+    },
+    {
+      "dataset_index": 563,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/990eb8b7-92c6-40ca-b679-e3cbaa3024b6.pt"
+    },
+    {
+      "dataset_index": 271,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/b3bcedd7-f56c-4d8f-a6e7-25ff6706beb0.pt"
+    },
+    {
+      "dataset_index": 474,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/73f9e84c-e192-4c21-bba6-f66251df59d4.pt"
+    },
+    {
+      "dataset_index": 560,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/93f027a8-36c7-4159-b997-fa581ea23d40.pt"
+    },
+    {
+      "dataset_index": 129,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/44856706-581b-4c89-8857-83ce12bad9ec.pt"
+    },
+    {
+      "dataset_index": 402,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/5ec7fd8c-72eb-41d0-9a9a-9d035947d37a.pt"
+    },
+    {
+      "dataset_index": 570,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/a7fcc3e0-563d-4404-9467-f86818191469.pt"
+    },
+    {
+      "dataset_index": 461,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/3f9b004c-2633-4a38-bd43-06617c92c19c.pt"
+    },
+    {
+      "dataset_index": 548,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/7f402bb4-51cf-485d-bc52-6ee172ca14fa.pt"
+    },
+    {
+      "dataset_index": 45,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/8491a254-4f47-453e-8a27-5b6e15733e2d.pt"
+    },
+    {
+      "dataset_index": 624,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/36781015570b9033a4256c6751954dfa.pt"
+    },
+    {
+      "dataset_index": 591,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e0877d2d-c62b-4796-be5f-96c63aefb754.pt"
+    },
+    {
+      "dataset_index": 692,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/e76bf57773bcf57b1f19da562e9ff10b.pt"
+    },
+    {
+      "dataset_index": 73,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/c9e4d655-9660-42c0-9a31-e52c556c6a9c.pt"
+    },
+    {
+      "dataset_index": 98,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/ff2e5f26-70ab-46a3-9f9a-ed597b0bc8f7.pt"
+    },
+    {
+      "dataset_index": 598,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e89c3f49-0a65-47bb-8ace-4c65db6d108b.pt"
+    },
+    {
+      "dataset_index": 658,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/9f747c2c9350eb5ee9df92af5c71cab0.pt"
+    },
+    {
+      "dataset_index": 39,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/80236500-af6b-41d2-a063-6bdd779fca11.pt"
+    },
+    {
+      "dataset_index": 228,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/617a1be4-cf76-4489-b259-f9ecad5b9516.pt"
+    },
+    {
+      "dataset_index": 368,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/97c5666c-0528-49c6-a2b8-0c6b394f7c96.pt"
+    },
+    {
+      "dataset_index": 596,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e8403995-eed4-4ab2-bad9-4ab7a8a95220.pt"
+    },
+    {
+      "dataset_index": 353,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/20533dec-40df-49bc-a023-637efb9c761c.pt"
+    },
+    {
+      "dataset_index": 645,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/7d1c401b976d19f7b51a7ff1e36b7278.pt"
+    },
+    {
+      "dataset_index": 104,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/0787c1ee-1d90-4b81-8c16-6d58f28f09bc.pt"
+    },
+    {
+      "dataset_index": 477,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/85dd97fc-ca2c-4743-9090-d348dc5566ea.pt"
+    },
+    {
+      "dataset_index": 451,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/1b29ff03-f8af-4ce2-847c-1510fc9443ab.pt"
+    },
+    {
+      "dataset_index": 143,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/726cbf52-3b64-4ae8-bc81-6e4bc324ea1f.pt"
+    },
+    {
+      "dataset_index": 632,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/4ba360cd9b8548b838783dd6fc77f454.pt"
+    },
+    {
+      "dataset_index": 468,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/55c01062-d189-4994-9a94-9bac60f5817b.pt"
+    },
+    {
+      "dataset_index": 238,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/749dd4e4-8191-4e7f-a4c5-e741c00477b8.pt"
+    },
+    {
+      "dataset_index": 156,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/936a8ff7-7ebb-4277-ab21-b9de8be46fc5.pt"
+    },
+    {
+      "dataset_index": 667,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/be5fb2d49addf71b553615d24a909f35.pt"
+    },
+    {
+      "dataset_index": 384,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/14962ede-dafe-4294-b6e2-7e1f48c5e6f6.pt"
+    },
+    {
+      "dataset_index": 527,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/38f204fc-3e79-4077-93a0-3892a3ab85d2.pt"
+    },
+    {
+      "dataset_index": 86,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e38a0fad-34bc-4635-a60c-95e67b77dd54.pt"
+    },
+    {
+      "dataset_index": 517,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/275c93ce-d31a-4833-97ca-00657c0684ec.pt"
+    },
+    {
+      "dataset_index": 701,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/f6d8bf0745d1fb17117a04ab71839702.pt"
+    },
+    {
+      "dataset_index": 467,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/5476acdc-7777-4091-bf1f-752dba797b0f.pt"
+    },
+    {
+      "dataset_index": 0,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/0162624c-ca32-4e05-a8be-48c9d355ef4b.pt"
+    },
+    {
+      "dataset_index": 494,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/dc9570ca-cbb7-4de5-b079-cc6cb2340763.pt"
+    },
+    {
+      "dataset_index": 48,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/89764b29-5f6a-4ed2-a10b-3af46d34f830.pt"
+    },
+    {
+      "dataset_index": 107,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/1422bee9-2f17-4820-946c-7217a3a0c2ce.pt"
+    },
+    {
+      "dataset_index": 195,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f3888dd9-3b10-4cdc-adc8-1e99f276d682.pt"
+    },
+    {
+      "dataset_index": 429,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/c3eb7dbd-6363-473b-bbf4-15ba765437b9.pt"
+    },
+    {
+      "dataset_index": 2,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/0bc7e3b8-c2a6-427a-ab7b-97c8d1f26de3.pt"
+    },
+    {
+      "dataset_index": 7,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/11fe5594-fbbe-4031-ac3a-4b43ba75a01f.pt"
+    },
+    {
+      "dataset_index": 185,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/d3bb67b0-53b9-4d26-a700-f081ba4bdbb6.pt"
+    },
+    {
+      "dataset_index": 108,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/1632f22b-2cbe-4895-8945-ec63631fc9ee.pt"
+    },
+    {
+      "dataset_index": 182,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/cda5863e-98f2-4748-bd81-78c49d268584.pt"
+    },
+    {
+      "dataset_index": 164,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/ab94c7c0-42a7-451c-ab54-020a42373430.pt"
+    },
+    {
+      "dataset_index": 42,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/81606105-7570-4a03-b41f-95e39e7ca326.pt"
+    },
+    {
+      "dataset_index": 606,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/0a71f622badcce1444e4220a7e8acd51.pt"
+    },
+    {
+      "dataset_index": 593,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e6a82969-b2e7-4bf3-ba16-00307a537ca0.pt"
+    },
+    {
+      "dataset_index": 559,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/93c8fe85-cd4d-4b53-a93f-688a737d92ef.pt"
+    },
+    {
+      "dataset_index": 691,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/e62c8770a7a82dfd0ce87bb98f711e45.pt"
+    },
+    {
+      "dataset_index": 354,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/2bbb6c81-9e0c-4521-8e62-718f0ec9a369.pt"
+    },
+    {
+      "dataset_index": 209,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/1aefc079-3d88-4736-ab6a-8821bf651cfa.pt"
+    },
+    {
+      "dataset_index": 252,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9207668e-1b5c-452d-988d-6140fea3858e.pt"
+    },
+    {
+      "dataset_index": 241,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/7abc1222-8f7b-49c4-b553-c52403d1efcb.pt"
+    },
+    {
+      "dataset_index": 479,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/8fd53263-c891-488c-aa35-7823e0b71291.pt"
+    },
+    {
+      "dataset_index": 162,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/a5551b85-5268-43bc-99ea-de2b45b8e735.pt"
+    },
+    {
+      "dataset_index": 638,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/61b85da579ad57d1b756d65f6016292f.pt"
+    },
+    {
+      "dataset_index": 153,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/8d7e170b-6b5e-49b2-894c-a0b7f0b019ce.pt"
+    },
+    {
+      "dataset_index": 275,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/c12178a4-9a41-4408-bb6e-2a2b0220f271.pt"
+    },
+    {
+      "dataset_index": 100,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/01ffd896-3ffb-4676-99db-aec59732aa32.pt"
+    },
+    {
+      "dataset_index": 356,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/3a104681-171e-4291-8ec6-3cb83c73ccf5.pt"
+    },
+    {
+      "dataset_index": 500,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/f6449998-1b38-434a-bf64-7cdd04e847f1.pt"
+    },
+    {
+      "dataset_index": 379,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/05ab7f66-56d8-41f6-ad04-603e6ac45ed5.pt"
+    },
+    {
+      "dataset_index": 287,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/d81254ee-8410-4999-9142-f0ce13378927.pt"
+    },
+    {
+      "dataset_index": 546,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/7ad022f0-031e-4928-8967-2a10e6ead5a5.pt"
+    },
+    {
+      "dataset_index": 125,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/3a08452a-105f-4554-a911-af6d94e29a63.pt"
+    },
+    {
+      "dataset_index": 587,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/d555c2bc-0669-45e4-91b5-39d9ebf234a6.pt"
+    },
+    {
+      "dataset_index": 422,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/972c28b2-797b-44af-afd3-cec5d61a8f7f.pt"
+    },
+    {
+      "dataset_index": 597,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e87f94ad-6357-4f1e-8148-702cc5865918.pt"
+    },
+    {
+      "dataset_index": 52,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/91a351ea-a03e-42c8-b5f5-bce11bd0cfeb.pt"
+    },
+    {
+      "dataset_index": 420,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/87cc04e1-24d9-48e9-99d9-a4d1cc1907d9.pt"
+    },
+    {
+      "dataset_index": 381,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/1320ac7d-394c-45b8-8703-c228266bedfe.pt"
+    },
+    {
+      "dataset_index": 199,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/fd5b9855-356c-498e-8a0a-5ad44deff7bd.pt"
+    },
+    {
+      "dataset_index": 74,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/cd02c6b2-1a29-4fdd-9daf-92dc46e656fe.pt"
+    },
+    {
+      "dataset_index": 360,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/6220ef78-be93-4007-83b5-3ba447273eca.pt"
+    },
+    {
+      "dataset_index": 9,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/18280638-35c3-4ac7-877a-fe029f413ead.pt"
+    },
+    {
+      "dataset_index": 59,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/acab3cbf-f555-428d-b9e3-462794b2e3e2.pt"
+    },
+    {
+      "dataset_index": 352,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/1f98a3c7-e0b3-486c-a3f0-e3463005b67c.pt"
+    },
+    {
+      "dataset_index": 421,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/8dac354c-4a68-4c4d-b0db-d4889b5e797c.pt"
+    },
+    {
+      "dataset_index": 641,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/70a2f6758eaeb733e720519d2e7285c0.pt"
+    },
+    {
+      "dataset_index": 444,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/fc104bca-438b-44ec-94c3-56102fe6a07c.pt"
+    },
+    {
+      "dataset_index": 646,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/8084a48ebfff5e9046536d5ec52d332d.pt"
+    },
+    {
+      "dataset_index": 505,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/0b264399-9786-4e1d-95f5-b15ae9eef489.pt"
+    },
+    {
+      "dataset_index": 167,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/b5944cf1-ec69-416a-918c-89e52b78fc28.pt"
+    },
+    {
+      "dataset_index": 282,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/d0d617b5-a316-48bf-b6f5-d0056d4c619d.pt"
+    },
+    {
+      "dataset_index": 419,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/87081d5a-236a-4a43-b408-c5e19f422528.pt"
+    },
+    {
+      "dataset_index": 342,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/d5af1b53-eda2-41c0-988f-844cc6954093.pt"
+    },
+    {
+      "dataset_index": 434,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/d8d26a1e-5908-4c54-b96b-718ace33552c.pt"
+    },
+    {
+      "dataset_index": 532,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/4705b427-e733-41ed-bda3-6cc20c46fb96.pt"
+    },
+    {
+      "dataset_index": 160,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/95e88e8a-4b84-4786-8960-fb359e646886.pt"
+    },
+    {
+      "dataset_index": 19,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/44bf4d16-0feb-4b63-a5cc-5366eb2e12fa.pt"
+    },
+    {
+      "dataset_index": 502,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/0273888c-6100-46de-ba53-476666388e81.pt"
+    },
+    {
+      "dataset_index": 15,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/317cfbb3-7721-42b6-97cc-349a86f2ca16.pt"
+    },
+    {
+      "dataset_index": 32,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/6ec87d6f-b68e-4e29-b851-4dba6500fdea.pt"
+    },
+    {
+      "dataset_index": 615,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2508f3f87a41a29e178c2d515d9d0013.pt"
+    },
+    {
+      "dataset_index": 335,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/baeff0a9-a453-40fc-9dd0-9301429bdefb.pt"
+    },
+    {
+      "dataset_index": 146,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/7542a6fe-16fe-4eab-b1fe-29d732fc68b1.pt"
+    },
+    {
+      "dataset_index": 110,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/1be5c2a5-5b49-4f8c-9fb6-0b444f6b85e4.pt"
+    },
+    {
+      "dataset_index": 447,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/09736b20-603d-470c-9769-da2f5f7d3a7b.pt"
+    },
+    {
+      "dataset_index": 21,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/536eed49-dc22-4467-a7f1-17a1a853a4fd.pt"
+    },
+    {
+      "dataset_index": 633,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/4cc05a86f52259384806d890167e96cd.pt"
+    },
+    {
+      "dataset_index": 147,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/765bfc6b-2f3c-499d-b8d8-5116c4b6d1e6.pt"
+    },
+    {
+      "dataset_index": 670,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/c55263e3e3953c77d1fd3407583cc1f3.pt"
+    },
+    {
+      "dataset_index": 522,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/34c6a605-582c-4ac3-a672-21a86b84164d.pt"
+    },
+    {
+      "dataset_index": 637,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/5bcec0245a7b837699d80ac2e4b6f46a.pt"
+    },
+    {
+      "dataset_index": 466,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/52f7d4f7-db0f-451e-a431-993e9aa0d427.pt"
+    },
+    {
+      "dataset_index": 626,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/3bdfe2f8b21e2434dc6258e8e7ae38be.pt"
+    },
+    {
+      "dataset_index": 311,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/463e8816-d59c-40c5-9c57-9797ef780b69.pt"
+    },
+    {
+      "dataset_index": 674,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/cd918faa361604bc1900dba67bea3c49.pt"
+    },
+    {
+      "dataset_index": 389,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/20cb3c42-d2dc-4fa7-9acc-53a92a9ec1c0.pt"
+    },
+    {
+      "dataset_index": 437,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/e11b5456-e35c-42b5-a41a-c60f0017cf7a.pt"
+    },
+    {
+      "dataset_index": 462,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/420d552f-1af1-4c78-9f42-27e07f3e0308.pt"
+    },
+    {
+      "dataset_index": 450,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/17383848-f5b7-4a30-aa15-3950fdea85a0.pt"
+    },
+    {
+      "dataset_index": 223,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/4f9953c6-ef20-4615-ad0a-eb9b68752ec3.pt"
+    },
+    {
+      "dataset_index": 664,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/b46ba552ba805cad9fe028c9b2beb67b.pt"
+    },
+    {
+      "dataset_index": 214,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/2c25e54e-6407-4d7f-aa17-1f590fd7eb15.pt"
+    },
+    {
+      "dataset_index": 217,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/330ce38e-929b-4c68-bab7-d8047b9a5b55.pt"
+    },
+    {
+      "dataset_index": 653,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/92b3fe0b48ae880c256e7be27772a237.pt"
+    },
+    {
+      "dataset_index": 272,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/b9d8fbed-05e5-4085-903f-9eab99dd7de1.pt"
+    },
+    {
+      "dataset_index": 206,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/1779f702-f865-451f-89d0-4f6b42a09e77.pt"
+    },
+    {
+      "dataset_index": 428,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/c1f97c3e-7159-40fb-99ac-c7f05e6a93c8.pt"
+    },
+    {
+      "dataset_index": 635,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/57ac7ae19952fd2f9768cf88bec4b88b.pt"
+    },
+    {
+      "dataset_index": 344,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/de5d84d9-1bc4-4971-a6ce-382c8bbd8995.pt"
+    },
+    {
+      "dataset_index": 303,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/10a572f8-97b1-42fd-b3b5-2efb9c639d3d.pt"
+    },
+    {
+      "dataset_index": 50,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/8fa8fee2-a29c-49de-af50-ddba5830bd36.pt"
+    },
+    {
+      "dataset_index": 617,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/28150676abe76b0800e9a657c816f8ea.pt"
+    },
+    {
+      "dataset_index": 458,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/38a5f100-6115-4692-a253-645686ee9f39.pt"
+    },
+    {
+      "dataset_index": 135,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/5823dfaf-8743-42a8-9231-ac8f8d4ea4a5.pt"
+    },
+    {
+      "dataset_index": 562,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/9748b154-4100-4641-a2d4-c9e8328e837d.pt"
+    },
+    {
+      "dataset_index": 440,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/eba01bb9-866f-4b0c-9bd3-05d35c73ba20.pt"
+    },
+    {
+      "dataset_index": 680,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/d88815bd6e6863544e612d4e073e1429.pt"
+    },
+    {
+      "dataset_index": 119,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/29f85cb3-66b2-4e11-b4e2-05e5543afda1.pt"
+    },
+    {
+      "dataset_index": 316,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/64141867-6a2d-4594-b05d-dbaf8c5b356a.pt"
+    },
+    {
+      "dataset_index": 250,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9147a739-c659-458c-98c5-1ef9299675af.pt"
+    },
+    {
+      "dataset_index": 547,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/7ecb5102-3313-4c41-9586-c1ad1fd36c66.pt"
+    },
+    {
+      "dataset_index": 71,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/c8ec6c4e-d9e0-4240-85b0-1f265819866b.pt"
+    },
+    {
+      "dataset_index": 36,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/78e928e4-f7e4-40c9-b6b4-8fd5186928b1.pt"
+    },
+    {
+      "dataset_index": 553,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/86a7fb3e-bc83-41fa-894f-d57ab0a037c1.pt"
+    },
+    {
+      "dataset_index": 689,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/e2b68e581a64455f05c011bf2cb4fa43.pt"
+    },
+    {
+      "dataset_index": 392,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/2517f98e-b860-4379-bd15-1723e9fbfdc9.pt"
+    },
+    {
+      "dataset_index": 424,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/a2f23922-6532-47bb-a151-b4a5d494a41f.pt"
+    },
+    {
+      "dataset_index": 677,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/cffafe382e4b4a7d65accd2fe34989a1.pt"
+    },
+    {
+      "dataset_index": 84,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e273ef3e-bf52-49b5-ae40-35a77c86bfa9.pt"
+    },
+    {
+      "dataset_index": 158,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/94128f51-3be6-4d17-b50c-77377297ec68.pt"
+    },
+    {
+      "dataset_index": 515,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/247d9155-f7f3-4ed7-92d8-cb8bf564eaeb.pt"
+    },
+    {
+      "dataset_index": 189,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/de7b06f7-2fcc-4ab6-8233-7ad7645abe6e.pt"
+    },
+    {
+      "dataset_index": 487,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/ac6e922e-73eb-4960-8be8-aba19f0f6428.pt"
+    },
+    {
+      "dataset_index": 141,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/6c6adacf-f710-4971-9074-60bcda8e33f1.pt"
+    },
+    {
+      "dataset_index": 259,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/97bf340b-211e-4c4b-bb58-d374d5fe41b4.pt"
+    },
+    {
+      "dataset_index": 288,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/dc9797ab-4012-46ae-8f41-f5da8b18319a.pt"
+    },
+    {
+      "dataset_index": 675,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ce91b1fd6da172feea7950d18e25fca8.pt"
+    },
+    {
+      "dataset_index": 103,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/05d0d721-b252-496f-92d5-51d39b0fa0a7.pt"
+    },
+    {
+      "dataset_index": 144,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/728915b3-9f3c-4f41-99a9-3c403d63db36.pt"
+    },
+    {
+      "dataset_index": 220,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/40532013-f65d-465e-8205-a2a316a92125.pt"
+    },
+    {
+      "dataset_index": 23,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/5902f8e5-9539-4fef-b6d3-2d59841dfa35.pt"
+    },
+    {
+      "dataset_index": 520,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/30e2c5f7-5a29-4903-8934-750ea19679e8.pt"
+    },
+    {
+      "dataset_index": 234,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/6677bec8-2c88-4ce9-89c6-8588190f1b63.pt"
+    },
+    {
+      "dataset_index": 150,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/86b4a9fe-c0bf-473e-b038-2b667b15cee8.pt"
+    },
+    {
+      "dataset_index": 370,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/b34eca25-cd32-4b50-bad5-377abda62e0b.pt"
+    },
+    {
+      "dataset_index": 584,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/c76f45c1-2e16-422b-b87f-0befcb5d1cc0.pt"
+    },
+    {
+      "dataset_index": 433,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/ce9b4aec-4a89-4b23-bfec-6338f62a3ffc.pt"
+    },
+    {
+      "dataset_index": 523,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/36213331-74e8-44ed-8da9-e209c6703607.pt"
+    },
+    {
+      "dataset_index": 539,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/6346baef-4016-4baa-95ca-4d01f340d884.pt"
+    },
+    {
+      "dataset_index": 497,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/f07f2efc-9719-475a-a03f-9af73e585bf3.pt"
+    },
+    {
+      "dataset_index": 269,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/ad4a8704-06de-4021-ad10-cecb3f1d7f17.pt"
+    },
+    {
+      "dataset_index": 528,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/3a3f2dca-5b03-44d4-9918-2282eb4440fb.pt"
+    },
+    {
+      "dataset_index": 594,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e78a5e99-9c04-4b9b-be44-a1b0d34a316b.pt"
+    },
+    {
+      "dataset_index": 549,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/8317cf35-eefa-4791-bcf7-f4065665fd13.pt"
+    },
+    {
+      "dataset_index": 178,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/c4b52d21-e3b2-4ad5-b29b-7aeea1cd9169.pt"
+    },
+    {
+      "dataset_index": 124,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/3864159d-5d42-4afd-8008-f15bf32d0e63.pt"
+    },
+    {
+      "dataset_index": 149,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/803e0053-1b6d-43f7-b857-d4232d769674.pt"
+    },
+    {
+      "dataset_index": 11,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/1e8f64d2-2c92-4ff2-9877-53c633c48a2c.pt"
+    },
+    {
+      "dataset_index": 565,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/9bce92a8-b4b7-42eb-a5e4-15f5d4f3c872.pt"
+    },
+    {
+      "dataset_index": 423,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/a16f76eb-446f-48ed-ba0d-9471cdce0bc5.pt"
+    },
+    {
+      "dataset_index": 687,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/dd45999e8410dbd0e67c40f31cd5955a.pt"
+    },
+    {
+      "dataset_index": 602,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/037fc21461f5f182fb4b02c9497faae1.pt"
+    },
+    {
+      "dataset_index": 258,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/96d7bc02-5a93-4246-93b8-c8f5251bf051.pt"
+    },
+    {
+      "dataset_index": 66,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b9c55cc1-33b8-4573-98e9-76d328fb262d.pt"
+    },
+    {
+      "dataset_index": 518,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/2b1ebd37-082b-44ce-80f1-5789f44e794d.pt"
+    },
+    {
+      "dataset_index": 180,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/c981af5e-41a0-42f9-be30-b9429f5f2ba1.pt"
+    },
+    {
+      "dataset_index": 261,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9e767c1a-c86e-47d2-9618-8ef0d7eff20c.pt"
+    },
+    {
+      "dataset_index": 233,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/662e0010-568e-4edb-b13e-66938c109ab7.pt"
+    },
+    {
+      "dataset_index": 183,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/cf3f2c09-b079-49cc-a2c9-be50e9340c14.pt"
+    },
+    {
+      "dataset_index": 343,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/d72220a2-bbee-4a6d-a29a-d985024a682e.pt"
+    },
+    {
+      "dataset_index": 6,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/11e8ed67-b180-4cba-ac1c-2b77e6e018e6.pt"
+    },
+    {
+      "dataset_index": 619,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2a81624c7292aae6935a31f2d8fe054d.pt"
+    },
+    {
+      "dataset_index": 336,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/c3a0a0c6-4d5d-40f3-87ba-6cb081660f10.pt"
+    },
+    {
+      "dataset_index": 526,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/37a7c317-89f4-4554-91c5-68afcaf539c1.pt"
+    },
+    {
+      "dataset_index": 255,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/93b4d7c4-226a-4921-810b-36c6457f81c4.pt"
+    },
+    {
+      "dataset_index": 16,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/3837a7d5-0c0e-4596-8191-a70ace44a780.pt"
+    },
+    {
+      "dataset_index": 131,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/44fb15d8-2c61-4a51-b201-63b213b2b02a.pt"
+    },
+    {
+      "dataset_index": 463,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/462a82f1-b9fe-4fe1-9613-6195c5560d1d.pt"
+    },
+    {
+      "dataset_index": 504,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/0971e6d6-d73b-4833-aefc-bbae6dc5b505.pt"
+    },
+    {
+      "dataset_index": 583,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/c554422a-7e7f-40d8-88a4-8c54a0a92d59.pt"
+    },
+    {
+      "dataset_index": 329,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/a3fe4972-fabc-4ed1-9e1f-bb6eb7175069.pt"
+    },
+    {
+      "dataset_index": 393,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/2bf83daa-d689-408a-92ec-f20041bcaffd.pt"
+    },
+    {
+      "dataset_index": 65,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b7ff2436-119d-4ba9-9b49-189b5fabbe4c.pt"
+    },
+    {
+      "dataset_index": 416,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/7e4263fd-4731-49a8-946e-1eeec3766c68.pt"
+    },
+    {
+      "dataset_index": 672,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/c6ea1b2af0b4d9ce5fed222d049d93cf.pt"
+    },
+    {
+      "dataset_index": 116,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/25b1fddf-e065-4fea-b31e-274ba799605a.pt"
+    },
+    {
+      "dataset_index": 213,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/27cd2a0e-be41-4596-aae8-69aa87381c9d.pt"
+    },
+    {
+      "dataset_index": 211,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/1f055d30-a38c-44df-a9a2-8a33231b9124.pt"
+    },
+    {
+      "dataset_index": 397,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/4bca440c-2413-43fa-8aa5-ee3efe6d03aa.pt"
+    },
+    {
+      "dataset_index": 386,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/16bea55c-0a01-4b07-abf4-835b674ea7ae.pt"
+    },
+    {
+      "dataset_index": 28,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/6387c693-f57c-4177-be2a-11de65c4b328.pt"
+    },
+    {
+      "dataset_index": 459,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/3cc5e183-8ef7-4a93-9145-79bc7412c910.pt"
+    },
+    {
+      "dataset_index": 64,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b6b0e981-5828-4fc7-818a-d6e7ecb5fc7a.pt"
+    },
+    {
+      "dataset_index": 540,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/641d2098-53ea-4e20-b11b-636ecfc4de3b.pt"
+    },
+    {
+      "dataset_index": 654,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/95d04cc082ad5f9f1f402bbae9688506.pt"
+    },
+    {
+      "dataset_index": 284,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/d59df298-fcc9-4a19-8cc2-31e6e6c2e504.pt"
+    },
+    {
+      "dataset_index": 640,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/6dd018731e28e52f924c6ef9a6343ca0.pt"
+    },
+    {
+      "dataset_index": 70,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/c27ae11a-172b-4ad7-ae78-00a1a9862830.pt"
+    },
+    {
+      "dataset_index": 112,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/22a18f1a-4b0f-49e3-aa5c-7792cc6bef7a.pt"
+    },
+    {
+      "dataset_index": 699,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/f2f40f2151e0fd30f1f868836e50279b.pt"
+    },
+    {
+      "dataset_index": 300,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/03c73b3e-86d4-462f-8e86-603db87552ba.pt"
+    },
+    {
+      "dataset_index": 244,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/8333fd63-584a-44f2-82a5-5a238b8c4fd0.pt"
+    },
+    {
+      "dataset_index": 686,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/db3435a10f0a7fbd6291b05decfba592.pt"
+    },
+    {
+      "dataset_index": 372,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/c6d69160-10d0-41e0-8a32-4438b13a35f5.pt"
+    },
+    {
+      "dataset_index": 67,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/bbcb0401-52de-45da-be65-e07694ee9ca5.pt"
+    },
+    {
+      "dataset_index": 331,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/a52a08e6-f54f-4f4d-965f-4679115f3470.pt"
+    },
+    {
+      "dataset_index": 34,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/71d5b971-74d6-456c-a7bf-997ef83663ee.pt"
+    },
+    {
+      "dataset_index": 266,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/a5c5b9b2-393e-450c-9600-7a067cca73f7.pt"
+    },
+    {
+      "dataset_index": 123,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/320217ef-3e96-4eb3-9b50-4b5e30dcfbe7.pt"
+    },
+    {
+      "dataset_index": 552,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/85e17655-4ec7-4dde-bbe4-d48bacfaa343.pt"
+    },
+    {
+      "dataset_index": 105,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/0939d065-7fd9-415f-8ef6-397c7682ccdb.pt"
+    },
+    {
+      "dataset_index": 439,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/e702fd0d-2f5a-4752-8811-f542ea5007e3.pt"
+    },
+    {
+      "dataset_index": 697,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/eea79f2ee33e9eba8e086cce0a1f286d.pt"
+    },
+    {
+      "dataset_index": 544,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/733d4346-c1e0-45cc-841d-62a798bbe60a.pt"
+    },
+    {
+      "dataset_index": 40,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/80788302-2292-4caa-a003-821aed591a4a.pt"
+    },
+    {
+      "dataset_index": 293,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/e748aabd-41ab-40e1-9c33-9d6a007627dd.pt"
+    },
+    {
+      "dataset_index": 273,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/ba046636-c51e-4776-990f-0773b0a767a0.pt"
+    },
+    {
+      "dataset_index": 90,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/ea2c554c-cf84-4083-a381-9e14a9c951f7.pt"
+    },
+    {
+      "dataset_index": 649,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/886cb484cdf7946c4a3db1317b32ad73.pt"
+    },
+    {
+      "dataset_index": 533,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/4d39c459-d8e1-4de1-a8de-a7b376d0e510.pt"
+    },
+    {
+      "dataset_index": 628,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/43fbd5b04590ddddae4cdaaca9e478e5.pt"
+    },
+    {
+      "dataset_index": 406,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/6e43f242-0f7e-423e-be5d-bf0b8d62cf61.pt"
+    },
+    {
+      "dataset_index": 61,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b1b07c0c-73ea-44e0-9924-c651258036e9.pt"
+    },
+    {
+      "dataset_index": 407,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/6f6624c5-a8ba-42f5-8e38-4f23ffa0b0d6.pt"
+    },
+    {
+      "dataset_index": 235,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/6a82d5ce-bdce-4eed-9e95-b70a6917a20a.pt"
+    },
+    {
+      "dataset_index": 542,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/67c490e4-5293-4931-a67a-efe1c2b8a712.pt"
+    },
+    {
+      "dataset_index": 589,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/dcec6b57-a6cd-442a-b467-1dd0d8a02ccf.pt"
+    },
+    {
+      "dataset_index": 309,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/3e4d2cac-91f3-4366-814b-244a08179dae.pt"
+    },
+    {
+      "dataset_index": 510,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/14689274-3866-4b30-b586-c404fc0eb7e3.pt"
+    },
+    {
+      "dataset_index": 478,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/899d2a0e-ebfa-4fa4-be42-7ab12ff6eb74.pt"
+    },
+    {
+      "dataset_index": 681,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/d9507fd2a1dabdde1e3fd7897483c38f.pt"
+    },
+    {
+      "dataset_index": 364,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/76447e63-5aa3-4e0c-8292-5730c75ac521.pt"
+    },
+    {
+      "dataset_index": 363,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/76352e77-b994-4dba-a6ab-2f447c3c7f5a.pt"
+    },
+    {
+      "dataset_index": 120,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/2c69ed0b-c6a1-492f-a599-491319346360.pt"
+    },
+    {
+      "dataset_index": 184,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/d19daa95-d425-4d0b-88e5-093f7111235f.pt"
+    },
+    {
+      "dataset_index": 561,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/94394a1c-cebb-41b5-97ba-053c2cbb4444.pt"
+    },
+    {
+      "dataset_index": 399,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/5035c4f4-0ef6-49cf-8ffb-e17102039cfb.pt"
+    },
+    {
+      "dataset_index": 684,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/dacc0957d62bbf0b236242f586e34250.pt"
+    },
+    {
+      "dataset_index": 337,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/c55c1c5f-3af4-4ca2-bde7-905d8dbd8785.pt"
+    },
+    {
+      "dataset_index": 550,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/840fcf94-ccfc-43d8-b7c2-d33799fa8aa8.pt"
+    },
+    {
+      "dataset_index": 30,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/6979d03f-7ff1-4738-886e-3ee059a69d8a.pt"
+    },
+    {
+      "dataset_index": 319,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/75fe6ac9-342f-457a-938c-2806475da067.pt"
+    },
+    {
+      "dataset_index": 138,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/62ea446b-b849-47d5-8216-a2f7c8cb4bac.pt"
+    },
+    {
+      "dataset_index": 659,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/a2a97f6e8f5b7f5074a41dbf344a2f73.pt"
+    },
+    {
+      "dataset_index": 660,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/a5f65f2ff96cfb886f347f5c291f0922.pt"
+    },
+    {
+      "dataset_index": 200,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/0024ccb6-93d3-4d05-b42a-dcd082b9fb71.pt"
+    },
+    {
+      "dataset_index": 114,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/245c0502-ba32-470d-a6b3-9969b95d077e.pt"
+    },
+    {
+      "dataset_index": 644,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/73a1653df0222f92713f59032b839744.pt"
+    },
+    {
+      "dataset_index": 168,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/b6ae1386-35cf-45e6-92ca-7684c4953183.pt"
+    },
+    {
+      "dataset_index": 599,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e9e2bcad-ffaa-477a-93b0-5d0493070787.pt"
+    },
+    {
+      "dataset_index": 396,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/443599f9-89b8-46aa-83b6-c01b172a8b02.pt"
+    },
+    {
+      "dataset_index": 113,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/23142019-8e45-40f3-a73c-dd71a8f6a57b.pt"
+    },
+    {
+      "dataset_index": 190,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/e196a519-a92f-42f1-b414-7739dffe0ee2.pt"
+    },
+    {
+      "dataset_index": 12,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/26a47034-7f9f-4f6b-87e1-d473569819c3.pt"
+    },
+    {
+      "dataset_index": 516,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/250eb325-6f3c-4c11-9d82-2353ec7b3655.pt"
+    },
+    {
+      "dataset_index": 465,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/51ee691c-fc3e-4344-b26f-c6ede458e30a.pt"
+    },
+    {
+      "dataset_index": 94,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/f5b7ad9e-0d32-4202-9407-b818a2a6759d.pt"
+    },
+    {
+      "dataset_index": 60,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b11d0ec6-4a97-4f94-82d2-aab31b994667.pt"
+    },
+    {
+      "dataset_index": 172,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/bd831581-a023-4533-a304-91e85526ae65.pt"
+    },
+    {
+      "dataset_index": 378,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/058f8a54-ac25-485c-9782-c06a2b7e615f.pt"
+    },
+    {
+      "dataset_index": 636,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/588ffecb80d9086fd6b28a46e7245ec6.pt"
+    },
+    {
+      "dataset_index": 507,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/0e85b020-3749-4e4d-ac93-a44f053ea57b.pt"
+    },
+    {
+      "dataset_index": 438,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/e2e514e1-6c55-4b8a-9d3c-555a3b4c22b7.pt"
+    },
+    {
+      "dataset_index": 535,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/4d7af3a5-68b9-46b1-9875-78271f4a712b.pt"
+    },
+    {
+      "dataset_index": 519,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/2db30ca7-c3d9-421a-bd5f-13c2711d4758.pt"
+    },
+    {
+      "dataset_index": 436,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/dd85badd-94ca-4169-802a-d7af9c51156c.pt"
+    },
+    {
+      "dataset_index": 236,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/6a93c56c-3a7d-4fb0-aa09-acf3c5c8cef0.pt"
+    },
+    {
+      "dataset_index": 24,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/5c9c38c2-4ebc-43b8-8108-531b1de9e822.pt"
+    },
+    {
+      "dataset_index": 566,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/9c3ee7e5-a98f-4ec9-9b34-0d1baaa3da26.pt"
+    },
+    {
+      "dataset_index": 315,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/5e5b9d9e-b782-49b3-8623-b8a9f9f9594a.pt"
+    },
+    {
+      "dataset_index": 347,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/f740ca73-d208-4058-acc4-9fda9e4b2cb2.pt"
+    },
+    {
+      "dataset_index": 54,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/a3158e1f-fab8-45a4-8dbf-fcbf6b6d04a1.pt"
+    },
+    {
+      "dataset_index": 134,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/51558906-48f4-4262-bb9f-2668034e96fc.pt"
+    },
+    {
+      "dataset_index": 449,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/11357baa-726d-48bb-b1d4-ddaa572b55d8.pt"
+    },
+    {
+      "dataset_index": 62,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/b346b53d-9205-4533-92ad-77fd309d08c3.pt"
+    },
+    {
+      "dataset_index": 556,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/8e75be00-7e3e-4f3d-8aa1-3e913ec040ec.pt"
+    },
+    {
+      "dataset_index": 186,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/d630ae52-0bde-447d-9b3b-458df1884f34.pt"
+    },
+    {
+      "dataset_index": 38,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/7c2eb354-4cc6-41e9-a896-82642be004bf.pt"
+    },
+    {
+      "dataset_index": 248,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/8aa55bbf-0f9c-4e83-b454-c2d11b026b03.pt"
+    },
+    {
+      "dataset_index": 291,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/e15f45e8-e937-4419-b661-351b6a4e3b24.pt"
+    },
+    {
+      "dataset_index": 130,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/44abc2b0-52ef-4c1a-a8a8-2aa7a279455d.pt"
+    },
+    {
+      "dataset_index": 642,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/719d75c14ea38e2b59bd99b440ccc061.pt"
+    },
+    {
+      "dataset_index": 26,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/5eba5166-3afb-46c4-a992-aa814093d96e.pt"
+    },
+    {
+      "dataset_index": 289,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/de008259-bcc6-454b-a763-6942d20f2a8c.pt"
+    },
+    {
+      "dataset_index": 270,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/afbb3863-0209-498d-80eb-e6fed2eb06db.pt"
+    },
+    {
+      "dataset_index": 576,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/b656d259-da97-4fd2-982a-eae002500fb2.pt"
+    },
+    {
+      "dataset_index": 499,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/f25a2935-0be0-4d4a-be54-f96cb165247f.pt"
+    },
+    {
+      "dataset_index": 93,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/f03929b4-833f-4c91-a2f4-603b7bd8773f.pt"
+    },
+    {
+      "dataset_index": 603,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/03fc07af2bd5b7474187b60987f4ddb0.pt"
+    },
+    {
+      "dataset_index": 427,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/be8f2fc7-8336-46c1-a04c-fa5a1d05be94.pt"
+    },
+    {
+      "dataset_index": 27,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/612b79f4-6b5f-4f7f-9d79-b6915445d7a1.pt"
+    }
+  ],
+  "validation": [
+    {
+      "dataset_index": 192,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f1f196d5-1325-4225-893b-f7fa6e75ed62.pt"
+    },
+    {
+      "dataset_index": 204,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/0e9a06ff-d052-4974-bfec-59f17d84f749.pt"
+    },
+    {
+      "dataset_index": 126,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/3a92d25d-8ddf-4a6c-97dc-ee16bce0db57.pt"
+    },
+    {
+      "dataset_index": 524,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/36b4d64d-8c42-4320-adc4-a82339843784.pt"
+    },
+    {
+      "dataset_index": 492,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/cccd1536-edbc-42ca-b615-841872d98b81.pt"
+    },
+    {
+      "dataset_index": 55,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/a4b77544-b0d8-4465-8a89-14f47365346c.pt"
+    },
+    {
+      "dataset_index": 340,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/d1c94bd8-9b95-4896-90ef-9820b72e9c80.pt"
+    },
+    {
+      "dataset_index": 201,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/0089987a-8200-4d44-afae-7cc41eddbf07.pt"
+    },
+    {
+      "dataset_index": 612,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2084ff9e1c3f7347ba0aea77dc91149a.pt"
+    },
+    {
+      "dataset_index": 69,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/c1190931-2080-44e9-b582-009ce361f719.pt"
+    },
+    {
+      "dataset_index": 666,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/bb29e5be8326d4c433c189c47376993f.pt"
+    },
+    {
+      "dataset_index": 216,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/3235688d-c83f-4645-a728-639dca1de8e3.pt"
+    },
+    {
+      "dataset_index": 367,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/95879529-0326-4462-8440-bf3a92be9c6c.pt"
+    },
+    {
+      "dataset_index": 581,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/c50bdf2e-0abe-43fc-8139-06cf5e73816b.pt"
+    },
+    {
+      "dataset_index": 541,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/64239147-5c4d-4f1c-b543-1bb26a6df2a6.pt"
+    },
+    {
+      "dataset_index": 683,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/da79d919753212c4a0b6b3f375126a39.pt"
+    },
+    {
+      "dataset_index": 142,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/6fa2d5cd-c2eb-4499-b95d-2b2b167275f9.pt"
+    },
+    {
+      "dataset_index": 1,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/01e4f100-40c0-4490-b7a6-ae37cbb70c7b.pt"
+    },
+    {
+      "dataset_index": 197,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f8ca8e8f-370f-483d-a7eb-4e709b42d7e1.pt"
+    },
+    {
+      "dataset_index": 411,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/732e720c-9e60-4a7a-804c-ffa3330f6261.pt"
+    },
+    {
+      "dataset_index": 460,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/3f73ac95-81fc-47b7-9ac8-8f79d117f23a.pt"
+    },
+    {
+      "dataset_index": 339,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/ce291d44-3bc6-4748-a560-11e827144800.pt"
+    },
+    {
+      "dataset_index": 148,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/7e8621c0-0dcf-4f11-a141-0fda1608013f.pt"
+    },
+    {
+      "dataset_index": 351,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/0f3187f9-3386-47ae-8044-8cd0968ed5a7.pt"
+    },
+    {
+      "dataset_index": 529,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/4107d0be-42b6-4158-9f36-c8a56530d5de.pt"
+    },
+    {
+      "dataset_index": 651,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/8d2cdad9082523fa3ea68740ce1050fe.pt"
+    },
+    {
+      "dataset_index": 621,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2ed023f9ef036f1cf6698c523844b9e5.pt"
+    },
+    {
+      "dataset_index": 312,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/4ea66603-df81-4dd7-8d8e-e2a8e6826c26.pt"
+    },
+    {
+      "dataset_index": 567,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/9c51cef1-e8be-4066-85b1-e69bbe003acc.pt"
+    },
+    {
+      "dataset_index": 313,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/57d2ba61-7869-4be1-8ca6-e7ea02662081.pt"
+    },
+    {
+      "dataset_index": 229,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/624a019d-fbc7-45c8-9ca5-50725c8a7bba.pt"
+    },
+    {
+      "dataset_index": 650,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/892e3cb2977e08682856275c6e9f79a8.pt"
+    },
+    {
+      "dataset_index": 380,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/0ef69d9e-5b6e-4153-812b-e24a36a023a9.pt"
+    },
+    {
+      "dataset_index": 609,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/129c32df20b34c6ccc3f009e7b092ba6.pt"
+    },
+    {
+      "dataset_index": 346,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/e4ef5798-d9c1-482b-a52c-23ac2d119467.pt"
+    },
+    {
+      "dataset_index": 489,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/b1bebdb4-d6ea-47bd-b1eb-1add0957e49b.pt"
+    },
+    {
+      "dataset_index": 575,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/b43c3d48-b63e-4826-8f80-4f21daca2b4f.pt"
+    },
+    {
+      "dataset_index": 240,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/7964a722-8bad-4458-9c56-7a00af65391c.pt"
+    },
+    {
+      "dataset_index": 302,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/0ec1e366-7668-444d-a19d-784d1377df38.pt"
+    },
+    {
+      "dataset_index": 511,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/182f2870-c640-40ba-987d-d85d5a889c32.pt"
+    },
+    {
+      "dataset_index": 111,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/220abe4b-c84a-4896-a433-d724e728e262.pt"
+    },
+    {
+      "dataset_index": 614,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/2339f65766415309a19973f60b56847d.pt"
+    },
+    {
+      "dataset_index": 109,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/1b640b85-c8ec-43ef-b967-7dbad52c0efb.pt"
+    },
+    {
+      "dataset_index": 409,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/719b1e74-8d1a-47ee-83d8-f2ec246a0690.pt"
+    },
+    {
+      "dataset_index": 118,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/29f2219a-82fd-4228-a36b-759c38419ed9.pt"
+    },
+    {
+      "dataset_index": 441,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/f7736eb2-b054-42b3-b4a7-c0c273cb49b5.pt"
+    },
+    {
+      "dataset_index": 373,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/cb130e06-49f3-4e4d-b671-a9e1523801e4.pt"
+    },
+    {
+      "dataset_index": 267,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/a6cff69c-f002-40ad-b566-887f80b5c700.pt"
+    },
+    {
+      "dataset_index": 604,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/05da13b36f4552d8950a1fc2282e4c2a.pt"
+    },
+    {
+      "dataset_index": 257,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9517f6e1-f723-4613-9e00-2ef5a2d8fd54.pt"
+    },
+    {
+      "dataset_index": 5,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/0e501e7a-8a7e-4233-a38f-8c4299d1b20b.pt"
+    },
+    {
+      "dataset_index": 14,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/2b9c1f3d-10e2-4bd5-93e8-eca0d7865515.pt"
+    },
+    {
+      "dataset_index": 225,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/5514e90a-4b71-4043-b3c7-3afd065a4e80.pt"
+    },
+    {
+      "dataset_index": 203,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/075ba7e2-686c-4d8c-8154-801a8c763333.pt"
+    },
+    {
+      "dataset_index": 414,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/777e4ee2-ce18-47a2-9f62-0061ca24e3b7.pt"
+    },
+    {
+      "dataset_index": 490,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/bdd3f573-5d43-4db9-8af5-3a38c4a5b927.pt"
+    },
+    {
+      "dataset_index": 263,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9f8634e0-7887-4fe7-be4f-cfd2f7cf5fcf.pt"
+    },
+    {
+      "dataset_index": 58,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/a77cb707-ea79-4f1c-b0be-3c48ad115929.pt"
+    },
+    {
+      "dataset_index": 297,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/f501929c-e089-4234-a2d4-b9b913c2eb87.pt"
+    },
+    {
+      "dataset_index": 647,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/833e9e718ff392ec5c7d7fd00a050c36.pt"
+    },
+    {
+      "dataset_index": 694,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ecf7f5a60f0ef8948e0f8b3c91eab2f1.pt"
+    },
+    {
+      "dataset_index": 222,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/4f415d2a-8a37-4458-9923-fe4ae65d193c.pt"
+    },
+    {
+      "dataset_index": 89,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e9c76293-9e6a-48f1-b378-168c5ecf7f81.pt"
+    },
+    {
+      "dataset_index": 306,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/292c10b3-fc48-446b-9b51-8926858f14a3.pt"
+    },
+    {
+      "dataset_index": 175,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/bffb7448-50ba-4fe9-baa8-a2259c234db6.pt"
+    },
+    {
+      "dataset_index": 292,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/e512b35b-2fc9-49ce-87f4-274643a853bd.pt"
+    },
+    {
+      "dataset_index": 338,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/c6b0f879-99bd-4d15-804c-ff576830a3d8.pt"
+    },
+    {
+      "dataset_index": 92,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/ee988277-dfbd-4069-b575-6ec269845314.pt"
+    },
+    {
+      "dataset_index": 655,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/99b3695d2b1e340b8efd8f0c8212ff55.pt"
+    },
+    {
+      "dataset_index": 246,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/88cf0a0e-91b2-4947-96d7-9eed8547d6cd.pt"
+    },
+    {
+      "dataset_index": 173,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/bd8cc68c-5608-41bc-8a50-ee9ec4b789c6.pt"
+    },
+    {
+      "dataset_index": 688,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/e26a3bf49ed55e5953941ef0a49d31bc.pt"
+    },
+    {
+      "dataset_index": 571,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/a84153c9-baad-493e-b043-331117736a38.pt"
+    },
+    {
+      "dataset_index": 13,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/28f27352-4968-4846-8e24-fbf005003fc0.pt"
+    },
+    {
+      "dataset_index": 514,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/206dfc0c-9319-43c0-b4e3-b5bf034ef1bd.pt"
+    },
+    {
+      "dataset_index": 121,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/2d1f70b7-423a-402f-ada9-942e9990e265.pt"
+    },
+    {
+      "dataset_index": 169,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/b6fdf1cc-22d3-4d4d-a8e7-f0dfb0a55d9a.pt"
+    },
+    {
+      "dataset_index": 435,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/d9513d05-59c9-40bb-89f9-27cc59c7dd57.pt"
+    },
+    {
+      "dataset_index": 136,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/60145e93-68eb-4ab9-b2c1-288d589fd323.pt"
+    },
+    {
+      "dataset_index": 304,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/1310c9b8-e9bd-48f6-836a-ed77b1e7cce5.pt"
+    },
+    {
+      "dataset_index": 362,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/6d484cfe-9973-4890-bf75-ebdd937c0244.pt"
+    },
+    {
+      "dataset_index": 525,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/371d50bf-1f3d-4d55-9d2d-9421bc2a01e2.pt"
+    },
+    {
+      "dataset_index": 332,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/ab687396-f457-491f-a39e-5e44dfc821b4.pt"
+    },
+    {
+      "dataset_index": 322,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/822f4255-a25c-40fb-866e-66e2fc9ccf23.pt"
+    },
+    {
+      "dataset_index": 278,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/c931f125-d81f-4ad7-8deb-3fedba17c28a.pt"
+    },
+    {
+      "dataset_index": 326,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/8fbdc2ef-8f56-46d3-862e-db80e0fefbf0.pt"
+    },
+    {
+      "dataset_index": 400,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/5bb71433-861c-4cbd-8c20-ee520a96973a.pt"
+    },
+    {
+      "dataset_index": 83,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e0e762b2-c042-40d5-81ff-9562e708adc1.pt"
+    },
+    {
+      "dataset_index": 207,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/182b1883-c1ef-4e91-b811-6a3d11a6d43f.pt"
+    },
+    {
+      "dataset_index": 237,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/6b3300f7-a118-4317-90b2-2bdf83c010d0.pt"
+    },
+    {
+      "dataset_index": 325,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/8b104884-e27d-48de-b14c-f164c3e20238.pt"
+    },
+    {
+      "dataset_index": 629,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/4617b43ecf0a73ed1c1303eabb7161c4.pt"
+    },
+    {
+      "dataset_index": 601,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/f7965c2f-28df-4155-9306-bfef8953a6be.pt"
+    },
+    {
+      "dataset_index": 341,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/d48d454a-eb04-4e3b-93c4-e02d3fd15b5a.pt"
+    },
+    {
+      "dataset_index": 643,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/72287c9cac676de50d6937c1591c013c.pt"
+    },
+    {
+      "dataset_index": 320,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/79d43e81-55cb-41d8-8da5-72ce41fcafad.pt"
+    },
+    {
+      "dataset_index": 281,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/ce352bfc-bbec-4951-8281-f01f2aef7e78.pt"
+    },
+    {
+      "dataset_index": 618,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/292067c07a79c665aceef846ceef1a69.pt"
+    },
+    {
+      "dataset_index": 323,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/82b35702-e1ac-446c-aabc-45ec3ed80610.pt"
+    },
+    {
+      "dataset_index": 446,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/04992afb-8679-4a99-a73d-137e6710a4d2.pt"
+    },
+    {
+      "dataset_index": 96,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/f8730447-91f8-4ba9-8e61-8f68f3e2bcf2.pt"
+    },
+    {
+      "dataset_index": 572,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/ab107bcf-9e12-42e0-9b1a-bf08d137f970.pt"
+    },
+    {
+      "dataset_index": 558,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/933de88a-1fe8-4497-b8cf-66fe9146b0e0.pt"
+    },
+    {
+      "dataset_index": 264,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/a0fa580f-3e1a-40e8-9e84-ff74191b77f5.pt"
+    },
+    {
+      "dataset_index": 170,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/b98ee90d-28b3-47a6-ba04-6aa03f4bb903.pt"
+    }
+  ],
+  "test": [
+    {
+      "dataset_index": 588,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/d624f608-06d4-4b6b-b0a4-1fd09b11f9a5.pt"
+    },
+    {
+      "dataset_index": 75,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/cdc76d86-77ef-49e1-b7a6-15f49931bcff.pt"
+    },
+    {
+      "dataset_index": 408,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/70e760e8-e3c0-402f-a5ba-4876fa9c460c.pt"
+    },
+    {
+      "dataset_index": 485,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/a6570df3-719e-4db4-9750-b3ac3b7b999f.pt"
+    },
+    {
+      "dataset_index": 394,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/309a8f6e-dd3c-47ec-8d59-3d1ae4c0c9bd.pt"
+    },
+    {
+      "dataset_index": 673,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/c8b43e229f04b218773593f2a9ee42e6.pt"
+    },
+    {
+      "dataset_index": 577,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/b85933b6-f63c-4af0-aa76-bbf3f5b74598.pt"
+    },
+    {
+      "dataset_index": 49,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/8cd79506-22df-4683-8c96-7de460d9fb65.pt"
+    },
+    {
+      "dataset_index": 536,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/4fe50b78-f06b-4441-a458-1445bd2d983a.pt"
+    },
+    {
+      "dataset_index": 265,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/a146ffd8-d0fb-4953-8ca8-21c83df1b404.pt"
+    },
+    {
+      "dataset_index": 358,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/4be4148b-06fb-4cf2-9dc5-45dfce3a4d19.pt"
+    },
+    {
+      "dataset_index": 545,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/74923cb9-abeb-4329-bb34-2e0714e33867.pt"
+    },
+    {
+      "dataset_index": 227,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/60400566-0320-4650-8ed8-c6ab80a4a20b.pt"
+    },
+    {
+      "dataset_index": 321,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/7f409ca1-f40e-482c-baa0-62bc58562519.pt"
+    },
+    {
+      "dataset_index": 260,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/9b0d6a8f-81b2-47f8-bf8f-b6e5281842b1.pt"
+    },
+    {
+      "dataset_index": 87,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e612f56a-7104-4924-8a8d-91698f555f92.pt"
+    },
+    {
+      "dataset_index": 456,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/28bf2b90-bd65-4827-939f-f6c713a11f12.pt"
+    },
+    {
+      "dataset_index": 145,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/73b225d6-eff8-4366-bea4-a1fab96633b9.pt"
+    },
+    {
+      "dataset_index": 623,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/3219ffd8661622e8c83c7ceec7993204.pt"
+    },
+    {
+      "dataset_index": 590,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/dd09668d-3c30-4aad-9f96-919ce4bedbf0.pt"
+    },
+    {
+      "dataset_index": 133,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/4de344e0-1230-49ed-9adb-3ae1b5501676.pt"
+    },
+    {
+      "dataset_index": 676,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ceaf187db294f8a933fe3ad3a817e3ff.pt"
+    },
+    {
+      "dataset_index": 616,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/27fc52564c8f3aac49a1ded5c450c255.pt"
+    },
+    {
+      "dataset_index": 657,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/9f4aa5283477144a0d0cf869e8d72889.pt"
+    },
+    {
+      "dataset_index": 4,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/0ceedcf7-5069-43e5-b761-a592699392fc.pt"
+    },
+    {
+      "dataset_index": 369,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/a54d99e9-5fdd-4a9c-a0ba-d16152a060fe.pt"
+    },
+    {
+      "dataset_index": 318,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/6adb216d-3204-4aad-adbb-b9205c614931.pt"
+    },
+    {
+      "dataset_index": 472,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/6f583435-646c-4724-99fc-6138529c26df.pt"
+    },
+    {
+      "dataset_index": 314,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/5da7ea13-8e23-4774-b18c-08eb313c1bca.pt"
+    },
+    {
+      "dataset_index": 508,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/1096f607-c024-4e57-a794-4bf4d2886e54.pt"
+    },
+    {
+      "dataset_index": 608,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/0ee4c8dcd8015f1b089d2ca174605fab.pt"
+    },
+    {
+      "dataset_index": 682,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/da198146f82ac67e875c643dc300fa52.pt"
+    },
+    {
+      "dataset_index": 383,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/141cccfe-4a6b-4af0-891c-de5382802c9d.pt"
+    },
+    {
+      "dataset_index": 279,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/cac2ba37-2e08-4ee6-a30f-40100774fba2.pt"
+    },
+    {
+      "dataset_index": 569,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/a7ab27fb-bd8e-4dfb-bc4f-fc37b71e548c.pt"
+    },
+    {
+      "dataset_index": 662,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ae8c28f0db94657ba95ea66e19b4b47f.pt"
+    },
+    {
+      "dataset_index": 554,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/8c5001d5-58f2-49e9-a6bb-2ae23830866f.pt"
+    },
+    {
+      "dataset_index": 595,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/e7919f10-29bd-4777-b4cc-29dbe353cd1c.pt"
+    },
+    {
+      "dataset_index": 387,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/16e51304-7de9-4fd9-9d2c-2f48c1c4cd2e.pt"
+    },
+    {
+      "dataset_index": 198,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f9508ba8-fd50-4b6c-a1f4-9938fd3cd52e.pt"
+    },
+    {
+      "dataset_index": 611,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/19dfe9941ff8fab662a5f9ec1766698c.pt"
+    },
+    {
+      "dataset_index": 79,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/d5f6dd7d-5420-46fb-8243-41eeba6486f8.pt"
+    },
+    {
+      "dataset_index": 253,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/92d982a4-b98e-4746-bdec-60cb53775183.pt"
+    },
+    {
+      "dataset_index": 25,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/5d915154-8f71-42a7-b1ac-cca37cbedb94.pt"
+    },
+    {
+      "dataset_index": 226,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/5d7e469b-eeed-42a6-bd65-4408d145e423.pt"
+    },
+    {
+      "dataset_index": 78,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/d5ddcdb0-db1a-4a4c-aed8-d332ebcb60dc.pt"
+    },
+    {
+      "dataset_index": 486,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/a9339957-f6c4-4a41-9926-698815c52521.pt"
+    },
+    {
+      "dataset_index": 665,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/b7f8ba9933ca67bf4e89522e4957ce7d.pt"
+    },
+    {
+      "dataset_index": 128,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/40b87615-d3ca-4643-8e6d-4fd8015a62d3.pt"
+    },
+    {
+      "dataset_index": 91,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/ecfce556-484f-4093-a80c-893fda981e41.pt"
+    },
+    {
+      "dataset_index": 166,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/b1d03c7e-d89d-4fd8-be2f-cf7d8f42c09f.pt"
+    },
+    {
+      "dataset_index": 695,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ed8331280ac6ef5ef8886e15cb23dbff.pt"
+    },
+    {
+      "dataset_index": 443,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/fab12994-57e1-4bf9-a633-2e4227bf709f.pt"
+    },
+    {
+      "dataset_index": 696,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/edf45bed20966df7915e58611489b673.pt"
+    },
+    {
+      "dataset_index": 165,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/af960ca5-f91f-4dd1-ba82-82754184eb50.pt"
+    },
+    {
+      "dataset_index": 410,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/71fd7aec-e295-42eb-aadc-bccd0fd8383b.pt"
+    },
+    {
+      "dataset_index": 661,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/ae7a6579cad57eb5a2308f2aeeee7e59.pt"
+    },
+    {
+      "dataset_index": 219,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/3b5cd565-d5da-4419-88f2-ef865cf76e55.pt"
+    },
+    {
+      "dataset_index": 371,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/c1aa587e-b84b-4c3d-bd11-fe87af364cc1.pt"
+    },
+    {
+      "dataset_index": 317,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/652e0143-09a7-4bb0-afe0-afe109e97397.pt"
+    },
+    {
+      "dataset_index": 122,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/2d90eec0-a5c9-4742-ba64-f07c9a80c1bc.pt"
+    },
+    {
+      "dataset_index": 513,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/1d3a9271-bb21-46f7-a928-48272ce7193f.pt"
+    },
+    {
+      "dataset_index": 512,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/1c3965f8-aac2-4e66-ae41-f24c4f7586e5.pt"
+    },
+    {
+      "dataset_index": 249,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/8e01aed5-f7bb-4f4f-9deb-ebd98ebb0e25.pt"
+    },
+    {
+      "dataset_index": 191,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/e45b7645-39d0-4cd5-83d9-2306a1618dc4.pt"
+    },
+    {
+      "dataset_index": 534,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/4d551fc6-7a68-4f90-a6b9-4c483baed59e.pt"
+    },
+    {
+      "dataset_index": 194,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f35de9aa-a9a5-4b32-a751-baaac69b21b7.pt"
+    },
+    {
+      "dataset_index": 375,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/ccdf54d4-0d2d-46ae-bc56-4b6e00b3e719.pt"
+    },
+    {
+      "dataset_index": 242,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/7dff1db2-d16a-4a01-829b-05b72a41623c.pt"
+    },
+    {
+      "dataset_index": 600,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/f47f94f0-87d1-4681-9dcc-02c2cb74fd5a.pt"
+    },
+    {
+      "dataset_index": 196,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/f38e0607-3c61-4bff-a1d4-4e33d78a6d96.pt"
+    },
+    {
+      "dataset_index": 174,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/bdceb934-f44d-47a5-a407-bba9907dde42.pt"
+    },
+    {
+      "dataset_index": 231,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/63d4fad7-8812-48d5-a578-5b50d2a30cdf.pt"
+    },
+    {
+      "dataset_index": 391,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/2316f7de-6f40-40fe-aae5-912d79aa3392.pt"
+    },
+    {
+      "dataset_index": 205,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/10b8ac65-a964-40e6-8f30-41adea71d012.pt"
+    },
+    {
+      "dataset_index": 412,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/753dcd91-1b2e-4e80-afe2-007070901f58.pt"
+    },
+    {
+      "dataset_index": 457,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/2ab8f8ef-d082-44ac-90f7-1af1a99772b1.pt"
+    },
+    {
+      "dataset_index": 139,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/661fb06b-cdc2-4f35-a7ab-be824572c53f.pt"
+    },
+    {
+      "dataset_index": 538,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/568fa7df-b876-4e31-bcb8-7dd7426d9616.pt"
+    },
+    {
+      "dataset_index": 295,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/eb17e028-36dd-4c2b-b465-b14e59f7e3a2.pt"
+    },
+    {
+      "dataset_index": 605,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/06c168b45dc8eaa94acbd977714bcbbe.pt"
+    },
+    {
+      "dataset_index": 56,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/a59b4b07-6993-4976-b67b-a732f5c95ca7.pt"
+    },
+    {
+      "dataset_index": 377,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/e10a6204-d6cc-48b5-8318-3abf66d6a48e.pt"
+    },
+    {
+      "dataset_index": 221,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/455ccffa-dd1e-4bc9-8a7a-c95ccd8a8ce0.pt"
+    },
+    {
+      "dataset_index": 445,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/024063f6-75d8-4f1a-8bb9-ae3c65538458.pt"
+    },
+    {
+      "dataset_index": 345,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/e0907ed3-830b-430f-bd06-24ca8f73cd31.pt"
+    },
+    {
+      "dataset_index": 202,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/06a6c3b5-8ae3-46e9-b9b3-32894180783f.pt"
+    },
+    {
+      "dataset_index": 44,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/81e31826-4f38-42ec-8aae-9e3908ec1dee.pt"
+    },
+    {
+      "dataset_index": 280,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/cb7b829c-bc2d-43e5-9f7d-9738167b8396.pt"
+    },
+    {
+      "dataset_index": 578,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/bb07fdf6-0145-43fa-b254-ae7790bd0390.pt"
+    },
+    {
+      "dataset_index": 426,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/be152b4e-03af-4473-87e2-1b4a380b94a5.pt"
+    },
+    {
+      "dataset_index": 656,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/9b2d1418ee1af29776395ac2df174d2e.pt"
+    },
+    {
+      "dataset_index": 470,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/60a8d365-6cf8-4bab-936d-c14405792b5b.pt"
+    },
+    {
+      "dataset_index": 299,
+      "kernel_family": "3layer",
+      "tensor_path": "3layer/archive_1/ffdcecc5-d14c-43be-b3c4-2857c53c08f1.pt"
+    },
+    {
+      "dataset_index": 631,
+      "kernel_family": "rule4ml",
+      "tensor_path": "rule4ml/archive_1/487280a0e2a06da5d10cef9adbd5fbb4.pt"
+    },
+    {
+      "dataset_index": 85,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e2d32045-fe85-41fa-87fd-34469cfd2b33.pt"
+    },
+    {
+      "dataset_index": 366,
+      "kernel_family": "conv2d",
+      "tensor_path": "conv2d/archive_5/8fac9f39-8d87-49ef-99fb-6909c6dbd361.pt"
+    },
+    {
+      "dataset_index": 388,
+      "kernel_family": "dense_latency",
+      "tensor_path": "dense_latency/archive_1/16fff3d4-afd3-4400-abf5-b01c877da50d.pt"
+    },
+    {
+      "dataset_index": 46,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/88f4bd06-8e7c-46a5-87d9-f0663989f0e9.pt"
+    },
+    {
+      "dataset_index": 88,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_1/e71cebc8-9c8d-4db4-af21-b5ffd3e7d1e9.pt"
+    },
+    {
+      "dataset_index": 543,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/6f78ee34-8249-459a-900a-d8aee5f203ad.pt"
+    },
+    {
+      "dataset_index": 503,
+      "kernel_family": "exemplar",
+      "tensor_path": "exemplar/archive_1/08ceef03-f529-483b-9de4-b4b67e848d56.pt"
+    },
+    {
+      "dataset_index": 476,
+      "kernel_family": "dense_resource",
+      "tensor_path": "dense_resource/archive_1/84aee444-abc3-4b80-a992-0a2f895f8ff8.pt"
+    },
+    {
+      "dataset_index": 305,
+      "kernel_family": "conv1d",
+      "tensor_path": "conv1d/archive_1/211f126c-b055-40ab-8917-34f6fc0c5eb1.pt"
+    },
+    {
+      "dataset_index": 152,
+      "kernel_family": "2layer",
+      "tensor_path": "2layer/archive_4/888e17dd-3e1c-418b-bd9d-bd7d5e56a91a.pt"
+    }
+  ]
+}

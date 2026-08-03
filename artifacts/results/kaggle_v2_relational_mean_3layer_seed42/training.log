@@ -1,0 +1,119 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W730 16:46:11.277176877 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W730 16:46:19.645545198 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hetero_relational.py:61: UserWarning: There exist node types ({'pragma'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.
+  self.conv = HeteroConv(
+[W730 16:46:20.886599644 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 1951 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 400
+    avg size: 0.71 MB
+    total size: 284.17 MB
+  3layer: 400
+    avg size: 1.10 MB
+    total size: 439.81 MB
+  conv1d: 173
+    avg size: 6.96 MB
+    total size: 1204.53 MB
+  conv2d: 81
+    avg size: 7.24 MB
+    total size: 586.26 MB
+  dense_latency: 292
+    avg size: 7.34 MB
+    total size: 2144.21 MB
+  dense_resource: 205
+    avg size: 7.28 MB
+    total size: 1493.15 MB
+  rule4ml: 400
+    avg size: 6.91 MB
+    total size: 2764.73 MB
+Indexed 400 graphs across 1 type(s)
+  exemplar: 400
+    avg size: 3.08 MB
+    total size: 1232.09 MB
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hetero_relational.py:61: UserWarning: There exist node types ({'pragma'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.
+  self.conv = HeteroConv(
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch   1/400  train=0.3807  val=0.2896
+Epoch   2/400  train=0.2962  val=0.2449
+Epoch   4/400  train=0.1957  val=0.1727
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch   6/400  train=0.1781  val=0.1665
+Epoch   8/400  train=0.1708  val=0.1457
+Epoch  10/400  train=0.1587  val=0.1415
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  12/400  train=0.1571  val=0.1638
+Epoch  14/400  train=0.1495  val=0.1448
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  16/400  train=0.1490  val=0.1379
+Epoch  18/400  train=0.1398  val=0.1455
+Epoch  20/400  train=0.1348  val=0.1207
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  22/400  train=0.1357  val=0.1181
+Epoch  24/400  train=0.1292  val=0.1156
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  26/400  train=0.1237  val=0.1075
+Epoch  28/400  train=0.1200  val=0.1103
+Epoch  30/400  train=0.1218  val=0.1104
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  32/400  train=0.1199  val=0.1101
+Epoch  34/400  train=0.1185  val=0.1148
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  36/400  train=0.1178  val=0.1063
+Epoch  38/400  train=0.1161  val=0.1059
+Epoch  40/400  train=0.1209  val=0.1088
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  42/400  train=0.1137  val=0.0986
+Epoch  44/400  train=0.1144  val=0.1055
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  46/400  train=0.1154  val=0.1325
+Epoch  48/400  train=0.1123  val=0.1006
+Epoch  50/400  train=0.1133  val=0.0963
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  52/400  train=0.1107  val=0.0968
+Epoch  54/400  train=0.1073  val=0.0982
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  56/400  train=0.1096  val=0.1041
+Epoch  58/400  train=0.1110  val=0.1092
+Epoch  60/400  train=0.1098  val=0.0960
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  62/400  train=0.1079  val=0.0964
+Epoch  64/400  train=0.1070  val=0.0995
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  66/400  train=0.1078  val=0.1021
+Epoch  68/400  train=0.1054  val=0.0986
+Epoch  70/400  train=0.1057  val=0.0857
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  72/400  train=0.1024  val=0.0926
+Epoch  74/400  train=0.1040  val=0.0975
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  76/400  train=0.1051  val=0.0970
+Epoch  78/400  train=0.1029  val=0.0885
+Epoch  80/400  train=0.1030  val=0.0892
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  82/400  train=0.1035  val=0.0916
+Epoch  84/400  train=0.1033  val=0.0935
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  86/400  train=0.1028  val=0.0916
+Epoch  88/400  train=0.1005  val=0.1039
+Epoch  90/400  train=0.1013  val=0.0922
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  92/400  train=0.1012  val=0.1020
+Epoch  94/400  train=0.1007  val=0.0876
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Epoch  96/400  train=0.1019  val=0.0950
+Epoch  98/400  train=0.0998  val=0.1013
+Epoch 100/400  train=0.0997  val=0.0987
+Early stopping triggered after 100 epochs.
+Model saved to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42/checkpoints/kaggle_v2_relational_mean_3layer_seed42_backup.pt
+Best model restored from epoch 70 with validation smape 31.7850
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/kaggle_v2_relational_mean_3layer_seed42

@@ -1,0 +1,29 @@
+{
+  "seed": 42,
+  "tensor_root": "/home/brend/projects/data/tensors",
+  "source_runs": {
+    "025": "/home/brend/projects/ll-hls4ml/artifacts/results/ll_hls4ml_gatv2_scaling_results/kaggle_v2_gatv2_1head_scale025_seed42",
+    "050": "/home/brend/projects/ll-hls4ml/artifacts/results/ll_hls4ml_gatv2_scaling_results/kaggle_v2_gatv2_1head_scale050_seed42",
+    "100": "/home/brend/projects/ll-hls4ml/artifacts/results/ll_hls4ml_gatv2_scaling_results/kaggle_v2_gatv2_1head_scale100_seed42",
+    "200": "/home/brend/projects/ll-hls4ml/artifacts/results/ll_hls4ml_gatv2_scaling_results/kaggle_v2_gatv2_1head_scale200_seed42"
+  },
+  "train_sizes": {
+    "025": 337,
+    "050": 672,
+    "100": 1342,
+    "200": 2728
+  },
+  "validation_size": 315,
+  "test_size": 294,
+  "exemplar_size": 400,
+  "feature_set": "graph (no synthesis context)",
+  "svr": {
+    "C": 10.0,
+    "epsilon": 0.05,
+    "gamma": "scale"
+  },
+  "hurdle_targets": [
+    "dsp",
+    "bram"
+  ]
+}

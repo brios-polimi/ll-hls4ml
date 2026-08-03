@@ -1,0 +1,30 @@
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hetero_gat.py:28: UserWarning: There exist node types ({'pragma'}) whose representations do not get updated during message passing as they do not occur as destination type in any edge type. This may lead to unexpected behavior.
+  self.conv = HeteroConv(
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.72 MB
+    total size: 576.36 MB
+  3layer: 800
+    avg size: 1.09 MB
+    total size: 875.00 MB
+  conv1d: 346
+    avg size: 6.97 MB
+    total size: 2412.64 MB
+  conv2d: 194
+    avg size: 7.30 MB
+    total size: 1416.81 MB
+  dense_latency: 550
+    avg size: 7.37 MB
+    total size: 4051.79 MB
+  dense_resource: 414
+    avg size: 7.40 MB
+    total size: 3062.25 MB
+  rule4ml: 800
+    avg size: 6.72 MB
+    total size: 5374.98 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 3.08 MB
+    total size: 2463.90 MB
+Wrote result bundle to /kaggle/working/results/kaggle_v2_gatv2_1head_scale025_seed42
