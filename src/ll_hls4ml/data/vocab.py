@@ -12,6 +12,7 @@ from ll_hls4ml.io.load_json import load_graph_json
 from ll_hls4ml.io.schema import (
     NODE_CONSTANT,
     NODE_BLOCK,
+    NODE_FUNCTION,
     NODE_INSTRUCTION,
     NODE_PRAGMA,
     NODE_VARIABLE,
@@ -181,6 +182,7 @@ def vocab_scan(
         "constant": {},
         "pragma": {},
         "block": {},
+        "function": {},
     }
     max_pos = 0
 
@@ -206,6 +208,8 @@ def vocab_scan(
                 vocab_counts["pragma"][term] = vocab_counts["pragma"].get(term, 0) + 1
             elif node_type == NODE_BLOCK:
                 vocab_counts["block"][term] = vocab_counts["block"].get(term, 0) + 1
+            elif node_type == NODE_FUNCTION:
+                vocab_counts["function"][term] = vocab_counts["function"].get(term, 0) + 1
 
         for link in graph_data.get("links") or []:
             position = link.get("position", 0)

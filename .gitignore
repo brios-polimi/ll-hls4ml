@@ -11,7 +11,7 @@ build/
 # Artifacts (keep directory structure via .gitkeep)
 artifacts/checkpoints/*.pt
 artifacts/exports/
-artifacts/results/
+#artifacts/results/
 artifacts/runs/
 artifacts/vocab/*.json
 .test_artifacts/*

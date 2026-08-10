@@ -11,6 +11,7 @@ from torch_geometric.nn import (
 
 from ll_hls4ml.io.schema import (
     BLOCK_FEATURE_SIZE,
+    FUNCTION_FEATURE_SIZE,
     LABEL_KEYS,
     NODE_TYPES,
     PRAGMA_ARGUMENT_SIZE,
@@ -50,6 +51,7 @@ class CDFGInputProjection(nn.Module):
         constant:    FloatTensor of shape (N, EMBED_SIZE)
         pragma:      FloatTensor of shape (N, 1 + PRAGMA_ARGUMENT_SIZE)
         block:       FloatTensor of shape (N, BLOCK_FEATURE_SIZE)
+        function:    FloatTensor of shape (N, FUNCTION_FEATURE_SIZE)
     """
 
     def __init__(
@@ -67,6 +69,7 @@ class CDFGInputProjection(nn.Module):
         self.variable_emb = MultilayerDense(variable_constant_size, hidden_dim, n_layers)
         self.constant_emb = MultilayerDense(variable_constant_size, hidden_dim, n_layers)
         self.block_emb = MultilayerDense(BLOCK_FEATURE_SIZE, hidden_dim, n_layers)
+        self.function_emb = MultilayerDense(FUNCTION_FEATURE_SIZE, hidden_dim, n_layers)
         self.pragma_emb = nn.Embedding(PRAGMA_VOCAB_SIZE, hidden_dim, padding_idx=0)
         self.pragma_arg_proj = MultilayerDense(
             PRAGMA_ARGUMENT_SIZE, hidden_dim, n_layers
@@ -84,6 +87,7 @@ class CDFGInputProjection(nn.Module):
         h_dict["variable"] = self.variable_emb(x_dict["variable"])
         h_dict["constant"] = self.constant_emb(x_dict["constant"])
         h_dict["block"] = self.block_emb(x_dict["block"])
+        h_dict["function"] = self.function_emb(x_dict["function"])
         pragma = x_dict["pragma"]
         h_dict["pragma"] = self.pragma_proj(
             torch.cat(

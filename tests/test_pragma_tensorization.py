@@ -206,7 +206,7 @@ class PragmaTensorizationTests(unittest.TestCase):
                 {
                     "source": 1,
                     "target": 0,
-                    "flow": 3,
+                    "relation": "applies_to",
                     "position": 0,
                 }
             ],
@@ -225,11 +225,19 @@ class PragmaTensorizationTests(unittest.TestCase):
     def test_tensorizes_named_blocks_and_loop_pragma_edges(self):
         graph = {
             "nodes": [
-                {"id": 0, "type": 0, "text": "br"},
+                {
+                    "id": 0,
+                    "type": 0,
+                    "text": "br",
+                    "function": 0,
+                    "block": 0,
+                },
                 {
                     "id": 1,
                     "type": 4,
                     "text": "llvm.basic_block",
+                    "function": 0,
+                    "block": 0,
                     "features": {
                         "name": ["ReuseLoop"],
                         "is_source_loop": ["true"],
@@ -244,11 +252,22 @@ class PragmaTensorizationTests(unittest.TestCase):
                         "arguments_json": [json.dumps({"ii": ["1"]})],
                     },
                 },
+                {
+                    "id": 3,
+                    "type": 5,
+                    "text": "llvm.function",
+                    "function": 0,
+                    "block": -1,
+                    "features": {
+                        "name": ["kernel"],
+                        "is_defined": ["true"],
+                    },
+                },
             ],
             "links": [
-                {"source": 1, "target": 0, "flow": 4, "position": 0},
-                {"source": 0, "target": 1, "flow": 4, "position": 0},
-                {"source": 2, "target": 1, "flow": 3, "position": 0},
+                {"source": 1, "target": 0, "relation": "contains", "position": 0},
+                {"source": 2, "target": 1, "relation": "applies_to", "position": 0},
+                {"source": 3, "target": 1, "relation": "contains", "position": 0},
             ],
         }
 

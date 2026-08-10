@@ -609,12 +609,12 @@ def _evaluate_neural(
         "hidden_dim": 64,
         "num_layers": 2,
         "dropout": 0.15,
-        "pool": "mean",
     }
-    if model_name in {"hetero_gat", "hetero_relational", "rgcn"}:
-        model_kwargs.update(
-            {"edge_pos_vocab_size": max_position, "aggr": "sum"}
-        )
+    if model_name in {"hetero_gat", "hetero_relational", "hierarchical", "rgcn"}:
+        model_kwargs["edge_pos_vocab_size"] = max_position
+        if model_name != "hierarchical":
+            model_kwargs["pool"] = "mean"
+            model_kwargs["aggr"] = "sum"
     else:
         model_kwargs.update(
             {"num_var_embed_layers": 2, "node_aggr": "concat"}

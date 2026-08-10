@@ -63,10 +63,10 @@ def analyze_graph_dataset(pt_dir, max_files=None, log_scale=True):
 
         edges = {
             "control": get_edge(("instruction", "control", "instruction")),
-            "call": get_edge(("instruction", "call", "instruction")),
-            "inst_data_var": get_edge(("instruction", "data", "variable")),
-            "var_data_inst": get_edge(("variable", "data", "instruction")),
-            "const_data_inst": get_edge(("constant", "data", "instruction")),
+            "call": get_edge(("instruction", "calls", "function")),
+            "inst_data_var": get_edge(("instruction", "defines", "variable")),
+            "var_data_inst": get_edge(("variable", "operand", "instruction")),
+            "const_data_inst": get_edge(("constant", "operand", "instruction")),
         }
 
         e_counts = {k: (v.shape[1] if v is not None else 0) for k, v in edges.items()}
@@ -114,11 +114,11 @@ def analyze_graph_dataset(pt_dir, max_files=None, log_scale=True):
         if ctrl_key in g.edge_types and g[ctrl_key].edge_attr is not None:
             control_positions.extend(g[ctrl_key].edge_attr.reshape(-1).tolist())
 
-        vdi_key = ("variable", "data", "instruction")
+        vdi_key = ("variable", "operand", "instruction")
         if vdi_key in g.edge_types and g[vdi_key].edge_attr is not None:
             var_data_positions.extend(g[vdi_key].edge_attr.reshape(-1).tolist())
 
-        cdi_key = ("constant", "data", "instruction")
+        cdi_key = ("constant", "operand", "instruction")
         if cdi_key in g.edge_types and g[cdi_key].edge_attr is not None:
             const_data_positions.extend(g[cdi_key].edge_attr.reshape(-1).tolist())
 

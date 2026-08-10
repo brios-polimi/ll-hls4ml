@@ -10,6 +10,7 @@ from ll_hls4ml.io.schema import (
     EDGE_TYPES,
     EDGE_TYPES_WITH_ATTR,
     LABEL_KEYS,
+    FUNCTION_FEATURE_SIZE,
     NODE_TYPES,
     PRAGMA_FEATURE_SIZE,
 )
@@ -23,20 +24,22 @@ def _tiny_graph(edge_position: int = 0) -> HeteroData:
     data["constant"].x = torch.zeros((1, EMBED_SIZE))
     data["pragma"].x = torch.zeros((1, PRAGMA_FEATURE_SIZE))
     data["block"].x = torch.zeros((1, BLOCK_FEATURE_SIZE))
+    data["function"].x = torch.zeros((1, FUNCTION_FEATURE_SIZE))
 
     indices = {
         ("instruction", "control", "instruction"): [[0], [1]],
-        ("instruction", "data", "variable"): [[0], [0]],
-        ("variable", "data", "instruction"): [[0], [1]],
-        ("constant", "data", "instruction"): [[0], [0]],
-        ("instruction", "call", "instruction"): [[0], [1]],
+        ("instruction", "defines", "variable"): [[0], [0]],
+        ("variable", "operand", "instruction"): [[0], [1]],
+        ("constant", "operand", "instruction"): [[0], [0]],
+        ("instruction", "calls", "function"): [[0], [0]],
         ("pragma", "applies_to", "instruction"): [[0], [0]],
         ("pragma", "applies_to", "variable"): [[0], [0]],
         ("pragma", "applies_to", "constant"): [[0], [0]],
         ("pragma", "applies_to", "block"): [[0], [0]],
+        ("pragma", "applies_to", "function"): [[0], [0]],
         ("block", "control", "block"): [[0], [0]],
         ("block", "contains", "instruction"): [[0], [0]],
-        ("instruction", "in_block", "block"): [[0], [0]],
+        ("function", "contains", "block"): [[0], [0]],
     }
     for edge_type in EDGE_TYPES:
         data[edge_type].edge_index = torch.tensor(

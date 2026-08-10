@@ -5,15 +5,49 @@ NODE_VARIABLE = 1
 NODE_CONSTANT = 2
 NODE_PRAGMA = 3
 NODE_BLOCK = 4
+NODE_FUNCTION = 5
 
-FLOW_CONTROL = 0
-FLOW_DATA = 1
-FLOW_CALL = 2
-FLOW_PRAGMA = 3
-FLOW_BLOCK = 4
+NODE_TYPE_NAMES = {
+    NODE_INSTRUCTION: "instruction",
+    NODE_VARIABLE: "variable",
+    NODE_CONSTANT: "constant",
+    NODE_PRAGMA: "pragma",
+    NODE_BLOCK: "block",
+    NODE_FUNCTION: "function",
+}
+# Canonical JSON relations. Endpoint types carry most semantics; the relation
+# remains explicit for validation and for the few same-endpoint alternatives.
+EDGE_TYPES = [
+    ("instruction", "control", "instruction"),
+    ("instruction", "defines", "variable"),
+    ("variable", "operand", "instruction"),
+    ("constant", "operand", "instruction"),
+    ("instruction", "calls", "function"),
+    ("pragma", "applies_to", "instruction"),
+    ("pragma", "applies_to", "variable"),
+    ("pragma", "applies_to", "constant"),
+    ("pragma", "applies_to", "block"),
+    ("pragma", "applies_to", "function"),
+    ("block", "control", "block"),
+    ("block", "contains", "instruction"),
+    ("function", "contains", "block"),
+]
+EDGE_TYPE_SET = frozenset(EDGE_TYPES)
+RELATION_NAMES = tuple(dict.fromkeys(relation for _, relation, _ in EDGE_TYPES))
 
-NODE_TYPES = ["instruction", "variable", "constant", "pragma", "block"]
+# Tensor-only adjacency derived once during preprocessing. It is intentionally
+# absent from graph JSON because it is a lossless join of defines + operand.
+DERIVED_DEF_USE_EDGE = ("instruction", "def_use", "instruction")
+
+# Hierarchy projection keys used by schema-driven visualization. Add a level
+# here when the graph producer introduces another structural node type.
+HIERARCHY_LEVEL_KEYS = {
+    "function": ("function",),
+    "block": ("function", "block"),
+}
+NODE_TYPES = list(NODE_TYPE_NAMES.values())
 BLOCK_FEATURE_SIZE = 3
+FUNCTION_FEATURE_SIZE = 2
 
 PRAGMA_VOCAB = {
     "UNK": 0,
@@ -166,21 +200,6 @@ PRAGMA_ARGUMENT_SIZE = (
 )
 PRAGMA_FEATURE_SIZE = 1 + PRAGMA_ARGUMENT_SIZE
 
-EDGE_TYPES = [
-    ("instruction", "control", "instruction"),
-    ("instruction", "data", "variable"),
-    ("variable", "data", "instruction"),
-    ("constant", "data", "instruction"),
-    ("instruction", "call", "instruction"),
-    ("pragma", "applies_to", "instruction"),
-    ("pragma", "applies_to", "variable"),
-    ("pragma", "applies_to", "constant"),
-    ("pragma", "applies_to", "block"),
-    ("block", "control", "block"),
-    ("block", "contains", "instruction"),
-    ("instruction", "in_block", "block"),
-]
-
 SELF_LOOP_EDGE_TYPES = [
     (nt, 'self', nt) for nt in NODE_TYPES
 ]
@@ -188,8 +207,8 @@ ALL_EDGE_TYPES = [*EDGE_TYPES, *SELF_LOOP_EDGE_TYPES]
 
 EDGE_TYPES_WITH_ATTR = [
     ("instruction", "control", "instruction"),
-    ("variable", "data", "instruction"),
-    ("constant", "data", "instruction"),
+    ("variable", "operand", "instruction"),
+    ("constant", "operand", "instruction"),
 ]
 
 LABEL_KEYS = [

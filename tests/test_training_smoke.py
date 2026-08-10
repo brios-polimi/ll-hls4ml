@@ -26,7 +26,7 @@ class TrainingSmokeTests(unittest.TestCase):
 
         graph = {
             "nodes": [
-                {"id": 0, "type": 0, "text": "add"},
+                {"id": 0, "type": 0, "text": "add", "function": 0, "block": 0},
                 {"id": 1, "type": 1, "text": "ap_fixed<16, 6, AP_TRN, AP_WRAP>"},
                 {"id": 2, "type": 2, "text": "i32"},
                 {
@@ -44,23 +44,32 @@ class TrainingSmokeTests(unittest.TestCase):
                     "id": 4,
                     "type": 4,
                     "text": "llvm.basic_block",
+                    "function": 0,
+                    "block": 0,
                     "features": {
                         "name": ["ReuseLoop"],
                         "is_source_loop": ["true"],
                     },
                 },
+                {
+                    "id": 5,
+                    "type": 5,
+                    "text": "llvm.function",
+                    "function": 0,
+                    "block": -1,
+                    "features": {"name": ["kernel"], "is_defined": ["true"]},
+                },
             ],
             "links": [
-                {"source": 0, "target": 0, "flow": 0, "position": 0},
-                {"source": 0, "target": 1, "flow": 1, "position": 0},
-                {"source": 1, "target": 0, "flow": 1, "position": 1},
-                {"source": 2, "target": 0, "flow": 1, "position": 2},
-                {"source": 0, "target": 0, "flow": 2, "position": 0},
-                {"source": 3, "target": 0, "flow": 3, "position": 0},
-                {"source": 3, "target": 1, "flow": 3, "position": 0},
-                {"source": 3, "target": 4, "flow": 3, "position": 0},
-                {"source": 4, "target": 0, "flow": 4, "position": 0},
-                {"source": 0, "target": 4, "flow": 4, "position": 0},
+                {"source": 0, "target": 0, "relation": "control", "position": 0},
+                {"source": 0, "target": 1, "relation": "defines", "position": 0},
+                {"source": 1, "target": 0, "relation": "operand", "position": 1},
+                {"source": 2, "target": 0, "relation": "operand", "position": 2},
+                {"source": 3, "target": 0, "relation": "applies_to", "position": 0},
+                {"source": 3, "target": 1, "relation": "applies_to", "position": 0},
+                {"source": 3, "target": 4, "relation": "applies_to", "position": 0},
+                {"source": 4, "target": 0, "relation": "contains", "position": 0},
+                {"source": 5, "target": 4, "relation": "contains", "position": 0},
             ],
         }
         labels = [100, 200, 3, 4, 1000, 10]
@@ -124,6 +133,15 @@ class TrainingSmokeTests(unittest.TestCase):
                         "edge_pos_vocab_size": 2,
                         "pool": "multi",
                         "use_global_features": True,
+                        "use_context": True,
+                        "split_heads": True,
+                        "hurdle_heads": True,
+                    },
+                ),
+                (
+                    "hierarchical",
+                    {
+                        "edge_pos_vocab_size": 2,
                         "use_context": True,
                         "split_heads": True,
                         "hurdle_heads": True,

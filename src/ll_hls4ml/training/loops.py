@@ -7,6 +7,7 @@ import gc
 import json
 import os
 from pathlib import Path
+from contextlib import nullcontext
 
 import numpy as np
 import torch
@@ -30,6 +31,14 @@ from ll_hls4ml.training.distributed import (
 )
 from ll_hls4ml.data.splits import random_train_val_test_split
 from ll_hls4ml.io.schema import LABEL_KEYS
+
+
+def _autocast(device: torch.device, precision: str):
+    if device.type != "cuda" or precision == "float32":
+        return nullcontext()
+    if precision != "bf16":
+        raise ValueError("precision must be 'float32' or 'bf16'")
+    return torch.autocast(device_type="cuda", dtype=torch.bfloat16)
 
 
 def _use_progress_bar() -> bool:
@@ -124,6 +133,7 @@ def train_one_epoch(
     device,
     pbar=None,
     distributed: bool = False,
+    precision: str = "float32",
 ):
     model.train()
     base_model = unwrap_model(model)
@@ -132,7 +142,7 @@ def train_one_epoch(
     num_targets = len(base_model.y_means)
 
     for batch in train_loader:
-        batch = batch.to(device)
+        batch = batch.to(device, non_blocking=device.type == "cuda")
         target = normalize_target(
             batch.y.view(-1, num_targets),
             base_model.y_means,
@@ -140,8 +150,9 @@ def train_one_epoch(
         )
 
         optimizer.zero_grad(set_to_none=True)
-        pred = model(batch)
-        loss = criterion(pred, target)
+        with _autocast(device, precision):
+            pred = model(batch)
+            loss = criterion(pred, target)
         loss.backward()
         optimizer.step()
 
@@ -167,6 +178,7 @@ def validate_one_epoch(
     device,
     pbar=None,
     distributed: bool = False,
+    precision: str = "float32",
 ):
     if distributed and not is_main_process():
         return 0.0, None, None, None, None
@@ -181,15 +193,16 @@ def validate_one_epoch(
 
     with torch.no_grad():
         for batch in val_loader:
-            batch = batch.to(device)
+            batch = batch.to(device, non_blocking=device.type == "cuda")
             target = normalize_target(
                 batch.y.view(-1, num_targets),
                 base_model.y_means,
                 base_model.y_stds,
             )
 
-            pred = evaluation_model(batch)
-            loss = criterion(pred, target)
+            with _autocast(device, precision):
+                pred = evaluation_model(batch)
+                loss = criterion(pred, target)
 
             all_preds.append(
                 apply_hurdle_prediction(
@@ -245,6 +258,7 @@ def fit(
     distributed: bool = False,
     early_stopping_metric: str = "loss",
     checkpoint_interval: int = 5,
+    precision: str = "float32",
 ):
     """
     Train model with optional early stopping.
@@ -320,11 +334,11 @@ def fit(
 
         train_loss = train_one_epoch(
             model, train_loader, criterion, optimizer, device,
-            pbar=pbar, distributed=distributed,
+            pbar=pbar, distributed=distributed, precision=precision,
         )
         val_metrics = validate_one_epoch(
             model, val_loader, criterion, device,
-            pbar=pbar, distributed=distributed,
+            pbar=pbar, distributed=distributed, precision=precision,
         )
         if main:
             history.append(

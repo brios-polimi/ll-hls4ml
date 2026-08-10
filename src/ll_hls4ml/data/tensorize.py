@@ -17,20 +17,20 @@ import numpy as np
 import tqdm
 
 from ll_hls4ml.io.schema import (
+    DERIVED_DEF_USE_EDGE,
     EDGE_TYPES,
+    EDGE_TYPE_SET,
     EDGE_TYPES_WITH_ATTR,
     BLOCK_FEATURE_SIZE,
-    FLOW_BLOCK,
-    FLOW_CALL,
-    FLOW_CONTROL,
-    FLOW_DATA,
-    FLOW_PRAGMA,
+    FUNCTION_FEATURE_SIZE,
     GRAPH_CONTEXT_CATEGORICAL_VOCABS,
     GRAPH_CONTEXT_NUMERIC_KEYS,
     NODE_CONSTANT,
     NODE_BLOCK,
+    NODE_FUNCTION,
     NODE_INSTRUCTION,
     NODE_PRAGMA,
+    NODE_TYPE_NAMES,
     NODE_VARIABLE,
     LABEL_KEYS,
     PRAGMA_ARGUMENT_SIZE,
@@ -43,6 +43,7 @@ from ll_hls4ml.io.schema import (
     pragma_directive_id,
     safe_int,
 )
+from ll_hls4ml.data.hierarchy import function_schedule
 from ll_hls4ml.io.discovery import iter_graph_paths
 from ll_hls4ml.io.load_json import load_graph_json
 
@@ -140,7 +141,7 @@ def pragma_embedding(node: dict) -> np.ndarray:
                 f"Pragma argument {key!r} must contain a list on node {node.get('id')}"
             )
         if key in PRAGMA_TARGET_ARGUMENTS:
-            # Targets are represented structurally by FLOW_PRAGMA edges.
+            # Targets are represented structurally by applies_to relations.
             continue
         for raw_value in raw_values:
             value = str(raw_value)
@@ -177,6 +178,21 @@ def block_embedding(node: dict) -> np.ndarray:
     )
     return np.asarray(
         [name == "entry", bool(name), is_source_loop],
+        dtype=np.float32,
+    )
+
+
+def function_embedding(node: dict) -> np.ndarray:
+    """Encode whether the function has a body while retaining its symbol in JSON."""
+
+    features = node.get("features", {})
+    names = features.get("name", [])
+    defined_values = features.get("is_defined", [])
+    return np.asarray(
+        [
+            len(names) == 1 and bool(str(names[0])),
+            len(defined_values) == 1 and str(defined_values[0]).lower() == "true",
+        ],
         dtype=np.float32,
     )
 
@@ -394,7 +410,11 @@ def _json_to_hetero(
     const_map = {}
     pragma_map = {}
     block_map = {}
+    function_map = {}
+    function_id_map = {}
     node_type_map: dict[int, int] = {}
+    instruction_function_ids = []
+    block_function_ids = []
 
     unknown_types = set()
 
@@ -404,6 +424,7 @@ def _json_to_hetero(
         "constant": [],
         "pragma": [],
         "block": [],
+        "function": [],
     }
     nodes = graph_data.get("nodes") or []
     for n in nodes:
@@ -432,6 +453,7 @@ def _json_to_hetero(
             text_idx = instruction_vocab.get(node_text, 0)
             features["instruction"].append([text_idx])
             inst_map[node_id] = len(inst_map)
+            instruction_function_ids.append(safe_int(n.get("function", -1)))
         elif node_type == NODE_VARIABLE:
             type_emb = type_embedding(node_text)
             if type_emb[TYPE_SIZE - 1]:
@@ -451,6 +473,14 @@ def _json_to_hetero(
         elif node_type == NODE_BLOCK:
             features["block"].append(block_embedding(n))
             block_map[node_id] = len(block_map)
+            block_function_ids.append(safe_int(n.get("function", -1)))
+        elif node_type == NODE_FUNCTION:
+            features["function"].append(function_embedding(n))
+            function_map[node_id] = len(function_map)
+            function_id = safe_int(n.get("function", -1))
+            if function_id in function_id_map:
+                raise ValueError(f"Duplicate function hierarchy ID {function_id}")
+            function_id_map[function_id] = function_map[node_id]
         else:
             raise ValueError(f"Invalid node type: {node_type} in node {n}")
 
@@ -479,6 +509,12 @@ def _json_to_hetero(
         else np.empty((0, BLOCK_FEATURE_SIZE), dtype=np.float32),
         dtype=torch.float,
     )
+    data["function"].x = torch.tensor(
+        np.stack(features["function"])
+        if features["function"]
+        else np.empty((0, FUNCTION_FEATURE_SIZE), dtype=np.float32),
+        dtype=torch.float,
+    )
 
     metadata = synthesis_metadata(graph_data)
     categorical_context, numeric_context = graph_context_embedding(metadata)
@@ -490,97 +526,43 @@ def _json_to_hetero(
     )
 
 
-    edge_index = { k: [] for k in EDGE_TYPES }
-    edge_attrs = { k: [] for k in EDGE_TYPES_WITH_ATTR }
+    local_maps = {
+        NODE_INSTRUCTION: inst_map,
+        NODE_VARIABLE: var_map,
+        NODE_CONSTANT: const_map,
+        NODE_PRAGMA: pragma_map,
+        NODE_BLOCK: block_map,
+        NODE_FUNCTION: function_map,
+    }
+    edge_index = {edge_type: [] for edge_type in EDGE_TYPES}
+    edge_attrs = {edge_type: [] for edge_type in EDGE_TYPES_WITH_ATTR}
     edges = graph_data.get("links") or []
     for edge in edges:
-        flow = safe_int(edge.get("flow", -1))
         source = safe_int(edge.get("source", -1))
         target = safe_int(edge.get("target", -1))
-        if source < 0 or source >= len(nodes) or target < 0 or target >= len(nodes) or flow not in [FLOW_CONTROL, FLOW_DATA, FLOW_CALL, FLOW_PRAGMA, FLOW_BLOCK]:
-            raise ValueError(f"Invalid edge with invalid source/target/flow: {edge}")
-            
-        position = safe_int(edge.get("position", 0))
-        if max_pos is not None and position > max_pos:
-            raise ValueError(f"Invalid edge with max pos too high: {position} > {max_pos}")
-        local_idx_source = None
-        local_idx_target = None
+        relation = str(edge.get("relation", ""))
+        if source not in node_type_map or target not in node_type_map:
+            raise ValueError(f"Invalid edge source/target: {edge}")
+        source_type_id = node_type_map[source]
+        target_type_id = node_type_map[target]
+        edge_type = (
+            NODE_TYPE_NAMES[source_type_id],
+            relation,
+            NODE_TYPE_NAMES[target_type_id],
+        )
+        if edge_type not in EDGE_TYPE_SET:
+            raise ValueError(f"Edge is outside the canonical schema: {edge_type}")
+        local_source = local_maps[source_type_id].get(source)
+        local_target = local_maps[target_type_id].get(target)
+        if local_source is None or local_target is None:
+            raise ValueError(f"Could not localize canonical edge: {edge}")
+        edge_index[edge_type].append([local_source, local_target])
 
-        if flow == FLOW_CONTROL:
-            local_idx_source = inst_map.get(source)
-            local_idx_target = inst_map.get(target)
-            edge_index[("instruction", "control", "instruction")].append([local_idx_source, local_idx_target])
-            edge_attrs[("instruction", "control", "instruction")].append([position])
-        elif flow == FLOW_DATA:
-            src_type = node_type_map[source]
-            if src_type == NODE_INSTRUCTION:
-                local_idx_source = inst_map.get(source)
-                local_idx_target = var_map.get(target)
-                edge_index[("instruction", "data", "variable")].append([local_idx_source, local_idx_target])
-            elif src_type == NODE_VARIABLE:
-                local_idx_source = var_map.get(source)
-                local_idx_target = inst_map.get(target)
-                edge_index[("variable", "data", "instruction")].append([local_idx_source, local_idx_target])
-                edge_attrs[("variable", "data", "instruction")].append([position])
-            elif src_type == NODE_CONSTANT:
-                local_idx_source = const_map.get(source)
-                local_idx_target = inst_map.get(target)
-                edge_index[("constant", "data", "instruction")].append([local_idx_source, local_idx_target])
-                edge_attrs[("constant", "data", "instruction")].append([position])
-        elif flow == FLOW_CALL:
-            local_idx_source = inst_map.get(source)
-            local_idx_target = inst_map.get(target)
-            edge_index[("instruction", "call", "instruction")].append([local_idx_source, local_idx_target])
-        elif flow == FLOW_PRAGMA:
-            local_idx_source = pragma_map.get(source)
-            target_type = node_type_map[target]
-            if target_type == NODE_INSTRUCTION:
-                local_idx_target = inst_map.get(target)
-                edge_index[("pragma", "applies_to", "instruction")].append(
-                    [local_idx_source, local_idx_target]
-                )
-            elif target_type == NODE_VARIABLE:
-                local_idx_target = var_map.get(target)
-                edge_index[("pragma", "applies_to", "variable")].append(
-                    [local_idx_source, local_idx_target]
-                )
-            elif target_type == NODE_CONSTANT:
-                local_idx_target = const_map.get(target)
-                edge_index[("pragma", "applies_to", "constant")].append(
-                    [local_idx_source, local_idx_target]
-                )
-            elif target_type == NODE_BLOCK:
-                local_idx_target = block_map.get(target)
-                edge_index[("pragma", "applies_to", "block")].append(
-                    [local_idx_source, local_idx_target]
-                )
-        elif flow == FLOW_BLOCK:
-            source_type = node_type_map[source]
-            target_type = node_type_map[target]
-            if source_type == NODE_BLOCK and target_type == NODE_BLOCK:
-                local_idx_source = block_map.get(source)
-                local_idx_target = block_map.get(target)
-                edge_index[("block", "control", "block")].append(
-                    [local_idx_source, local_idx_target]
-                )
-            elif source_type == NODE_BLOCK and target_type == NODE_INSTRUCTION:
-                local_idx_source = block_map.get(source)
-                local_idx_target = inst_map.get(target)
-                edge_index[("block", "contains", "instruction")].append(
-                    [local_idx_source, local_idx_target]
-                )
-            elif source_type == NODE_INSTRUCTION and target_type == NODE_BLOCK:
-                local_idx_source = inst_map.get(source)
-                local_idx_target = block_map.get(target)
-                edge_index[("instruction", "in_block", "block")].append(
-                    [local_idx_source, local_idx_target]
-                )
-
-        if local_idx_source is None or local_idx_target is None:
-            raise ValueError(
-                f"Invalid edge indices: {local_idx_source=}, {local_idx_target=}, "
-                f"original source={source}, target={target}"
-            )
+        if edge_type in edge_attrs:
+            position = safe_int(edge.get("position", 0))
+            if position < 0 or (max_pos is not None and position > max_pos):
+                raise ValueError(f"Invalid edge position {position}: {edge}")
+            edge_attrs[edge_type].append([position])
 
     for et, v in edge_index.items():
         data[et].edge_index = (
@@ -595,6 +577,98 @@ def _json_to_hetero(
             if v
             else torch.empty((0, 1), dtype=torch.long)
         )
+
+    # Materialize the expensive relational join once, not during every epoch:
+    # instruction --defines--> variable --operand--> instruction.
+    producers_by_variable: dict[int, list[int]] = {}
+    for producer, variable in edge_index[("instruction", "defines", "variable")]:
+        producers_by_variable.setdefault(variable, []).append(producer)
+    def_use = {
+        (producer, consumer)
+        for variable, consumer in edge_index[("variable", "operand", "instruction")]
+        for producer in producers_by_variable.get(variable, ())
+    }
+    data[DERIVED_DEF_USE_EDGE].edge_index = (
+        torch.tensor(sorted(def_use), dtype=torch.long).t().contiguous()
+        if def_use
+        else torch.empty((2, 0), dtype=torch.long)
+    )
+
+    instruction_owner = [
+        function_id_map.get(function_id, -1)
+        for function_id in instruction_function_ids
+    ]
+    block_owner = [
+        function_id_map.get(function_id, -1)
+        for function_id in block_function_ids
+    ]
+    if any(owner < 0 for owner in instruction_owner + block_owner):
+        raise ValueError("Every instruction and block must belong to a function node")
+
+    block_by_instruction = {}
+    for block, instruction in edge_index[("block", "contains", "instruction")]:
+        if instruction in block_by_instruction:
+            raise ValueError(f"Instruction {instruction} has multiple block owners")
+        block_by_instruction[instruction] = block
+    function_by_block = {}
+    for function, block in edge_index[("function", "contains", "block")]:
+        if block in function_by_block:
+            raise ValueError(f"Block {block} has multiple function owners")
+        function_by_block[block] = function
+    if len(block_by_instruction) != len(inst_map):
+        raise ValueError("Every instruction requires exactly one contains edge")
+    if len(function_by_block) != len(block_map):
+        raise ValueError("Every block requires exactly one contains edge")
+    for instruction, expected_function in enumerate(instruction_owner):
+        block = block_by_instruction[instruction]
+        if function_by_block[block] != expected_function:
+            raise ValueError("Instruction metadata disagrees with containment edges")
+    for block, expected_function in enumerate(block_owner):
+        if function_by_block[block] != expected_function:
+            raise ValueError("Block metadata disagrees with containment edges")
+
+    for relation_edges in (
+        edge_index[("instruction", "control", "instruction")],
+        def_use,
+    ):
+        for source, target in relation_edges:
+            if instruction_owner[source] != instruction_owner[target]:
+                raise ValueError("Intraprocedural instruction edge crosses functions")
+    for source, target in edge_index[("block", "control", "block")]:
+        if block_owner[source] != block_owner[target]:
+            raise ValueError("Basic-block CFG edge crosses functions")
+
+    call_pairs = [
+        (instruction_owner[callsite], callee)
+        for callsite, callee in edge_index[("instruction", "calls", "function")]
+    ]
+    instruction_counts = [0] * len(function_map)
+    for owner in instruction_owner:
+        instruction_counts[owner] += 1
+    schedule = function_schedule(
+        len(function_map), call_pairs, instruction_counts
+    )
+    data["function"].call_depth = torch.tensor(schedule.depth, dtype=torch.long)
+    data["function"].is_root = torch.tensor(schedule.roots, dtype=torch.bool)
+    data["function"].is_entry = torch.tensor(schedule.entry, dtype=torch.bool)
+    data["function"].is_reachable = torch.tensor(
+        schedule.reachable, dtype=torch.bool
+    )
+    data["instruction"].call_depth = torch.tensor(
+        [
+            schedule.depth[owner] if schedule.reachable[owner] else -1
+            for owner in instruction_owner
+        ],
+        dtype=torch.long,
+    )
+    data["block"].call_depth = torch.tensor(
+        [
+            schedule.depth[owner] if schedule.reachable[owner] else -1
+            for owner in block_owner
+        ],
+        dtype=torch.long,
+    )
+    data.hierarchy_schema_version = 2
 
     # Always add all expected labels unless it is an inference-mode graph
     if not inference_mode:

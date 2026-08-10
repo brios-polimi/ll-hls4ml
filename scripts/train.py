@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+from contextlib import nullcontext
 import csv
 import json
 import os
@@ -72,7 +73,6 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         "hidden_dim": config.get("hidden_dim", 128),
         "num_layers": config.get("num_layers", 3),
         "dropout": config.get("dropout", 0.1),
-        "pool": config.get("pool", "mean"),
         "use_global_features": config.get("use_global_features", False),
         "use_context": config.get("use_context", False),
         "split_heads": config.get("split_heads", False),
@@ -84,12 +84,15 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         ),
     }
     model_name = config.get("model", "hetero_gat")
-    if model_name in {"hetero_gat", "hetero_relational", "rgcn"}:
+    if model_name != "hierarchical":
+        common["pool"] = config.get("pool", "mean")
+    if model_name in {"hetero_gat", "hetero_relational", "hierarchical", "rgcn"}:
         common["edge_pos_vocab_size"] = max_pos
-        common["aggr"] = config.get("aggr", "sum")
+        if model_name != "hierarchical":
+            common["aggr"] = config.get("aggr", "sum")
         if model_name == "hetero_relational":
             common["message_aggr"] = config.get("message_aggr", "mean")
-        else:
+        elif model_name != "hierarchical":
             common["heads"] = config.get("heads", 1)
     elif model_name == "mlp":
         common["num_var_embed_layers"] = config.get("num_var_embed_layers", 2)
@@ -141,9 +144,17 @@ def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
     started = time.perf_counter()
     with torch.no_grad():
         for batch in loader:
-            batch = batch.to(device)
+            batch = batch.to(device, non_blocking=device.type == "cuda")
+            precision = getattr(base_model, "inference_precision", "float32")
+            amp = (
+                torch.autocast(device_type="cuda", dtype=torch.bfloat16)
+                if device.type == "cuda" and precision == "bf16"
+                else nullcontext()
+            )
+            with amp:
+                raw_prediction = base_model(batch)
             normalized_prediction = apply_hurdle_prediction(
-                base_model(batch),
+                raw_prediction,
                 base_model.y_means,
                 base_model.y_stds,
                 mode=getattr(
@@ -504,6 +515,9 @@ def main() -> None:
 
     batch_size = config.get("batch_size", 4)
     num_workers = config.get("num_workers")
+    pin_memory = config.get("pin_memory")
+    prefetch_factor = config.get("prefetch_factor", 2)
+    thread_prefetch = config.get("thread_prefetch", False)
     train_sampler = None
     if config.get("family_balanced_sampling", False):
         family_counts = Counter(
@@ -529,18 +543,33 @@ def main() -> None:
         num_workers=num_workers,
         distributed=distributed,
         sampler=train_sampler,
+        pin_memory=pin_memory,
+        prefetch_factor=prefetch_factor,
+        thread_prefetch=thread_prefetch,
     )
     val_loader = make_loader(
-        val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+        val_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers,
+        pin_memory=pin_memory, prefetch_factor=prefetch_factor,
+        thread_prefetch=thread_prefetch,
     )
     test_loader = make_loader(
-        test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+        test_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers,
+        pin_memory=pin_memory, prefetch_factor=prefetch_factor,
+        thread_prefetch=thread_prefetch,
     )
     exemplar_loader = make_loader(
-        exemplar_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers
+        exemplar_ds, batch_size=batch_size, shuffle=False, num_workers=num_workers,
+        pin_memory=pin_memory, prefetch_factor=prefetch_factor,
+        thread_prefetch=thread_prefetch,
     )
 
     model = _model_from_config(config, len(vocab), max_pos, train_ds)
+    precision = config.get("precision", "float32")
+    if precision not in {"float32", "bf16"}:
+        raise ValueError("precision must be 'float32' or 'bf16'")
+    if precision == "bf16" and device.type == "cuda" and not torch.cuda.is_bf16_supported():
+        raise ValueError("This CUDA device does not support bfloat16 training")
+    model.inference_precision = precision
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.get("learning_rate", 1e-3),
@@ -675,6 +704,7 @@ def main() -> None:
                 early_stopping_metric=config.get(
                     "early_stopping_metric", "smape"
                 ),
+                precision=precision,
             )
 
         if main_process:

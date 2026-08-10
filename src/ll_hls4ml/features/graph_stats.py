@@ -17,14 +17,13 @@ from ll_hls4ml.data.tensorize import (
     type_embedding,
 )
 from ll_hls4ml.io.schema import (
-    FLOW_CONTROL,
-    FLOW_DATA,
-    FLOW_CALL,
-    FLOW_PRAGMA,
-    FLOW_BLOCK,
+    EDGE_TYPE_SET,
     NODE_BLOCK,
     NODE_CONSTANT,
     NODE_PRAGMA,
+    NODE_FUNCTION,
+    NODE_INSTRUCTION,
+    NODE_TYPE_NAMES,
     NODE_VARIABLE,
 )
 
@@ -138,39 +137,25 @@ def extract_graph_features(graph_data):
         node_type = n.get("type", -1)
         node_type_counts[node_type] += 1
 
-    num_instruction_nodes = node_type_counts[0]
-    num_variable_nodes = node_type_counts[1]
-    num_constant_nodes = node_type_counts[2]
+    num_instruction_nodes = node_type_counts[NODE_INSTRUCTION]
+    num_variable_nodes = node_type_counts[NODE_VARIABLE]
+    num_constant_nodes = node_type_counts[NODE_CONSTANT]
     num_pragma_nodes = node_type_counts[NODE_PRAGMA]
     num_block_nodes = node_type_counts[NODE_BLOCK]
+    num_function_nodes = node_type_counts[NODE_FUNCTION]
 
     instruction_ratio = num_instruction_nodes / num_nodes if num_nodes > 0 else 0.0
     variable_ratio = num_variable_nodes / num_nodes if num_nodes > 0 else 0.0
     constant_ratio = num_constant_nodes / num_nodes if num_nodes > 0 else 0.0
     pragma_ratio = num_pragma_nodes / num_nodes if num_nodes > 0 else 0.0
     block_ratio = num_block_nodes / num_nodes if num_nodes > 0 else 0.0
+    function_ratio = num_function_nodes / num_nodes if num_nodes > 0 else 0.0
 
-    flow_counts = Counter()
+    edge_type_counts = Counter()
     in_degree = Counter()
     out_degree = Counter()
 
-    flow_types = [
-        ("instruction", "control", "instruction"),
-        ("instruction", "data", "variable"),
-        ("variable", "data", "instruction"),
-        ("constant", "data", "instruction"),
-        ("instruction", "call", "instruction"),
-        ("pragma", "applies_to", "instruction"),
-        ("pragma", "applies_to", "variable"),
-        ("pragma", "applies_to", "constant"),
-        ("pragma", "applies_to", "block"),
-        ("block", "control", "block"),
-        ("block", "contains", "instruction"),
-        ("instruction", "in_block", "block"),
-    ]
-
     for e in links:
-        flow = e.get("flow", -1)
         source = e.get("source", -1)
         target = e.get("target", -1)
 
@@ -178,83 +163,23 @@ def extract_graph_features(graph_data):
         in_degree[target] += 1
         G.add_edge(source, target)
 
-        source_type = nodes[source].get("type", -1)
-        target_type = nodes[target].get("type", -1)
+        edge_type = (
+            NODE_TYPE_NAMES.get(nodes[source].get("type", -1)),
+            str(e.get("relation", "")),
+            NODE_TYPE_NAMES.get(nodes[target].get("type", -1)),
+        )
+        if edge_type not in EDGE_TYPE_SET:
+            raise ValueError(f"Unknown canonical edge type: {edge_type}")
+        edge_type_counts[edge_type] += 1
 
-        known_edge_type = False
-        if flow == FLOW_CONTROL:
-            if source_type == 0 and target_type == 0:
-                flow_counts[flow_types[0]] += 1
-                known_edge_type = True
-        elif flow == FLOW_DATA:
-            if source_type == 0 and target_type == 1:
-                flow_counts[flow_types[1]] += 1
-                known_edge_type = True
-            elif source_type == 1 and target_type == 0:
-                flow_counts[flow_types[2]] += 1
-                known_edge_type = True
-            elif source_type == 2 and target_type == 0:
-                flow_counts[flow_types[3]] += 1
-                known_edge_type = True
-        elif flow == FLOW_CALL:
-            if source_type == 0 and target_type == 0:
-                flow_counts[flow_types[4]] += 1
-                known_edge_type = True
-        elif flow == FLOW_PRAGMA:
-            if source_type == NODE_PRAGMA and target_type == 0:
-                flow_counts[flow_types[5]] += 1
-                known_edge_type = True
-            elif source_type == NODE_PRAGMA and target_type == NODE_VARIABLE:
-                flow_counts[flow_types[6]] += 1
-                known_edge_type = True
-            elif source_type == NODE_PRAGMA and target_type == NODE_CONSTANT:
-                flow_counts[flow_types[7]] += 1
-                known_edge_type = True
-            elif source_type == NODE_PRAGMA and target_type == NODE_BLOCK:
-                flow_counts[flow_types[8]] += 1
-                known_edge_type = True
-        elif flow == FLOW_BLOCK:
-            if source_type == NODE_BLOCK and target_type == NODE_BLOCK:
-                flow_counts[flow_types[9]] += 1
-                known_edge_type = True
-            elif source_type == NODE_BLOCK and target_type == 0:
-                flow_counts[flow_types[10]] += 1
-                known_edge_type = True
-            elif source_type == 0 and target_type == NODE_BLOCK:
-                flow_counts[flow_types[11]] += 1
-                known_edge_type = True
-
-        if not known_edge_type:
-            raise ValueError(
-                f"Unknown edge type with flow={flow}, "
-                f"source_type={source_type}, target_type={target_type}"
-            )
-
-    num_inst_control_inst_edges = flow_counts[flow_types[0]]
-    num_inst_data_var_edges = flow_counts[flow_types[1]]
-    num_var_data_inst_edges = flow_counts[flow_types[2]]
-    num_const_data_inst_edges = flow_counts[flow_types[3]]
-    num_inst_call_inst_edges = flow_counts[flow_types[4]]
-    num_pragma_inst_edges = flow_counts[flow_types[5]]
-    num_pragma_var_edges = flow_counts[flow_types[6]]
-    num_pragma_const_edges = flow_counts[flow_types[7]]
-    num_pragma_block_edges = flow_counts[flow_types[8]]
-    num_block_control_edges = flow_counts[flow_types[9]]
-    num_block_inst_edges = flow_counts[flow_types[10]]
-    num_inst_block_edges = flow_counts[flow_types[11]]
-
-    inst_control_inst_ratio = num_inst_control_inst_edges / num_edges if num_edges > 0 else 0.0
-    inst_data_var_ratio = num_inst_data_var_edges / num_edges if num_edges > 0 else 0.0
-    var_data_inst_ratio = num_var_data_inst_edges / num_edges if num_edges > 0 else 0.0
-    const_data_inst_ratio = num_const_data_inst_edges / num_edges if num_edges > 0 else 0.0
-    inst_call_inst_ratio = num_inst_call_inst_edges / num_edges if num_edges > 0 else 0.0
-    pragma_inst_ratio = num_pragma_inst_edges / num_edges if num_edges > 0 else 0.0
-    pragma_var_ratio = num_pragma_var_edges / num_edges if num_edges > 0 else 0.0
-    pragma_const_ratio = num_pragma_const_edges / num_edges if num_edges > 0 else 0.0
-    pragma_block_ratio = num_pragma_block_edges / num_edges if num_edges > 0 else 0.0
-    block_control_ratio = num_block_control_edges / num_edges if num_edges > 0 else 0.0
-    block_inst_ratio = num_block_inst_edges / num_edges if num_edges > 0 else 0.0
-    inst_block_ratio = num_inst_block_edges / num_edges if num_edges > 0 else 0.0
+    edge_ratios = {
+        f"edge_{source}_{relation}_{target}_ratio": (
+            edge_type_counts[(source, relation, target)] / num_edges
+            if num_edges
+            else 0.0
+        )
+        for source, relation, target in EDGE_TYPE_SET
+    }
 
     density = num_edges / (num_nodes * (num_nodes - 1)) if num_nodes > 1 else 0.0
     condensed = nx.condensation(G)
@@ -280,18 +205,7 @@ def extract_graph_features(graph_data):
         "constant_ratio": constant_ratio,
         "pragma_ratio": pragma_ratio,
         "block_ratio": block_ratio,
-        "inst_control_inst_ratio": inst_control_inst_ratio,
-        "inst_data_var_ratio": inst_data_var_ratio,
-        "var_data_inst_ratio": var_data_inst_ratio,
-        "const_data_inst_ratio": const_data_inst_ratio,
-        "inst_call_inst_ratio": inst_call_inst_ratio,
-        "pragma_inst_ratio": pragma_inst_ratio,
-        "pragma_var_ratio": pragma_var_ratio,
-        "pragma_const_ratio": pragma_const_ratio,
-        "pragma_block_ratio": pragma_block_ratio,
-        "block_control_ratio": block_control_ratio,
-        "block_inst_ratio": block_inst_ratio,
-        "inst_block_ratio": inst_block_ratio,
+        "function_ratio": function_ratio,
         "mean_in_degree": mean_in_degree,
         "max_in_degree": max_in_degree,
         "std_in_degree": std_in_degree,
@@ -299,6 +213,7 @@ def extract_graph_features(graph_data):
         "max_out_degree": max_out_degree,
         "std_out_degree": std_out_degree,
     }
+    features.update(edge_ratios)
     features.update(geometry_features)
     features.update(semantic_type_stats(nodes))
 

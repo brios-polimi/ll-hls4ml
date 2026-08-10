@@ -8,6 +8,7 @@ import torch.nn as nn
 from ll_hls4ml.data.tensorize import EMBED_SIZE
 from ll_hls4ml.io.schema import (
     BLOCK_FEATURE_SIZE,
+    FUNCTION_FEATURE_SIZE,
     PRAGMA_ARGUMENT_SIZE,
     PRAGMA_VOCAB_SIZE,
 )
@@ -42,6 +43,7 @@ class CDFGInputProjection(nn.Module):
         self.variable_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.constant_proj = _dense_projection(EMBED_SIZE, hidden_dim)
         self.block_proj = _dense_projection(BLOCK_FEATURE_SIZE, hidden_dim)
+        self.function_proj = _dense_projection(FUNCTION_FEATURE_SIZE, hidden_dim)
         self.edge_pos_emb = nn.Embedding(edge_pos_vocab_size + 1, hidden_dim)
 
     def forward(self, x_dict, edge_attr_dict):
@@ -52,6 +54,7 @@ class CDFGInputProjection(nn.Module):
             "variable": self.variable_proj(x_dict["variable"].float()),
             "constant": self.constant_proj(x_dict["constant"].float()),
             "block": self.block_proj(x_dict["block"].float()),
+            "function": self.function_proj(x_dict["function"].float()),
             "pragma": self.pragma_proj(
                 torch.cat(
                     [
