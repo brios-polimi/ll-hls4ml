@@ -244,6 +244,23 @@ def feature_statistics(cache: dict, tensor_paths: list[str]):
     return means, stds
 
 
+def _processed_layer_features(raw, means, stds):
+    numerical = (raw[:, NUMERICAL_INDICES] - means) / stds
+    layer_type = F.one_hot(
+        raw[:, 9].long().clamp(0, LAYER_TYPE_CLASSES - 1),
+        LAYER_TYPE_CLASSES,
+    ).float()
+    activation = F.one_hot(
+        raw[:, 10].long().clamp(0, ACTIVATION_CLASSES - 1),
+        ACTIVATION_CLASSES,
+    ).float()
+    padding = F.one_hot(
+        raw[:, 14].long().clamp(0, PADDING_CLASSES - 1),
+        PADDING_CLASSES,
+    ).float()
+    return torch.cat([numerical, layer_type, activation, padding], dim=-1)
+
+
 class HighLevelLayerDataset(Dataset):
     """Preprocessed homogeneous layer graphs for one saved split."""
 
@@ -258,20 +275,7 @@ class HighLevelLayerDataset(Dataset):
         self.graphs = []
         for index, path in enumerate(self.tensor_paths):
             raw = cache["samples"][path]["features"]
-            numerical = (raw[:, NUMERICAL_INDICES] - means) / stds
-            layer_type = F.one_hot(
-                raw[:, 9].long().clamp(0, LAYER_TYPE_CLASSES - 1),
-                LAYER_TYPE_CLASSES,
-            ).float()
-            activation = F.one_hot(
-                raw[:, 10].long().clamp(0, ACTIVATION_CLASSES - 1),
-                ACTIVATION_CLASSES,
-            ).float()
-            padding = F.one_hot(
-                raw[:, 14].long().clamp(0, PADDING_CLASSES - 1),
-                PADDING_CLASSES,
-            ).float()
-            x = torch.cat([numerical, layer_type, activation, padding], dim=-1)
+            x = _processed_layer_features(raw, means, stds)
             node_count = len(x)
             edge_index = (
                 torch.stack([torch.arange(node_count - 1), torch.arange(1, node_count)])
@@ -288,3 +292,73 @@ class HighLevelLayerDataset(Dataset):
 
     def __getitem__(self, index):
         return self.graphs[index]
+
+
+class CDFGHighLevelDataset(Dataset):
+    """Attach an aligned high-level layer graph to each lazy CDFG sample."""
+
+    def __init__(self, cdfg_dataset, indices, cache: dict, means, stds):
+        self.dataset = cdfg_dataset
+        self.indices = [int(index) for index in indices]
+        root = Path(cdfg_dataset.root)
+        self.tensor_paths = [
+            cdfg_dataset.paths[index].relative_to(root).as_posix()
+            for index in self.indices
+        ]
+        self.targets = cdfg_dataset.targets[
+            torch.as_tensor(self.indices, dtype=torch.long)
+        ]
+        self.families = [cdfg_dataset.type_of(index) for index in self.indices]
+        high_level_targets = torch.stack(
+            [cache["samples"][path]["target"] for path in self.tensor_paths]
+        )
+        if not torch.allclose(self.targets, high_level_targets):
+            raise ValueError("CDFG and high-level targets are not aligned")
+        processed = [
+            _processed_layer_features(
+                cache["samples"][path]["features"], means, stds
+            )
+            for path in self.tensor_paths
+        ]
+        sizes = torch.tensor([len(features) for features in processed])
+        self.offsets = torch.cat([torch.zeros(1, dtype=torch.long), sizes.cumsum(0)])
+        self.layer_features = torch.cat(processed)
+        self.strategies = torch.stack(
+            [
+                F.one_hot(
+                    cache["samples"][path]["features"][0, 8].long(), 2
+                ).float()
+                for path in self.tensor_paths
+            ]
+        )
+        self.io_types = torch.stack(
+            [
+                F.one_hot(
+                    cache["samples"][path]["features"][0, 17].long(), 2
+                ).float()
+                for path in self.tensor_paths
+            ]
+        )
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, index):
+        data = self.dataset[self.indices[index]]
+        start = int(self.offsets[index])
+        stop = int(self.offsets[index + 1])
+        layer_features = self.layer_features[start:stop]
+        layer_count = len(layer_features)
+        data["high_level_layer"].x = layer_features
+        data[
+            ("high_level_layer", "next", "high_level_layer")
+        ].edge_index = (
+            torch.stack(
+                [torch.arange(layer_count - 1), torch.arange(1, layer_count)]
+            )
+            if layer_count > 1
+            else torch.empty((2, 0), dtype=torch.long)
+        )
+        data.high_level_strategy = self.strategies[index].unsqueeze(0)
+        data.high_level_io_type = self.io_types[index].unsqueeze(0)
+        return data

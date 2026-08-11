@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 import hashlib
 import math
 from pathlib import Path
@@ -11,6 +11,59 @@ import re
 
 import torch
 from torch.utils.data import Subset, random_split
+
+
+def saved_manifest_split(
+    dataset,
+    manifest: dict,
+    tensor_root: str | Path,
+    split_names: tuple[str, ...],
+    *,
+    require_all: bool = True,
+):
+    """Select exact saved split membership by relative tensor path."""
+    tensor_root = Path(tensor_root)
+    index_by_path = {
+        path.relative_to(tensor_root).as_posix(): index
+        for index, path in enumerate(dataset.paths)
+    }
+    manifest_paths = [
+        row["tensor_path"]
+        for name in split_names
+        for row in manifest[name]
+    ]
+    duplicates = [
+        path for path, count in Counter(manifest_paths).items() if count > 1
+    ]
+    if duplicates:
+        raise ValueError(
+            f"Saved split manifest contains duplicate paths: {duplicates[:5]}"
+        )
+    unexpected = sorted(set(index_by_path) - set(manifest_paths))
+    if unexpected:
+        raise ValueError(
+            f"{len(unexpected)} indexed tensors are absent from the saved "
+            f"manifest; first: {unexpected[:5]}"
+        )
+
+    subsets = []
+    coverage = {}
+    for name in split_names:
+        requested = [row["tensor_path"] for row in manifest[name]]
+        missing = [path for path in requested if path not in index_by_path]
+        if require_all and missing:
+            raise ValueError(
+                f"Saved {name} split is missing {len(missing)} tensors; "
+                f"first: {missing[:5]}"
+            )
+        indices = [index_by_path[path] for path in requested if path in index_by_path]
+        subsets.append(Subset(dataset, indices))
+        coverage[name] = {
+            "requested": len(requested),
+            "selected": len(indices),
+            "missing": len(missing),
+        }
+    return (*subsets, coverage)
 
 
 def random_train_val_test_split(

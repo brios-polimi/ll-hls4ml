@@ -10,6 +10,7 @@ from ll_hls4ml.models.hetero_relational import (
 )
 from ll_hls4ml.models.input_projection import CDFGInputProjection
 from ll_hls4ml.models.hierarchical import CDFGHierarchical
+from ll_hls4ml.models.fusion import HierarchicalHighLevelFusion
 
 __all__ = [
     "build",
@@ -21,4 +22,5 @@ __all__ = [
     "EdgeAwareRelationConv",
     "CDFGInputProjection",
     "CDFGHierarchical",
+    "HierarchicalHighLevelFusion",
 ]

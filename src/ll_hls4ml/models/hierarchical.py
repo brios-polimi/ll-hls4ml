@@ -130,6 +130,7 @@ class CDFGHierarchical(nn.Module):
         context_mode: str = "core",
         hurdle_heads: bool = False,
         hurdle_prediction_mode: str = "expected",
+        build_head: bool = True,
     ):
         super().__init__()
         if hurdle_heads and not split_heads:
@@ -187,21 +188,24 @@ class CDFGHierarchical(nn.Module):
         if use_context:
             self.context_encoder = GraphContextEncoder(hidden_dim, context_mode)
             classifier_dim += hidden_dim
-        self.classifier = (
-            SplitRegressionHead(
-                classifier_dim,
-                hidden_dim,
-                dropout,
-                hurdle_heads=hurdle_heads,
+        self.output_dim = classifier_dim
+        self.classifier = None
+        if build_head:
+            self.classifier = (
+                SplitRegressionHead(
+                    classifier_dim,
+                    hidden_dim,
+                    dropout,
+                    hurdle_heads=hurdle_heads,
+                )
+                if split_heads
+                else nn.Sequential(
+                    nn.Linear(classifier_dim, hidden_dim),
+                    nn.ReLU(),
+                    nn.Dropout(dropout),
+                    nn.Linear(hidden_dim, len(LABEL_KEYS)),
+                )
             )
-            if split_heads
-            else nn.Sequential(
-                nn.Linear(classifier_dim, hidden_dim),
-                nn.ReLU(),
-                nn.Dropout(dropout),
-                nn.Linear(hidden_dim, len(LABEL_KEYS)),
-            )
-        )
 
     @staticmethod
     def _owners(data):
@@ -220,7 +224,7 @@ class CDFGHierarchical(nn.Module):
             raise ValueError("Incomplete instruction/block/function containment")
         return instruction_block, block_function
 
-    def forward(self, data):
+    def encode(self, data):
         versions = torch.as_tensor(
             data.hierarchy_schema_version,
             device=data["instruction"].x.device,
@@ -434,4 +438,9 @@ class CDFGHierarchical(nn.Module):
             features.append(self.global_features(data))
         if self.use_context:
             features.append(self.context_encoder(data))
-        return self.classifier(torch.cat(features, dim=-1))
+        return torch.cat(features, dim=-1)
+
+    def forward(self, data):
+        if self.classifier is None:
+            raise RuntimeError("This hierarchical encoder has no prediction head")
+        return self.classifier(self.encode(data))

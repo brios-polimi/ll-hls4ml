@@ -12,6 +12,7 @@ import os
 import random
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -32,6 +33,7 @@ from ll_hls4ml.data.splits import (
     limit_subset_archives,
     nested_group_train_subset,
     random_train_val_test_split,
+    saved_manifest_split,
 )
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.models.registry import build
@@ -84,16 +86,34 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         ),
     }
     model_name = config.get("model", "hetero_gat")
-    if model_name != "hierarchical":
+    hierarchical_models = {
+        "hierarchical",
+        "hierarchical_high_level_fusion",
+    }
+    if model_name not in hierarchical_models:
         common["pool"] = config.get("pool", "mean")
-    if model_name in {"hetero_gat", "hetero_relational", "hierarchical", "rgcn"}:
+    if model_name in {
+        "hetero_gat",
+        "hetero_relational",
+        "hierarchical",
+        "hierarchical_high_level_fusion",
+        "rgcn",
+    }:
         common["edge_pos_vocab_size"] = max_pos
-        if model_name != "hierarchical":
+        if model_name not in hierarchical_models:
             common["aggr"] = config.get("aggr", "sum")
         if model_name == "hetero_relational":
             common["message_aggr"] = config.get("message_aggr", "mean")
-        elif model_name != "hierarchical":
+        elif model_name not in hierarchical_models:
             common["heads"] = config.get("heads", 1)
+        elif model_name == "hierarchical_high_level_fusion":
+            from ll_hls4ml.data.high_level import PROCESSED_FEATURE_DIM
+
+            common["heads"] = config.get("heads", 1)
+            common["high_level_input_dim"] = PROCESSED_FEATURE_DIM
+            common["high_level_encoder"] = config.get(
+                "high_level_encoder", "gatv2"
+            )
     elif model_name == "mlp":
         common["num_var_embed_layers"] = config.get("num_var_embed_layers", 2)
         common["node_aggr"] = config.get("node_aggr", "concat")
@@ -394,6 +414,9 @@ def main() -> None:
     with config_file.open() as handle:
         config = yaml.safe_load(handle)
     config_dir = config_file.parent
+    if config.get("worker_tmpdir"):
+        os.environ["TMPDIR"] = str(config["worker_tmpdir"])
+        tempfile.tempdir = None
 
     _rank, world_size, local_rank = setup_from_env()
     distributed = world_size > 1
@@ -447,18 +470,40 @@ def main() -> None:
         max_per_type=None,
         silent=not main_process,
     )
-    exemplar_ds = Subset(exemplar_dataset, range(len(exemplar_dataset)))
-    split_fn = (
-        random_train_val_test_split
-        if config.get("split_strategy") == "random"
-        else benchmark_train_val_test_split
-    )
-    train_ds, val_ds, test_ds = split_fn(
-        dataset,
-        val_fraction=config.get("val_fraction", 0.15),
-        test_fraction=config.get("test_fraction", 0.15),
-        seed=seed,
-    )
+    split_coverage = None
+    split_manifest_path = config.get("split_manifest_path")
+    if split_manifest_path:
+        split_manifest_path = _config_path(split_manifest_path, config_dir)
+        saved_manifest = json.loads(split_manifest_path.read_text())
+        strict_manifest = config.get("require_complete_split_manifest", True)
+        train_ds, val_ds, test_ds, split_coverage = saved_manifest_split(
+            dataset,
+            saved_manifest,
+            tensor_dir,
+            ("train", "validation", "test"),
+            require_all=strict_manifest,
+        )
+        exemplar_ds, exemplar_coverage = saved_manifest_split(
+            exemplar_dataset,
+            saved_manifest,
+            tensor_dir,
+            ("exemplar",),
+            require_all=strict_manifest,
+        )
+        split_coverage.update(exemplar_coverage)
+    else:
+        exemplar_ds = Subset(exemplar_dataset, range(len(exemplar_dataset)))
+        split_fn = (
+            random_train_val_test_split
+            if config.get("split_strategy") == "random"
+            else benchmark_train_val_test_split
+        )
+        train_ds, val_ds, test_ds = split_fn(
+            dataset,
+            val_fraction=config.get("val_fraction", 0.15),
+            test_fraction=config.get("test_fraction", 0.15),
+            seed=seed,
+        )
     data_scale_manifest = None
     if config.get("train_scale") is not None:
         train_scale = float(config["train_scale"])
@@ -512,6 +557,38 @@ def main() -> None:
         )
     if not exemplar_ds:
         raise ValueError("No exemplar tensors found in the tensor directory")
+
+    if config.get("model") == "hierarchical_high_level_fusion":
+        from ll_hls4ml.data.high_level import (
+            CDFGHighLevelDataset,
+            feature_statistics,
+        )
+
+        cache_path = _config_path(config["high_level_cache"], config_dir)
+        high_level_cache = torch.load(cache_path, weights_only=False)
+        train_paths = [
+            dataset.paths[index].relative_to(tensor_dir).as_posix()
+            for index in train_ds.indices
+        ]
+        high_level_means, high_level_stds = feature_statistics(
+            high_level_cache, train_paths
+        )
+        train_ds = CDFGHighLevelDataset(
+            dataset, train_ds.indices, high_level_cache,
+            high_level_means, high_level_stds,
+        )
+        val_ds = CDFGHighLevelDataset(
+            dataset, val_ds.indices, high_level_cache,
+            high_level_means, high_level_stds,
+        )
+        test_ds = CDFGHighLevelDataset(
+            dataset, test_ds.indices, high_level_cache,
+            high_level_means, high_level_stds,
+        )
+        exemplar_ds = CDFGHighLevelDataset(
+            exemplar_dataset, exemplar_ds.indices, high_level_cache,
+            high_level_means, high_level_stds,
+        )
 
     batch_size = config.get("batch_size", 4)
     num_workers = config.get("num_workers")
@@ -646,6 +723,10 @@ def main() -> None:
         "device": str(device),
         "torch_version": torch.__version__,
         "seed": seed,
+        "split_manifest_path": (
+            str(split_manifest_path) if split_manifest_path else None
+        ),
+        "split_manifest_coverage": split_coverage,
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
     }
     if main_process:
