@@ -24,7 +24,13 @@ def _messages(
     edge_features: torch.Tensor | None = None,
 ) -> torch.Tensor:
     if edge_index.numel() == 0:
-        return source.new_zeros((target_count, source.size(-1)))
+        # Sparse graph batches can omit an otherwise valid relation on one DDP
+        # rank. Preserve a zero-gradient dependency on the source projection so
+        # every rank reduces the same parameters without changing the message.
+        zero = source.sum(dim=0, keepdim=True)
+        if edge_features is not None:
+            zero = zero + edge_features.sum(dim=0, keepdim=True)
+        return zero.expand(target_count, -1) * 0
     values = source[edge_index[0]]
     if edge_features is not None:
         values = values + edge_features
@@ -43,7 +49,9 @@ def _reverse_messages(
     source_count: int,
 ) -> torch.Tensor:
     if edge_index.numel() == 0:
-        return target.new_zeros((source_count, target.size(-1)))
+        return target.sum(dim=0, keepdim=True).expand(
+            source_count, -1
+        ) * 0
     return scatter(
         target[edge_index[1]],
         edge_index[0],

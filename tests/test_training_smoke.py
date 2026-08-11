@@ -15,6 +15,31 @@ except ImportError:
 
 @unittest.skipUnless(torch is not None, "requires PyTorch and PyG")
 class TrainingSmokeTests(unittest.TestCase):
+    def test_empty_hierarchy_messages_keep_zero_gradient_paths(self):
+        from ll_hls4ml.models.hierarchical import _messages, _reverse_messages
+
+        projection = torch.nn.Linear(3, 4)
+        edge_projection = torch.nn.Embedding(2, 4)
+        empty_source = projection(torch.empty((0, 3)))
+        empty_edge_features = edge_projection(torch.empty(0, dtype=torch.long))
+        empty_edges = torch.empty((2, 0), dtype=torch.long)
+
+        forward = _messages(
+            empty_source,
+            empty_edges,
+            target_count=2,
+            edge_features=empty_edge_features,
+        )
+        reverse = _reverse_messages(empty_source, empty_edges, source_count=2)
+        (forward.sum() + reverse.sum()).backward()
+
+        self.assertIsNotNone(projection.weight.grad)
+        self.assertIsNotNone(projection.bias.grad)
+        self.assertIsNotNone(edge_projection.weight.grad)
+        self.assertTrue(torch.count_nonzero(projection.weight.grad) == 0)
+        self.assertTrue(torch.count_nonzero(projection.bias.grad) == 0)
+        self.assertTrue(torch.count_nonzero(edge_projection.weight.grad) == 0)
+
     def test_json_tensorization_and_training_for_both_models(self):
         from ll_hls4ml.data.dataset import HeteroGraphDataset
         from ll_hls4ml.data.tensorize import create_graph_tensors
