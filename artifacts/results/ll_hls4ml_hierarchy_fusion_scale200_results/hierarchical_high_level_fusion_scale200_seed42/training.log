@@ -1,0 +1,376 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W811 19:54:37.243270701 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W811 19:54:46.309667458 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W811 19:54:46.338255951 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.62 MB
+    total size: 496.43 MB
+  3layer: 800
+    avg size: 0.92 MB
+    total size: 737.16 MB
+  conv1d: 346
+    avg size: 5.82 MB
+    total size: 2015.27 MB
+  conv2d: 194
+    avg size: 6.05 MB
+    total size: 1173.97 MB
+  dense_latency: 550
+    avg size: 6.11 MB
+    total size: 3358.46 MB
+  dense_resource: 414
+    avg size: 6.10 MB
+    total size: 2526.88 MB
+  rule4ml: 800
+    avg size: 5.82 MB
+    total size: 4658.69 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 2.67 MB
+    total size: 2131.49 MB
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch   1/400  train=0.2903  val=0.2080
+Epoch   2/400  train=0.1784  val=0.1433
+Epoch   4/400  train=0.1310  val=0.1060
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch   6/400  train=0.1156  val=0.1190
+Epoch   8/400  train=0.1008  val=0.0845
+Epoch  10/400  train=0.0969  val=0.0768
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  12/400  train=0.0922  val=0.0852
+Epoch  14/400  train=0.0888  val=0.0735
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  16/400  train=0.0849  val=0.0678
+Epoch  18/400  train=0.0832  val=0.0796
+Epoch  20/400  train=0.0806  val=0.0694
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  22/400  train=0.0778  val=0.0640
+Epoch  24/400  train=0.0751  val=0.0620
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  26/400  train=0.0710  val=0.0719
+Epoch  28/400  train=0.0735  val=0.0518
+Epoch  30/400  train=0.0692  val=0.0582
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  32/400  train=0.0682  val=0.0561
+Epoch  34/400  train=0.0691  val=0.0525
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  36/400  train=0.0663  val=0.0614
+Epoch  38/400  train=0.0680  val=0.0571
+Epoch  40/400  train=0.0647  val=0.0612
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  42/400  train=0.0646  val=0.0567
+Epoch  44/400  train=0.0638  val=0.0537
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  46/400  train=0.0613  val=0.0541
+Epoch  48/400  train=0.0611  val=0.0536
+Epoch  50/400  train=0.0606  val=0.0451
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  52/400  train=0.0614  val=0.0508
+Epoch  54/400  train=0.0586  val=0.0466
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  56/400  train=0.0590  val=0.0443
+Epoch  58/400  train=0.0584  val=0.0476
+Epoch  60/400  train=0.0594  val=0.0523
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  62/400  train=0.0594  val=0.0445
+Epoch  64/400  train=0.0599  val=0.0451
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  66/400  train=0.0570  val=0.0467
+Epoch  68/400  train=0.0561  val=0.0467
+Epoch  70/400  train=0.0571  val=0.0445
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  72/400  train=0.0568  val=0.0465
+Epoch  74/400  train=0.0570  val=0.0434
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  76/400  train=0.0559  val=0.0459
+Epoch  78/400  train=0.0542  val=0.0451
+Epoch  80/400  train=0.0550  val=0.0475
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  82/400  train=0.0538  val=0.0475
+Epoch  84/400  train=0.0556  val=0.0432
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  86/400  train=0.0562  val=0.0457
+Epoch  88/400  train=0.0541  val=0.0470
+Epoch  90/400  train=0.0536  val=0.0471
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  92/400  train=0.0523  val=0.0445
+Epoch  94/400  train=0.0509  val=0.0444
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch  96/400  train=0.0503  val=0.0450
+Epoch  98/400  train=0.0538  val=0.0470
+Epoch 100/400  train=0.0497  val=0.0432
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 102/400  train=0.0531  val=0.0422
+Epoch 104/400  train=0.0515  val=0.0461
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 106/400  train=0.0519  val=0.0390
+Epoch 108/400  train=0.0495  val=0.0404
+Epoch 110/400  train=0.0510  val=0.0403
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 112/400  train=0.0485  val=0.0432
+Epoch 114/400  train=0.0490  val=0.0475
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 116/400  train=0.0489  val=0.0440
+Epoch 118/400  train=0.0482  val=0.0427
+Epoch 120/400  train=0.0485  val=0.0425
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 122/400  train=0.0501  val=0.0432
+Epoch 124/400  train=0.0484  val=0.0422
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 126/400  train=0.0477  val=0.0462
+Epoch 128/400  train=0.0492  val=0.0450
+Epoch 130/400  train=0.0478  val=0.0401
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 132/400  train=0.0471  val=0.0444
+Epoch 134/400  train=0.0482  val=0.0413
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 136/400  train=0.0479  val=0.0391
+Epoch 138/400  train=0.0477  val=0.0371
+Epoch 140/400  train=0.0479  val=0.0401
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 142/400  train=0.0468  val=0.0471
+Epoch 144/400  train=0.0475  val=0.0411
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 146/400  train=0.0450  val=0.0436
+Epoch 148/400  train=0.0464  val=0.0379
+Epoch 150/400  train=0.0479  val=0.0423
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 152/400  train=0.0455  val=0.0381
+Epoch 154/400  train=0.0469  val=0.0402
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 156/400  train=0.0473  val=0.0414
+Epoch 158/400  train=0.0459  val=0.0415
+Epoch 160/400  train=0.0453  val=0.0387
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 162/400  train=0.0461  val=0.0439
+Epoch 164/400  train=0.0450  val=0.0401
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 166/400  train=0.0459  val=0.0474
+Epoch 168/400  train=0.0452  val=0.0419
+Epoch 170/400  train=0.0450  val=0.0433
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 172/400  train=0.0459  val=0.0442
+Epoch 174/400  train=0.0451  val=0.0386
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 176/400  train=0.0435  val=0.0397
+Epoch 178/400  train=0.0441  val=0.0372
+Epoch 180/400  train=0.0442  val=0.0382
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+W0812 01:24:34.609000 4953 torch/distributed/elastic/agent/server/api.py:739] Received 2 death signal, shutting down workers
+W0812 01:24:34.611000 4953 torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 4961 closing signal SIGINT
+W0812 01:24:34.612000 4953 torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 4962 closing signal SIGINT
+Exception in thread Thread-1 (_pin_memory_loop):
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/threading.py", line 1075, in _bootstrap_inner
+    self.run()
+  File "/usr/lib/python3.12/threading.py", line 1012, in run
+    self._target(*self._args, **self._kwargs)
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/data/_utils/pin_memory.py", line 52, in _pin_memory_loop
+    do_one_step()
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/data/_utils/pin_memory.py", line 28, in do_one_step
+    r = in_queue.get(timeout=MP_STATUS_CHECK_INTERVAL)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 122, in get
+    return _ForkingPickler.loads(res)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/multiprocessing/reductions.py", line 540, in rebuild_storage_fd
+    fd = df.detach()
+         ^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/resource_sharer.py", line 57, in detach
+    with _resource_sharer.get_connection(self._id) as conn:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/resource_sharer.py", line 86, in get_connection
+    c = Client(address, authkey=process.current_process().authkey)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 519, in Client
+    c = SocketClient(address)
+        ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 647, in SocketClient
+    s.connect(address)
+FileNotFoundError: [Errno 2] No such file or directory
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 885, in <module>
+[rank0]:     main()
+[rank0]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 768, in main
+[rank0]:     model = fit(
+[rank0]:             ^^^^
+[rank0]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 335, in fit
+[rank0]:     train_loss = train_one_epoch(
+[rank0]:                  ^^^^^^^^^^^^^^^^
+[rank0]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 156, in train_one_epoch
+[rank0]:     loss.backward()
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 630, in backward
+[rank0]:     torch.autograd.backward(
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/__init__.py", line 364, in backward
+[rank0]:     _engine_run_backward(
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 865, in _engine_run_backward
+[rank0]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 885, in <module>
+[rank1]:     main()
+[rank1]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 768, in main
+[rank1]:     model = fit(
+[rank1]:             ^^^^
+[rank1]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 335, in fit
+[rank1]:     train_loss = train_one_epoch(
+[rank1]:                  ^^^^^^^^^^^^^^^^
+[rank1]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 156, in train_one_epoch
+[rank1]:     loss.backward()
+[rank1]:   File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 630, in backward
+[rank1]:     torch.autograd.backward(
+[rank1]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/__init__.py", line 364, in backward
+[rank1]:     _engine_run_backward(
+[rank1]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 865, in _engine_run_backward
+[rank1]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]: KeyboardInterrupt
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 995, in <module>
+    main()
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 991, in main
+    run(args)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 982, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 4953 got signal: 2
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W812 10:07:22.998310655 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W812 10:07:34.054158381 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W812 10:07:34.054743796 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.62 MB
+    total size: 496.43 MB
+  3layer: 800
+    avg size: 0.92 MB
+    total size: 737.16 MB
+  conv1d: 346
+    avg size: 5.82 MB
+    total size: 2015.27 MB
+  conv2d: 194
+    avg size: 6.05 MB
+    total size: 1173.97 MB
+  dense_latency: 550
+    avg size: 6.11 MB
+    total size: 3358.46 MB
+  dense_resource: 414
+    avg size: 6.10 MB
+    total size: 2526.88 MB
+  rule4ml: 800
+    avg size: 5.82 MB
+    total size: 4658.69 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 2.67 MB
+    total size: 2131.49 MB
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch 182/400  train=0.0450  val=0.0377
+Epoch 184/400  train=0.0423  val=0.0373
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 186/400  train=0.0430  val=0.0375
+Epoch 188/400  train=0.0448  val=0.0397
+Epoch 190/400  train=0.0444  val=0.0372
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 192/400  train=0.0429  val=0.0376
+Epoch 194/400  train=0.0430  val=0.0420
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 196/400  train=0.0442  val=0.0385
+Epoch 198/400  train=0.0425  val=0.0364
+Epoch 200/400  train=0.0438  val=0.0388
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 202/400  train=0.0425  val=0.0406
+Epoch 204/400  train=0.0418  val=0.0430
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 206/400  train=0.0433  val=0.0394
+Epoch 208/400  train=0.0436  val=0.0372
+Epoch 210/400  train=0.0422  val=0.0381
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 212/400  train=0.0427  val=0.0406
+Epoch 214/400  train=0.0417  val=0.0398
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 216/400  train=0.0420  val=0.0393
+Epoch 218/400  train=0.0422  val=0.0364
+Epoch 220/400  train=0.0410  val=0.0387
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 222/400  train=0.0435  val=0.0386
+Epoch 224/400  train=0.0418  val=0.0406
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 226/400  train=0.0409  val=0.0388
+Epoch 228/400  train=0.0395  val=0.0365
+Epoch 230/400  train=0.0415  val=0.0436
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 232/400  train=0.0400  val=0.0396
+Epoch 234/400  train=0.0418  val=0.0419
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 236/400  train=0.0413  val=0.0445
+Epoch 238/400  train=0.0432  val=0.0431
+Epoch 240/400  train=0.0419  val=0.0389
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 242/400  train=0.0410  val=0.0431
+Epoch 244/400  train=0.0406  val=0.0351
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 246/400  train=0.0405  val=0.0332
+Epoch 248/400  train=0.0401  val=0.0383
+Epoch 250/400  train=0.0397  val=0.0397
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 252/400  train=0.0409  val=0.0396
+Epoch 254/400  train=0.0394  val=0.0394
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 256/400  train=0.0387  val=0.0366
+Epoch 258/400  train=0.0404  val=0.0416
+Epoch 260/400  train=0.0407  val=0.0380
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 262/400  train=0.0392  val=0.0382
+Epoch 264/400  train=0.0413  val=0.0365
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 266/400  train=0.0404  val=0.0437
+Epoch 268/400  train=0.0399  val=0.0429
+Epoch 270/400  train=0.0393  val=0.0450
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 272/400  train=0.0398  val=0.0377
+Epoch 274/400  train=0.0389  val=0.0368
+Model saved to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt
+Epoch 276/400  train=0.0405  val=0.0398
+Early stopping triggered after 276 epochs.
+Best model restored from epoch 246 with validation smape 16.7647
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42

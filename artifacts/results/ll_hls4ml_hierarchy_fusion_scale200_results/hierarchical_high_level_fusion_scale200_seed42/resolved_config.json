@@ -1,0 +1,86 @@
+{
+  "tensor_dir": "/kaggle/working/hierarchy_tensors",
+  "tensor_source_revision": "32bc0272f1a1f53fbf051371ca7e2728bba60c77",
+  "vocab_path": "/kaggle/working/hierarchy_tensors/vocab.json",
+  "split_manifest_path": "/kaggle/working/configs/official_archives1_8_manifest.json",
+  "require_complete_split_manifest": true,
+  "results_dir": "/kaggle/working/results",
+  "kernel_types": [
+    "2layer",
+    "3layer",
+    "conv1d",
+    "conv2d",
+    "dense_latency",
+    "dense_resource",
+    "rule4ml"
+  ],
+  "scale_percent": 200,
+  "distributed_world_size": 2,
+  "seed": 42,
+  "family_balanced_sampling": false,
+  "batch_size": 8,
+  "num_workers": 2,
+  "worker_tmpdir": "/tmp",
+  "pin_memory": true,
+  "prefetch_factor": 2,
+  "thread_prefetch": false,
+  "precision": "bf16",
+  "epochs": 400,
+  "patience": 30,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "hidden_dim": 64,
+  "num_layers": 3,
+  "dropout": 0.15,
+  "use_global_features": true,
+  "use_context": true,
+  "context_mode": "core",
+  "split_heads": true,
+  "hurdle_heads": true,
+  "hurdle_prediction_mode": "threshold",
+  "loss": "log_huber_hurdle",
+  "log_huber_delta": 0.35,
+  "hurdle_classification_weight": 0.25,
+  "early_stopping_metric": "smape",
+  "verbose": 2,
+  "model": "hierarchical_high_level_fusion",
+  "heads": 1,
+  "high_level_encoder": "gatv2",
+  "high_level_cache": "/kaggle/input/datasets/brendanrios/wa-high-level-archives1-8/wa_high_level_archives1_8.pt",
+  "experiment_name": "hierarchical_high_level_fusion_scale200_seed42",
+  "checkpoint_dir": "/kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints",
+  "resume_checkpoint_path": "/kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt",
+  "checkpoint_path": "/kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_checkpoint.pt",
+  "backup_checkpoint_path": "/kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42/checkpoints/hierarchical_high_level_fusion_scale200_seed42_backup.pt",
+  "evaluation_checkpoint_path": null,
+  "run_dir": "/kaggle/working/results/hierarchical_high_level_fusion_scale200_seed42",
+  "device": "cuda:0",
+  "torch_version": "2.10.0+cu128",
+  "split_manifest_coverage": {
+    "train": {
+      "requested": 2742,
+      "selected": 2742,
+      "missing": 0
+    },
+    "validation": {
+      "requested": 569,
+      "selected": 569,
+      "missing": 0
+    },
+    "test": {
+      "requested": 593,
+      "selected": 593,
+      "missing": 0
+    },
+    "exemplar": {
+      "requested": 799,
+      "selected": 799,
+      "missing": 0
+    }
+  },
+  "ll_hls4ml_git": {
+    "commit": "0ad1c98f3bc431184ff81b67354e736311719b51",
+    "dirty": false
+  },
+  "wall_seconds": 9472.372972836
+}
