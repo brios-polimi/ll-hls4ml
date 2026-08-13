@@ -130,6 +130,8 @@ class CDFGHierarchical(nn.Module):
         instruction_vocab_size: int | None = None,
         hidden_dim: int = 128,
         num_layers: int = 3,
+        instruction_num_layers: int | None = None,
+        block_num_layers: int | None = None,
         dropout: float = 0.1,
         node_vocab_sizes: dict[str, int] | None = None,
         use_global_features: bool = False,
@@ -153,6 +155,12 @@ class CDFGHierarchical(nn.Module):
         self.hurdle_prediction_mode = hurdle_prediction_mode
         self.use_global_features = use_global_features
         self.use_context = use_context
+        instruction_num_layers = (
+            num_layers if instruction_num_layers is None else instruction_num_layers
+        )
+        block_num_layers = (
+            num_layers if block_num_layers is None else block_num_layers
+        )
 
         self.input_proj = CDFGInputProjection(
             instruction_vocab_size, edge_pos_vocab_size, hidden_dim
@@ -165,7 +173,7 @@ class CDFGHierarchical(nn.Module):
         )
         self.instruction_layers = nn.ModuleList(
             InstructionFlowLayer(hidden_dim, dropout)
-            for _ in range(num_layers)
+            for _ in range(instruction_num_layers)
         )
         pooled_dim = 4 * hidden_dim + 1
         self.block_input = nn.Sequential(
@@ -174,7 +182,8 @@ class CDFGHierarchical(nn.Module):
             nn.LayerNorm(hidden_dim),
         )
         self.block_layers = nn.ModuleList(
-            BlockFlowLayer(hidden_dim, dropout) for _ in range(num_layers)
+            BlockFlowLayer(hidden_dim, dropout)
+            for _ in range(block_num_layers)
         )
         self.function_input = nn.Sequential(
             nn.Linear(pooled_dim + 2 * hidden_dim, hidden_dim),
@@ -250,7 +259,6 @@ class CDFGHierarchical(nn.Module):
         }
         base, edge_features = self.input_proj(x_dict, edge_attr_dict)
         instruction_block, block_function = self._owners(data)
-        instruction_function = block_function[instruction_block]
         call_depth = data["function"].call_depth.long()
         instruction_depth = data["instruction"].call_depth.long()
         block_depth = data["block"].call_depth.long()

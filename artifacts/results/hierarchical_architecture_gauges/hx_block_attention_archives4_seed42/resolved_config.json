@@ -1,0 +1,355 @@
+{
+  "experiment_name": "hx_block_attention_archives4_seed42",
+  "model": "hierarchical_block_attention",
+  "architecture_label": "H5 directed CFG + per-function global block attention",
+  "tensor_dir": "/home/brend/projects/data/tensors",
+  "vocab_path": "/home/brend/projects/ll-hls4ml/artifacts/vocab/vocab.json",
+  "split_manifest_path": "/home/brend/projects/ll-hls4ml/artifacts/cache/official_archives1_8_full_exemplar_manifest.json",
+  "require_complete_split_manifest": true,
+  "baseline_predictions_path": "../../artifacts/results/ll_hls4ml_hierarchy_fusion_scale200_results/hierarchical_scale200_seed42/predictions.csv",
+  "checkpoint_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/checkpoints",
+  "results_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges",
+  "kernel_types": [
+    "2layer",
+    "3layer",
+    "conv1d",
+    "conv2d",
+    "dense_latency",
+    "dense_resource",
+    "rule4ml"
+  ],
+  "seed": 42,
+  "train_scale": 1.0,
+  "baseline_archives_per_family": 4,
+  "evaluation_archives_per_family": 1,
+  "train_subset_seed": 42,
+  "strict_archive_counts": true,
+  "batch_size": 8,
+  "num_workers": 2,
+  "pin_memory": true,
+  "prefetch_factor": 2,
+  "thread_prefetch": false,
+  "worker_tmpdir": "/tmp",
+  "precision": "bf16",
+  "gpu_telemetry_interval_ms": 500,
+  "epochs": 25,
+  "max_training_seconds": 5400,
+  "patience": 100,
+  "checkpoint_interval": 5,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "hidden_dim": 64,
+  "num_layers": 1,
+  "instruction_num_layers": 1,
+  "block_num_layers": 1,
+  "attention_heads": 4,
+  "attention_layers": 2,
+  "attention_pair_budget": 131072,
+  "dropout": 0.15,
+  "use_global_features": true,
+  "use_context": true,
+  "context_mode": "core",
+  "split_heads": true,
+  "hurdle_heads": true,
+  "hurdle_prediction_mode": "threshold",
+  "loss": "log_huber_hurdle",
+  "log_huber_delta": 0.35,
+  "hurdle_classification_weight": 0.25,
+  "early_stopping_metric": "smape",
+  "verbose": 1,
+  "checkpoint_path": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/checkpoints/hx_block_attention_archives4_seed42_checkpoint.pt",
+  "backup_checkpoint_path": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/checkpoints/hx_block_attention_archives4_seed42_backup.pt",
+  "resume_checkpoint_path": null,
+  "evaluation_checkpoint_path": null,
+  "run_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/hx_block_attention_archives4_seed42",
+  "device": "cuda",
+  "torch_version": "2.11.0+cu130",
+  "split_manifest_coverage": {
+    "train": {
+      "requested": 2742,
+      "selected": 2742,
+      "missing": 0
+    },
+    "validation": {
+      "requested": 569,
+      "selected": 569,
+      "missing": 0
+    },
+    "test": {
+      "requested": 593,
+      "selected": 593,
+      "missing": 0
+    },
+    "exemplar": {
+      "requested": 886,
+      "selected": 886,
+      "missing": 0
+    }
+  },
+  "split_sha256": "e3232c6e25a73d2d8cb6a00d440ffc644b06e620dd28044b7a9e27bdfa511fdb",
+  "cohort_membership": {
+    "train": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 76
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_2",
+        "n_samples": 74
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_3",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_4",
+        "n_samples": 72
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_2",
+        "n_samples": 73
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_3",
+        "n_samples": 73
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_4",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 37
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_2",
+        "n_samples": 22
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_3",
+        "n_samples": 28
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_4",
+        "n_samples": 37
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 21
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_3",
+        "n_samples": 21
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_4",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 45
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_2",
+        "n_samples": 44
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_3",
+        "n_samples": 50
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_4",
+        "n_samples": 53
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 37
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_2",
+        "n_samples": 39
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_3",
+        "n_samples": 35
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_4",
+        "n_samples": 31
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 65
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_2",
+        "n_samples": 80
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_3",
+        "n_samples": 67
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_4",
+        "n_samples": 75
+      }
+    ],
+    "validation": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 1
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 12
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 15
+      }
+    ],
+    "test": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 20
+      }
+    ],
+    "exemplar": [
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_1",
+        "n_samples": 100
+      }
+    ]
+  },
+  "validation_cadence_epochs": 1,
+  "checkpoint_cadence_epochs": 5,
+  "parameter_count": 289744,
+  "ll_hls4ml_git": {
+    "commit": "235016b62584c43c538420657c0b585971587184",
+    "dirty": true
+  },
+  "wall_seconds": 2195.4375265309936,
+  "cumulative_training_seconds": 2176.56818774002,
+  "best_wall_seconds": 2093.7166344800207,
+  "peak_gpu_memory_mb": 1611.2890625,
+  "mean_train_seconds_per_sample": 0.058601302400231196,
+  "stop_reason": "epochs_complete",
+  "gpu_telemetry": {
+    "samples": 3951,
+    "interval_ms": 500,
+    "gpu_utilization_mean_percent": 37.92609465957985,
+    "gpu_utilization_p10_percent": 0.0,
+    "gpu_utilization_p50_percent": 42.0,
+    "gpu_utilization_p90_percent": 66.0,
+    "gpu_zero_utilization_fraction": 0.11262971399645659,
+    "gpu_below_25_percent_fraction": 0.2877752467729689,
+    "gpu_active_mean_percent": 50.93319118692253,
+    "gpu_utilization_coefficient_of_variation": 0.6309824538125061,
+    "gpu_longest_below_25_seconds": 9.5,
+    "gpu_active_bursts_per_minute": 15.702353834472285,
+    "memory_utilization_mean_percent": 12.508225765628955,
+    "resident_gpu_memory_mean_mb": 2694.995191090863,
+    "power_draw_mean_w": 12.169873449759555,
+    "sm_clock_mean_mhz": 740.7441154138193,
+    "temperature_mean_c": 63.98709187547456,
+    "predominant_pstate": "P3",
+    "system_cpu_mean_percent": 16.537173620457605,
+    "system_cpu_p90_percent": 21.2,
+    "driver_cpu_mean_percent": 87.46907133243607,
+    "driver_cpu_p90_percent": 115.9,
+    "training_tree_cpu_mean_percent": 87.46907133243607,
+    "training_tree_cpu_p90_percent": 115.9,
+    "training_tree_rss_mean_mb": 4956.856963955249,
+    "training_tree_rss_p90_mb": 5077.49453125,
+    "system_disk_read_mean_mb_s": 0.3663935399578102,
+    "system_disk_read_p90_mb_s": 0.0,
+    "system_disk_write_mean_mb_s": 0.07009937648223934,
+    "system_disk_write_p90_mb_s": 0.06705509961616404
+  }
+}

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import copy
+import csv
 import gc
 import json
 import os
+import time
 from pathlib import Path
 from contextlib import nullcontext
 
@@ -96,6 +98,46 @@ def _release_cuda_memory(*objects: object) -> None:
         torch.cuda.empty_cache()
 
 
+def _synchronize(device: torch.device) -> None:
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+
+
+def _history_validation_metrics(metrics: dict) -> dict[str, float]:
+    """Flatten validation vectors while retaining useful target-group macros."""
+
+    record: dict[str, float] = {}
+    for name, value in metrics.items():
+        if isinstance(value, torch.Tensor):
+            values = value.detach().float().cpu().flatten()
+            record[f"val_{name}"] = float(values.mean())
+            for index, label in enumerate(LABEL_KEYS):
+                if index < values.numel():
+                    record[f"val_{name}_{label}"] = float(values[index])
+            if values.numel() >= len(LABEL_KEYS):
+                record[f"val_resource_{name}"] = float(values[:4].mean())
+                record[f"val_timing_{name}"] = float(values[4:6].mean())
+        else:
+            record[f"val_{name}"] = float(value)
+    return record
+
+
+def _write_history(path: str | Path, history: list[dict]) -> None:
+    """Atomically refresh a monitorable per-epoch CSV."""
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    with temporary.open("w", newline="") as handle:
+        fieldnames = list(
+            dict.fromkeys(key for row in history for key in row)
+        )
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(history)
+    temporary.replace(path)
+
+
 def _optimizer_for_model(template: torch.optim.Optimizer, model: torch.nn.Module) -> torch.optim.Optimizer:
     """Fresh optimizer for ``model`` with the same hyperparameters as ``template``."""
     cls = type(template)
@@ -134,14 +176,24 @@ def train_one_epoch(
     pbar=None,
     distributed: bool = False,
     precision: str = "float32",
+    return_profile: bool = False,
 ):
     model.train()
     base_model = unwrap_model(model)
-    loss_sum = 0.0
+    loss_sum = torch.zeros((), device=device)
     num_samples = 0
     num_targets = len(base_model.y_means)
+    data_wait_seconds = 0.0
+    step_started = time.perf_counter()
+    iterator = iter(train_loader)
 
-    for batch in train_loader:
+    while True:
+        data_started = time.perf_counter()
+        try:
+            batch = next(iterator)
+        except StopIteration:
+            break
+        data_wait_seconds += time.perf_counter() - data_started
         batch = batch.to(device, non_blocking=device.type == "cuda")
         target = normalize_target(
             batch.y.view(-1, num_targets),
@@ -157,18 +209,28 @@ def train_one_epoch(
         optimizer.step()
 
         n = batch.num_graphs
-        loss_sum += loss.item() * n
+        loss_sum += loss.detach() * n
         num_samples += n
 
         if pbar is not None:
             pbar.update(1)
 
     if distributed and dist.is_initialized():
-        stats = torch.tensor([loss_sum, float(num_samples)], device=device)
+        stats = torch.stack(
+            [loss_sum, loss_sum.new_tensor(float(num_samples))]
+        )
         dist.all_reduce(stats, op=dist.ReduceOp.SUM)
-        loss_sum, num_samples = stats.tolist()
+        loss_sum, num_samples = stats[0], int(stats[1].item())
 
-    return loss_sum / num_samples if num_samples else 0.0
+    mean_loss = float((loss_sum / max(num_samples, 1)).item())
+    if not return_profile:
+        return mean_loss
+    wall_seconds = time.perf_counter() - step_started
+    return mean_loss, {
+        "data_wait_seconds": data_wait_seconds,
+        "compute_submission_seconds": wall_seconds - data_wait_seconds,
+        "data_wait_fraction": data_wait_seconds / max(wall_seconds, 1e-12),
+    }
 
 
 def validate_one_epoch(
@@ -187,7 +249,7 @@ def validate_one_epoch(
     evaluation_model = base_model if distributed else model
     evaluation_model.eval()
     all_preds, all_targets = [], []
-    loss_sum = 0.0
+    loss_sum = torch.zeros((), device=device)
     num_samples = 0
     num_targets = len(base_model.y_means)
 
@@ -219,7 +281,7 @@ def validate_one_epoch(
             all_targets.append(target)
 
             n = batch.num_graphs
-            loss_sum += loss.item() * n
+            loss_sum += loss.detach() * n
             num_samples += n
 
             if pbar is not None:
@@ -234,7 +296,7 @@ def validate_one_epoch(
     metrics = wahls4ml_metrics(
         preds, targets, base_model.y_means, base_model.y_stds
     )
-    metrics["loss"] = loss_sum / num_samples if num_samples else 0.0
+    metrics["loss"] = float((loss_sum / max(num_samples, 1)).item())
     return metrics
 
 
@@ -259,6 +321,8 @@ def fit(
     early_stopping_metric: str = "loss",
     checkpoint_interval: int = 5,
     precision: str = "float32",
+    max_training_seconds: float | None = None,
+    history_path: str | Path | None = None,
 ):
     """
     Train model with optional early stopping.
@@ -278,7 +342,14 @@ def fit(
     if isinstance(criterion, torch.nn.Module):
         criterion.to(device)
 
+    fit_started = time.perf_counter()
+    prior_training_seconds = 0.0
+    resumed_from_epoch = 0
+    best_wall_seconds = None
+    stop_reason = None
     history = []
+    if device.type == "cuda":
+        torch.cuda.reset_peak_memory_stats(device)
     if patience > 0:
         patience_counter = 0
         best_metric = float("-inf") if mode == "max" else float("inf")
@@ -291,7 +362,12 @@ def fit(
         if scheduler is not None and checkpoint["scheduler"] is not None:
             scheduler.load_state_dict(checkpoint["scheduler"])
         start_epoch = checkpoint["epoch"] + 1
+        resumed_from_epoch = int(checkpoint["epoch"])
         training_state = checkpoint.get("training_state", {})
+        prior_training_seconds = float(
+            training_state.get("cumulative_training_seconds", 0.0)
+        )
+        best_wall_seconds = training_state.get("best_wall_seconds")
         history = list(training_state.get("history", []))
         if patience > 0:
             patience_counter = int(
@@ -332,29 +408,55 @@ def fit(
                 leave=log_epoch,
             )
 
-        train_loss = train_one_epoch(
+        _synchronize(device)
+        epoch_started = time.perf_counter()
+        train_started = epoch_started
+        train_result = train_one_epoch(
             model, train_loader, criterion, optimizer, device,
-            pbar=pbar, distributed=distributed, precision=precision,
+            pbar=pbar,
+            distributed=distributed,
+            precision=precision,
+            return_profile=True,
         )
+        if isinstance(train_result, tuple):
+            train_loss, train_profile = train_result
+        else:  # Keep simple mocked/custom loops compatible.
+            train_loss, train_profile = train_result, {}
+        _synchronize(device)
+        train_seconds = time.perf_counter() - train_started
+        validation_started = time.perf_counter()
         val_metrics = validate_one_epoch(
             model, val_loader, criterion, device,
             pbar=pbar, distributed=distributed, precision=precision,
+        )
+        _synchronize(device)
+        validation_seconds = time.perf_counter() - validation_started
+        epoch_seconds = time.perf_counter() - epoch_started
+        cumulative_seconds = (
+            prior_training_seconds + time.perf_counter() - fit_started
         )
         if main:
             history.append(
                 {
                     "epoch": epoch,
                     "train_loss": float(train_loss),
-                    **{
-                        f"val_{name}": (
-                            float(value.mean().item())
-                            if isinstance(value, torch.Tensor)
-                            else float(value)
-                        )
-                        for name, value in val_metrics.items()
-                    },
+                    **_history_validation_metrics(val_metrics),
+                    "train_seconds": train_seconds,
+                    "validation_seconds": validation_seconds,
+                    "epoch_seconds": epoch_seconds,
+                    "cumulative_training_seconds": cumulative_seconds,
+                    "train_seconds_per_sample": train_seconds
+                    / max(len(train_loader.dataset), 1),
+                    **train_profile,
+                    "peak_gpu_memory_mb": (
+                        torch.cuda.max_memory_allocated(device) / (1024**2)
+                        if device.type == "cuda"
+                        else 0.0
+                    ),
                 }
             )
+            if history_path is not None:
+                _write_history(history_path, history)
 
         if pbar is not None:
             pbar.set_postfix({
@@ -390,6 +492,7 @@ def fit(
             if is_improvement:
                 best_metric = current_metric
                 best_epoch = epoch
+                best_wall_seconds = cumulative_seconds
                 patience_counter = 0
                 _save_checkpoint(
                     epoch,
@@ -402,12 +505,22 @@ def fit(
                         "best_metric": best_metric,
                         "best_epoch": best_epoch,
                         "patience_counter": patience_counter,
+                        "cumulative_training_seconds": (
+                            prior_training_seconds
+                            + time.perf_counter()
+                            - fit_started
+                        ),
+                        "best_wall_seconds": best_wall_seconds,
+                        "peak_gpu_memory_mb": history[-1][
+                            "peak_gpu_memory_mb"
+                        ],
                     },
                 )
             else:
                 patience_counter += 1
                 if patience_counter >= patience:
                     print(f"Early stopping triggered after {epoch} epochs.")
+                    stop_reason = "early_stopping"
                     should_stop[0] = 1
 
         if main and checkpoint_interval > 0 and epoch % checkpoint_interval == 0:
@@ -428,9 +541,28 @@ def fit(
                     "patience_counter": (
                         patience_counter if patience > 0 else 0
                     ),
+                    "cumulative_training_seconds": (
+                        prior_training_seconds
+                        + time.perf_counter()
+                        - fit_started
+                    ),
+                    "best_wall_seconds": best_wall_seconds,
+                    "peak_gpu_memory_mb": history[-1]["peak_gpu_memory_mb"],
                 },
             )
             print(f"Model saved to {backup_path}")
+
+        if (
+            main
+            and max_training_seconds is not None
+            and cumulative_seconds >= max_training_seconds
+        ):
+            stop_reason = "wall_time_budget"
+            should_stop[0] = 1
+            print(
+                f"Wall-time budget reached after epoch {epoch} "
+                f"({cumulative_seconds:.1f}s)."
+            )
 
         if distributed:
             dist.broadcast(should_stop, src=0)
@@ -449,15 +581,48 @@ def fit(
             )
 
     if patience == 0 and main:
-        _save_checkpoint(epoch, model, optimizer, scheduler, ckpt_path)
+        _save_checkpoint(
+            epoch,
+            model,
+            optimizer,
+            scheduler,
+            ckpt_path,
+            training_state={
+                "history": history,
+                "best_metric": None,
+                "best_epoch": epoch,
+                "patience_counter": 0,
+                "cumulative_training_seconds": (
+                    prior_training_seconds
+                    + time.perf_counter()
+                    - fit_started
+                ),
+                "best_wall_seconds": None,
+                "peak_gpu_memory_mb": history[-1]["peak_gpu_memory_mb"],
+            },
+        )
 
     if distributed:
         dist.barrier()
 
     base_model = unwrap_model(model)
+    if stop_reason is None:
+        stop_reason = "epochs_complete"
     base_model.training_history = history
     base_model.best_epoch = best_epoch if patience > 0 else epoch
     base_model.best_metric = best_metric if patience > 0 else None
+    base_model.cumulative_training_seconds = (
+        prior_training_seconds + time.perf_counter() - fit_started
+    )
+    base_model.resumed_from_epoch = resumed_from_epoch
+    base_model.validation_cadence_epochs = 1
+    base_model.best_wall_seconds = best_wall_seconds
+    base_model.peak_gpu_memory_mb = (
+        torch.cuda.max_memory_allocated(device) / (1024**2)
+        if device.type == "cuda"
+        else 0.0
+    )
+    base_model.stop_reason = stop_reason
     return model
 
 

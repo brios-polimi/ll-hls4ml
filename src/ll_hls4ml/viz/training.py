@@ -20,6 +20,69 @@ def plot_loss_curves(training_history, title="Training Loss"):
     plt.show()
 
 
+def learning_curve_figure(history: list[dict], x_key: str, title: str):
+    """Plot loss and validation SMAPE against epoch or cumulative wall time."""
+
+    if not history:
+        raise ValueError("Training history is empty")
+    x = np.asarray([float(row[x_key]) for row in history])
+    figure, axes = plt.subplots(1, 2, figsize=(10.5, 4.0))
+    axes[0].plot(x, [row["train_loss"] for row in history], label="train")
+    axes[0].plot(x, [row["val_loss"] for row in history], label="validation")
+    axes[0].set_ylabel("Log-Huber hurdle loss")
+    axes[0].legend()
+    for key, label in (
+        ("val_smape", "overall"),
+        ("val_resource_smape", "resource"),
+        ("val_timing_smape", "timing"),
+    ):
+        if key in history[0]:
+            axes[1].plot(x, [row[key] for row in history], label=label)
+    axes[1].set_ylabel("Validation SMAPE (%)")
+    axes[1].legend()
+    xlabel = "Epoch" if x_key == "epoch" else "Cumulative training wall time (s)"
+    for axis in axes:
+        axis.set_xlabel(xlabel)
+        axis.grid(True, linestyle=":", alpha=0.45)
+    figure.suptitle(title)
+    figure.tight_layout()
+    return figure, axes
+
+
+def hurdle_calibration_figure(rows: list[dict], split: str):
+    """Reliability diagrams for overall DSP and BRAM presence predictions."""
+
+    figure, axes = plt.subplots(1, 2, figsize=(8.5, 3.8))
+    for axis, target in zip(axes, ("dsp", "bram")):
+        selected = [
+            row
+            for row in rows
+            if row["split"] == split
+            and row["cohort"] == "all"
+            and row["target"] == target
+        ]
+        axis.plot([0, 1], [0, 1], linestyle="--", color="gray")
+        if selected:
+            axis.plot(
+                [row["mean_probability"] for row in selected],
+                [row["observed_frequency"] for row in selected],
+                marker="o",
+            )
+            axis.set_title(
+                f"{target.upper()} (ECE {selected[0]['expected_calibration_error']:.3f})"
+            )
+        else:
+            axis.set_title(target.upper())
+        axis.set_xlabel("Predicted presence probability")
+        axis.set_ylabel("Observed frequency")
+        axis.set_xlim(0, 1)
+        axis.set_ylim(0, 1)
+        axis.grid(True, linestyle=":", alpha=0.45)
+    figure.suptitle(f"{split}: hurdle calibration")
+    figure.tight_layout()
+    return figure, axes
+
+
 def plot_predictions_vs_targets(
     model,
     val_loader,

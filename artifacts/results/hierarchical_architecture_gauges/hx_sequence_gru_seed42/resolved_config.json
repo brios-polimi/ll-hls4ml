@@ -1,0 +1,303 @@
+{
+  "experiment_name": "hx_sequence_gru_seed42",
+  "model": "hierarchical_sequence",
+  "architecture_label": "H4 sequence GRU + gated dependencies",
+  "tensor_dir": "/home/brend/projects/data/tensors",
+  "vocab_path": "/home/brend/projects/ll-hls4ml/artifacts/vocab/vocab.json",
+  "split_manifest_path": "/home/brend/projects/ll-hls4ml/artifacts/cache/official_archives1_8_full_exemplar_manifest.json",
+  "require_complete_split_manifest": true,
+  "baseline_predictions_path": "../../artifacts/results/ll_hls4ml_hierarchy_fusion_scale200_results/hierarchical_scale200_seed42/predictions.csv",
+  "checkpoint_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/checkpoints",
+  "results_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges",
+  "kernel_types": [
+    "2layer",
+    "3layer",
+    "conv1d",
+    "conv2d",
+    "dense_latency",
+    "dense_resource",
+    "rule4ml"
+  ],
+  "seed": 42,
+  "train_scale": 0.05,
+  "baseline_archives_per_family": 4,
+  "evaluation_archives_per_family": 1,
+  "train_subset_seed": 42,
+  "strict_archive_counts": true,
+  "batch_size": 8,
+  "num_workers": 0,
+  "pin_memory": true,
+  "prefetch_factor": 2,
+  "thread_prefetch": true,
+  "precision": "bf16",
+  "epochs": 100,
+  "max_training_seconds": 5400,
+  "patience": 100,
+  "checkpoint_interval": 5,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "hidden_dim": 64,
+  "num_layers": 1,
+  "instruction_num_layers": 1,
+  "block_num_layers": 2,
+  "sequence_token_budget": 65536,
+  "dropout": 0.15,
+  "use_global_features": true,
+  "use_context": true,
+  "context_mode": "core",
+  "split_heads": true,
+  "hurdle_heads": true,
+  "hurdle_prediction_mode": "threshold",
+  "loss": "log_huber_hurdle",
+  "log_huber_delta": 0.35,
+  "hurdle_classification_weight": 0.25,
+  "early_stopping_metric": "smape",
+  "verbose": 1,
+  "checkpoint_path": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/checkpoints/hx_sequence_gru_seed42_checkpoint.pt",
+  "backup_checkpoint_path": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/checkpoints/hx_sequence_gru_seed42_backup.pt",
+  "resume_checkpoint_path": null,
+  "evaluation_checkpoint_path": null,
+  "run_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/hierarchical_architecture_gauges/hx_sequence_gru_seed42",
+  "device": "cuda",
+  "torch_version": "2.11.0+cu130",
+  "split_manifest_coverage": {
+    "train": {
+      "requested": 2742,
+      "selected": 2742,
+      "missing": 0
+    },
+    "validation": {
+      "requested": 569,
+      "selected": 569,
+      "missing": 0
+    },
+    "test": {
+      "requested": 593,
+      "selected": 593,
+      "missing": 0
+    },
+    "exemplar": {
+      "requested": 886,
+      "selected": 886,
+      "missing": 0
+    }
+  },
+  "split_sha256": "b7049caeb9040a2536a753015bef9379a06db6c967fd5caa116551331b7b507f",
+  "cohort_membership": {
+    "train": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_2",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_3",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_4",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_2",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_3",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_4",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_2",
+        "n_samples": 1
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_4",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_3",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_4",
+        "n_samples": 1
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_2",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_3",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_4",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_2",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_3",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_4",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_2",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_3",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_4",
+        "n_samples": 4
+      }
+    ],
+    "validation": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 1
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 12
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 15
+      }
+    ],
+    "test": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 20
+      }
+    ],
+    "exemplar": [
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_1",
+        "n_samples": 100
+      }
+    ]
+  },
+  "validation_cadence_epochs": 1,
+  "checkpoint_cadence_epochs": 5,
+  "parameter_count": 289233,
+  "ll_hls4ml_git": {
+    "commit": "235016b62584c43c538420657c0b585971587184",
+    "dirty": true
+  }
+}

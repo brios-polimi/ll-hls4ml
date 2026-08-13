@@ -29,6 +29,11 @@ from ll_hls4ml.data.high_level import (
 )
 from ll_hls4ml.io.schema import LABEL_KEYS
 from ll_hls4ml.models.high_level import HighLevelLayerGNN
+from ll_hls4ml.reporting.accounting import (
+    cohort_membership,
+    hurdle_confusion_rows,
+    split_sha256,
+)
 from ll_hls4ml.training import compute_target_z_stats, make_loader
 from ll_hls4ml.training.loops import fit
 from ll_hls4ml.training.targets import LogHuberHurdleLoss
@@ -39,6 +44,7 @@ from train import (
     _predict,
     _prediction_rows,
     _write_csv,
+    _write_report,
 )
 
 
@@ -95,7 +101,7 @@ def _evaluate(model, datasets, manifests, device, batch_size, num_workers):
 
 
 def _run_one(args, cache, scale: int, seed: int, device: torch.device):
-    experiment = f"high_level_{args.encoder}_scale{SCALE_TAGS[scale]}_seed{seed}"
+    experiment = args.experiment_name or f"high_level_{args.encoder}_scale{SCALE_TAGS[scale]}_seed{seed}"
     run_dir = args.output_root / experiment
     complete_path = run_dir / "summary.json"
     if complete_path.exists() and not args.force:
@@ -103,8 +109,10 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         return json.loads(complete_path.read_text())
     run_dir.mkdir(parents=True, exist_ok=True)
 
-    manifest_path = _source_manifest(args.cdfg_results_root, scale)
+    manifest_path = args.manifest or _source_manifest(args.cdfg_results_root, scale)
     manifest = json.loads(manifest_path.read_text())
+    membership = cohort_membership(manifest)
+    manifest_hash = split_sha256(manifest)
     train_paths = _paths(manifest, "train")
     means, stds = feature_statistics(cache, train_paths)
     datasets = {
@@ -149,6 +157,7 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
     backup = checkpoint_dir / f"{experiment}_backup.pt"
     resolved_config = {
         "experiment_name": experiment,
+        "model": "high_level_gatv2" if args.encoder == "gatv2" else "high_level_sage",
         "representation": "wa-hls4ml layer/config graph",
         "encoder": args.encoder,
         "scale_percent": scale,
@@ -162,6 +171,9 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         "weight_decay": args.weight_decay,
         "epochs": args.epochs,
         "patience": args.patience,
+        "precision": args.precision,
+        "validation_cadence_epochs": 1,
+        "checkpoint_cadence_epochs": args.backup_interval,
         "loss": "log_huber_hurdle",
         "hurdle_prediction_mode": "threshold",
         "source_manifest": str(manifest_path),
@@ -170,6 +182,8 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         "device": str(device),
         "torch_version": torch.__version__,
         "parameter_count": sum(p.numel() for p in model.parameters()),
+        "split_sha256": manifest_hash,
+        "cohort_membership": membership,
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
     }
     (run_dir / "resolved_config.json").write_text(
@@ -195,6 +209,7 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         resume_from_backup=backup if backup.exists() else None,
         early_stopping_metric="smape",
         checkpoint_interval=args.backup_interval,
+        precision=args.precision,
     )
     wall_seconds = time.perf_counter() - started
     metric_rows, prediction_rows = _evaluate(
@@ -208,8 +223,28 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
     _write_csv(run_dir / "metrics.csv", metric_rows)
     _write_csv(run_dir / "predictions.csv", prediction_rows)
     base_model = model
+    hurdle_rows = hurdle_confusion_rows(prediction_rows)
+    _write_csv(run_dir / "hurdle_confusion.csv", hurdle_rows)
+    accounting = {
+        "split_sha256": manifest_hash,
+        "cohort_membership": membership,
+        "hurdle_confusion": hurdle_rows,
+        "validation_cadence_epochs": 1,
+        "checkpoint_cadence_epochs": args.backup_interval,
+        "cumulative_training_seconds": getattr(
+            base_model, "cumulative_training_seconds", wall_seconds
+        ),
+        "resumed_from_epoch": getattr(base_model, "resumed_from_epoch", 0),
+    }
+    (run_dir / "experiment_accounting.json").write_text(
+        json.dumps(accounting, indent=2)
+    )
+    resolved_config["wall_seconds"] = wall_seconds
+    resolved_config["cumulative_training_seconds"] = accounting[
+        "cumulative_training_seconds"
+    ]
     summary = {
-        "resolved_config": {**resolved_config, "wall_seconds": wall_seconds},
+        "resolved_config": resolved_config,
         "sizes": {split: len(dataset) for split, dataset in datasets.items()},
         "best_epoch": base_model.best_epoch,
         "best_metric": base_model.best_metric,
@@ -217,9 +252,16 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         "metrics": metric_rows,
     }
     complete_path.write_text(json.dumps(summary, indent=2, default=_json_converter))
-    resolved_config["wall_seconds"] = wall_seconds
     (run_dir / "resolved_config.json").write_text(
         json.dumps(resolved_config, indent=2)
+    )
+    _write_report(
+        run_dir,
+        experiment,
+        resolved_config,
+        summary["sizes"],
+        metric_rows,
+        accounting,
     )
     print(
         f"Completed {experiment}: best epoch {base_model.best_epoch}, "
@@ -281,6 +323,8 @@ def main():
         type=Path,
         default=Path("artifacts/cache/wa_high_level_scale200.pt"),
     )
+    parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--experiment-name")
     parser.add_argument("--scales", nargs="+", type=int, choices=SCALE_TAGS, default=[25, 50, 100, 200])
     parser.add_argument("--seeds", nargs="+", type=int, default=[42, 43, 44])
     parser.add_argument("--encoder", choices=("gatv2", "sage"), default="gatv2")
@@ -296,6 +340,7 @@ def main():
     parser.add_argument("--log-huber-delta", type=float, default=0.35)
     parser.add_argument("--hurdle-classification-weight", type=float, default=0.25)
     parser.add_argument("--num-workers", type=int, default=0)
+    parser.add_argument("--precision", choices=("float32", "bf16"), default="float32")
     parser.add_argument("--verbose", type=int, default=10)
     parser.add_argument("--backup-interval", type=int, default=25)
     parser.add_argument("--build-cache-only", action="store_true")
@@ -304,13 +349,15 @@ def main():
 
     for name in ("tensor_root", "label_root", "wa_gnn_dir", "cdfg_results_root", "output_root", "cache"):
         setattr(args, name, getattr(args, name).resolve())
+    if args.manifest is not None:
+        args.manifest = args.manifest.resolve()
     args.output_root.mkdir(parents=True, exist_ok=True)
     if args.cache.exists():
         cache = torch.load(args.cache, weights_only=False)
         print(f"Loaded {len(cache['samples'])} samples from {args.cache}", flush=True)
     else:
         cache = build_high_level_cache(
-            _source_manifest(args.cdfg_results_root, 200),
+            args.manifest or _source_manifest(args.cdfg_results_root, 200),
             args.label_root,
             args.tensor_root,
             args.wa_gnn_dir,

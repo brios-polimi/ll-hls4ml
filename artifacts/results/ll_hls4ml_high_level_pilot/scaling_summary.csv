@@ -1,3 +1,0 @@
-encoder,scale_percent,seed,split,macro_smape,best_epoch,best_validation_smape,wall_seconds
-gatv2,25,42,test,56.61381085713705,29,57.087921142578125,5.995051313999284
-gatv2,25,42,exemplar,117.41946792602539,29,57.087921142578125,5.995051313999284

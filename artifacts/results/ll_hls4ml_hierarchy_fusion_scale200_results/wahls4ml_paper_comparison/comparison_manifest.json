@@ -18,7 +18,21 @@
         "seed": 42,
         "scale_percent": 200,
         "tensor_source_revision": "32bc0272f1a1f53fbf051371ca7e2728bba60c77",
-        "split_manifest_path": "/kaggle/working/configs/official_archives1_8_manifest.json"
+        "split_manifest_path": "/home/brend/projects/ll-hls4ml/artifacts/cache/official_archives1_8_full_exemplar_manifest.json",
+        "split_sha256": "076373d277dbbf0a4fefe6e221cc3392837c8fee4a7cab628c0e3b56593be335"
+      }
+    },
+    {
+      "display_name": "High-level only",
+      "run_dir": "/home/brend/projects/ll-hls4ml/artifacts/results/ll_hls4ml_hierarchy_fusion_scale200_results/high_level_gatv2_scale200_seed42",
+      "metadata": {
+        "experiment_name": "high_level_gatv2_scale200_seed42",
+        "model": "high_level_gatv2",
+        "seed": 42,
+        "scale_percent": 200,
+        "tensor_source_revision": null,
+        "split_manifest_path": null,
+        "split_sha256": "076373d277dbbf0a4fefe6e221cc3392837c8fee4a7cab628c0e3b56593be335"
       }
     },
     {
@@ -30,83 +44,121 @@
         "seed": 42,
         "scale_percent": 200,
         "tensor_source_revision": "32bc0272f1a1f53fbf051371ca7e2728bba60c77",
-        "split_manifest_path": "/kaggle/working/configs/official_archives1_8_manifest.json"
+        "split_manifest_path": "/home/brend/projects/ll-hls4ml/artifacts/cache/official_archives1_8_full_exemplar_manifest.json",
+        "split_sha256": "076373d277dbbf0a4fefe6e221cc3392837c8fee4a7cab628c0e3b56593be335"
       }
     }
   ],
   "exemplar_coverage": {
     "Hierarchy only": {
       "Jet": {
-        "selected": 115,
+        "selected": 124,
         "paper_total": 124,
-        "missing": 9
+        "missing": 0
       },
       "Quarks": {
-        "selected": 117,
+        "selected": 126,
         "paper_total": 126,
-        "missing": 9
+        "missing": 0
       },
       "Anomaly": {
-        "selected": 122,
+        "selected": 133,
         "paper_total": 133,
-        "missing": 11
+        "missing": 0
       },
       "BiPC": {
-        "selected": 106,
+        "selected": 119,
         "paper_total": 119,
-        "missing": 13
+        "missing": 0
       },
       "Cookie-box": {
-        "selected": 120,
+        "selected": 130,
         "paper_total": 130,
-        "missing": 10
+        "missing": 0
       },
       "AutoMLP": {
-        "selected": 110,
+        "selected": 127,
         "paper_total": 127,
-        "missing": 17
+        "missing": 0
       },
       "Particle Tracking": {
-        "selected": 109,
+        "selected": 127,
         "paper_total": 128,
-        "missing": 19
+        "missing": 1
+      }
+    },
+    "High-level only": {
+      "Jet": {
+        "selected": 124,
+        "paper_total": 124,
+        "missing": 0
+      },
+      "Quarks": {
+        "selected": 126,
+        "paper_total": 126,
+        "missing": 0
+      },
+      "Anomaly": {
+        "selected": 133,
+        "paper_total": 133,
+        "missing": 0
+      },
+      "BiPC": {
+        "selected": 119,
+        "paper_total": 119,
+        "missing": 0
+      },
+      "Cookie-box": {
+        "selected": 130,
+        "paper_total": 130,
+        "missing": 0
+      },
+      "AutoMLP": {
+        "selected": 127,
+        "paper_total": 127,
+        "missing": 0
+      },
+      "Particle Tracking": {
+        "selected": 127,
+        "paper_total": 128,
+        "missing": 1
       }
     },
     "Late fusion": {
       "Jet": {
-        "selected": 115,
+        "selected": 124,
         "paper_total": 124,
-        "missing": 9
+        "missing": 0
       },
       "Quarks": {
-        "selected": 117,
+        "selected": 126,
         "paper_total": 126,
-        "missing": 9
+        "missing": 0
       },
       "Anomaly": {
-        "selected": 122,
+        "selected": 133,
         "paper_total": 133,
-        "missing": 11
+        "missing": 0
       },
       "BiPC": {
-        "selected": 106,
+        "selected": 119,
         "paper_total": 119,
-        "missing": 13
+        "missing": 0
       },
       "Cookie-box": {
-        "selected": 120,
+        "selected": 130,
         "paper_total": 130,
-        "missing": 10
+        "missing": 0
       },
       "AutoMLP": {
-        "selected": 110,
+        "selected": 127,
         "paper_total": 127,
-        "missing": 17
+        "missing": 0
       },
       "Particle Tracking": {
-        "selected": 109,
+        "selected": 127,
         "paper_total": 128,
-        "missing": 19
+        "missing": 1
       }
     }
   }

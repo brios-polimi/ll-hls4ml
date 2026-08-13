@@ -53,42 +53,60 @@ test,All,paper,Transformer,102484,rmse,ff,57138.2,False
 test,All,paper,Transformer,102484,rmse,lut,115943.6,False
 test,All,paper,Transformer,102484,rmse,cycles_max,147137.7,True
 test,All,paper,Transformer,102484,rmse,interval_max,150688.4,True
-test,All,run,Hierarchy only,593,r2,bram,0.6662539044234003,False
-test,All,run,Hierarchy only,593,r2,dsp,0.8421428512748104,False
-test,All,run,Hierarchy only,593,r2,ff,0.8681182507663479,False
-test,All,run,Hierarchy only,593,r2,lut,0.698842336427673,False
-test,All,run,Hierarchy only,593,r2,cycles_max,0.403717542187489,False
-test,All,run,Hierarchy only,593,r2,interval_max,0.3313159952943765,False
-test,All,run,Hierarchy only,593,smape,bram,29.09064779243565,False
-test,All,run,Hierarchy only,593,smape,dsp,19.229149945390116,False
-test,All,run,Hierarchy only,593,smape,ff,23.170551125013276,False
-test,All,run,Hierarchy only,593,smape,lut,24.526187033126938,False
-test,All,run,Hierarchy only,593,smape,cycles_max,27.591650212450734,False
-test,All,run,Hierarchy only,593,smape,interval_max,23.72249062242317,False
-test,All,run,Hierarchy only,593,rmse,bram,24.784963727613754,False
-test,All,run,Hierarchy only,593,rmse,dsp,443.0548518204428,False
-test,All,run,Hierarchy only,593,rmse,ff,25290.633854878186,False
-test,All,run,Hierarchy only,593,rmse,lut,70580.5640576736,False
-test,All,run,Hierarchy only,593,rmse,cycles_max,731181.5982466463,False
-test,All,run,Hierarchy only,593,rmse,interval_max,774451.2165991849,False
-test,All,run,Late fusion,593,r2,bram,0.7925572927583405,True
-test,All,run,Late fusion,593,r2,dsp,0.8867105787883259,False
-test,All,run,Late fusion,593,r2,ff,0.9693234247313431,True
-test,All,run,Late fusion,593,r2,lut,0.8557197941043299,True
-test,All,run,Late fusion,593,r2,cycles_max,0.7239547858337163,False
-test,All,run,Late fusion,593,r2,interval_max,0.7794078621860656,False
-test,All,run,Late fusion,593,smape,bram,19.367438130481247,False
-test,All,run,Late fusion,593,smape,dsp,13.14273807894123,False
-test,All,run,Late fusion,593,smape,ff,13.488142830210265,False
-test,All,run,Late fusion,593,smape,lut,14.92834815555176,False
-test,All,run,Late fusion,593,smape,cycles_max,16.31437001130476,False
-test,All,run,Late fusion,593,smape,interval_max,19.334239802184975,False
-test,All,run,Late fusion,593,rmse,bram,19.540212240904914,False
-test,All,run,Late fusion,593,rmse,dsp,375.3358508162285,True
-test,All,run,Late fusion,593,rmse,ff,12197.499286898,True
-test,All,run,Late fusion,593,rmse,lut,48853.03414780787,False
-test,All,run,Late fusion,593,rmse,cycles_max,497495.7184999246,False
-test,All,run,Late fusion,593,rmse,interval_max,444814.1700724086,False
+test,All,run,Hierarchy only,593,r2,bram,0.66669178006274,False
+test,All,run,Hierarchy only,593,r2,dsp,0.8420116940467298,False
+test,All,run,Hierarchy only,593,r2,ff,0.8680950149629386,False
+test,All,run,Hierarchy only,593,r2,lut,0.6988047531539324,False
+test,All,run,Hierarchy only,593,r2,cycles_max,0.403120928564755,False
+test,All,run,Hierarchy only,593,r2,interval_max,0.3313264005896881,False
+test,All,run,Hierarchy only,593,smape,bram,29.090659507349933,False
+test,All,run,Hierarchy only,593,smape,dsp,19.244566498407806,False
+test,All,run,Hierarchy only,593,smape,ff,23.169023828426372,False
+test,All,run,Hierarchy only,593,smape,lut,24.50942087262697,False
+test,All,run,Hierarchy only,593,smape,cycles_max,27.582850994425407,False
+test,All,run,Hierarchy only,593,smape,interval_max,23.721761316439085,False
+test,All,run,Hierarchy only,593,rmse,bram,24.768699426665442,False
+test,All,run,Hierarchy only,593,rmse,dsp,443.2388719343344,False
+test,All,run,Hierarchy only,593,rmse,ff,25292.861692763643,False
+test,All,run,Hierarchy only,593,rmse,lut,70584.96800654453,False
+test,All,run,Hierarchy only,593,rmse,cycles_max,731547.3006350474,False
+test,All,run,Hierarchy only,593,rmse,interval_max,774445.1910139268,False
+test,All,run,High-level only,593,r2,bram,0.644861068637244,False
+test,All,run,High-level only,593,r2,dsp,0.31386789614338495,False
+test,All,run,High-level only,593,r2,ff,0.7390516783617744,False
+test,All,run,High-level only,593,r2,lut,0.5922778457974855,False
+test,All,run,High-level only,593,r2,cycles_max,0.39473104003635007,False
+test,All,run,High-level only,593,r2,interval_max,0.3832385204388027,False
+test,All,run,High-level only,593,smape,bram,23.84584245338362,False
+test,All,run,High-level only,593,smape,dsp,24.315640171316073,False
+test,All,run,High-level only,593,smape,ff,24.0802558351183,False
+test,All,run,High-level only,593,smape,lut,20.533095561747565,False
+test,All,run,High-level only,593,smape,cycles_max,25.502387392904648,False
+test,All,run,High-level only,593,smape,interval_max,34.99823176870447,False
+test,All,run,High-level only,593,rmse,bram,25.566974164413516,False
+test,All,run,High-level only,593,rmse,dsp,923.6963762927978,False
+test,All,run,High-level only,593,rmse,ff,35574.97623750513,False
+test,All,run,High-level only,593,rmse,lut,82124.04272711446,False
+test,All,run,High-level only,593,rmse,cycles_max,736670.7694686281,False
+test,All,run,High-level only,593,rmse,interval_max,743776.1014506489,False
+test,All,run,Late fusion,593,r2,bram,0.7919762699096558,True
+test,All,run,Late fusion,593,r2,dsp,0.886711149954288,False
+test,All,run,Late fusion,593,r2,ff,0.9693291312129798,True
+test,All,run,Late fusion,593,r2,lut,0.8562865752949642,True
+test,All,run,Late fusion,593,r2,cycles_max,0.7239553455176875,False
+test,All,run,Late fusion,593,r2,interval_max,0.779407842753946,False
+test,All,run,Late fusion,593,smape,bram,19.379955184079492,False
+test,All,run,Late fusion,593,smape,dsp,13.138072605263021,False
+test,All,run,Late fusion,593,smape,ff,13.491143886724988,False
+test,All,run,Late fusion,593,smape,lut,14.927085978145591,False
+test,All,run,Late fusion,593,smape,cycles_max,16.31338300946175,False
+test,All,run,Late fusion,593,smape,interval_max,19.334899569561497,False
+test,All,run,Late fusion,593,rmse,bram,19.56755803488432,False
+test,All,run,Late fusion,593,rmse,dsp,375.3349046584573,True
+test,All,run,Late fusion,593,rmse,ff,12196.364739733397,True
+test,All,run,Late fusion,593,rmse,lut,48756.98414864334,False
+test,All,run,Late fusion,593,rmse,cycles_max,497495.2141613122,False
+test,All,run,Late fusion,593,rmse,interval_max,444814.1896644078,False
 test,Dense,paper,MLP,91307,r2,bram,0.47,False
 test,Dense,paper,MLP,91307,r2,dsp,0.03,False
 test,Dense,paper,MLP,91307,r2,ff,0.13,False
@@ -143,42 +161,60 @@ test,Dense,paper,Transformer,91307,rmse,ff,58463.5,False
 test,Dense,paper,Transformer,91307,rmse,lut,118826.6,False
 test,Dense,paper,Transformer,91307,rmse,cycles_max,659.7,False
 test,Dense,paper,Transformer,91307,rmse,interval_max,395.6,False
-test,Dense,run,Hierarchy only,514,r2,bram,0.535857316678567,False
-test,Dense,run,Hierarchy only,514,r2,dsp,0.8409945941964354,False
-test,Dense,run,Hierarchy only,514,r2,ff,0.9434358339111443,False
-test,Dense,run,Hierarchy only,514,r2,lut,0.6919228386766001,False
-test,Dense,run,Hierarchy only,514,r2,cycles_max,0.9587742137769155,False
-test,Dense,run,Hierarchy only,514,r2,interval_max,0.9890690419756294,True
-test,Dense,run,Hierarchy only,514,smape,bram,28.260421773085476,False
-test,Dense,run,Hierarchy only,514,smape,dsp,20.202939392532286,False
-test,Dense,run,Hierarchy only,514,smape,ff,24.159460804575783,False
-test,Dense,run,Hierarchy only,514,smape,lut,26.350447922375324,False
-test,Dense,run,Hierarchy only,514,smape,cycles_max,23.048899637205654,False
-test,Dense,run,Hierarchy only,514,smape,interval_max,18.20234140949841,False
-test,Dense,run,Hierarchy only,514,rmse,bram,25.559592722170954,False
-test,Dense,run,Hierarchy only,514,rmse,dsp,475.8851295764293,False
-test,Dense,run,Hierarchy only,514,rmse,ff,15377.553972026666,False
-test,Dense,run,Hierarchy only,514,rmse,lut,75735.98095154288,False
-test,Dense,run,Hierarchy only,514,rmse,cycles_max,582.1992747028853,False
-test,Dense,run,Hierarchy only,514,rmse,interval_max,152.8144277011041,True
-test,Dense,run,Late fusion,514,r2,bram,0.8609343176501266,True
-test,Dense,run,Late fusion,514,r2,dsp,0.8858870189946442,True
-test,Dense,run,Late fusion,514,r2,ff,0.9702819544589424,True
-test,Dense,run,Late fusion,514,r2,lut,0.8522604600432735,True
-test,Dense,run,Late fusion,514,r2,cycles_max,0.9790661571511842,True
-test,Dense,run,Late fusion,514,r2,interval_max,0.9791806747225854,False
-test,Dense,run,Late fusion,514,smape,bram,18.070259295892182,False
-test,Dense,run,Late fusion,514,smape,dsp,13.6801040759479,False
-test,Dense,run,Late fusion,514,smape,ff,13.571929997483696,False
-test,Dense,run,Late fusion,514,smape,lut,15.443031063412363,False
-test,Dense,run,Late fusion,514,smape,cycles_max,14.868739424764902,False
-test,Dense,run,Late fusion,514,smape,interval_max,18.24507160488238,False
-test,Dense,run,Late fusion,514,rmse,bram,13.990658646053832,False
-test,Dense,run,Late fusion,514,rmse,dsp,403.1472621725692,True
-test,Dense,run,Late fusion,514,rmse,ff,11146.19630528165,True
-test,Dense,run,Late fusion,514,rmse,lut,52447.026898215154,False
-test,Dense,run,Late fusion,514,rmse,cycles_max,414.8696513857067,True
-test,Dense,run,Late fusion,514,rmse,interval_max,210.89611102109967,False
+test,Dense,run,Hierarchy only,514,r2,bram,0.5365215063168689,False
+test,Dense,run,Hierarchy only,514,r2,dsp,0.8408624570243111,False
+test,Dense,run,Hierarchy only,514,r2,ff,0.9434034136474099,False
+test,Dense,run,Hierarchy only,514,r2,lut,0.6918992062852014,False
+test,Dense,run,Hierarchy only,514,r2,cycles_max,0.9588529882728373,False
+test,Dense,run,Hierarchy only,514,r2,interval_max,0.989032330214795,True
+test,Dense,run,Hierarchy only,514,smape,bram,28.258074307260486,False
+test,Dense,run,Hierarchy only,514,smape,dsp,20.218872593318785,False
+test,Dense,run,Hierarchy only,514,smape,ff,24.160420937655417,False
+test,Dense,run,Hierarchy only,514,smape,lut,26.33875121164702,False
+test,Dense,run,Hierarchy only,514,smape,cycles_max,23.027023383782,False
+test,Dense,run,Hierarchy only,514,smape,interval_max,18.205650458952096,False
+test,Dense,run,Hierarchy only,514,rmse,bram,25.54129824621421,False
+test,Dense,run,Hierarchy only,514,rmse,dsp,476.08282429084085,False
+test,Dense,run,Hierarchy only,514,rmse,ff,15381.960232862746,False
+test,Dense,run,Hierarchy only,514,rmse,lut,75738.88572386424,False
+test,Dense,run,Hierarchy only,514,rmse,cycles_max,581.6427736859397,False
+test,Dense,run,Hierarchy only,514,rmse,interval_max,153.0708271958181,True
+test,Dense,run,High-level only,514,r2,bram,0.8352145279700114,False
+test,Dense,run,High-level only,514,r2,dsp,0.3088772392303658,False
+test,Dense,run,High-level only,514,r2,ff,0.8068678197434549,False
+test,Dense,run,High-level only,514,r2,lut,0.5840192394769257,False
+test,Dense,run,High-level only,514,r2,cycles_max,0.9554505988569819,False
+test,Dense,run,High-level only,514,r2,interval_max,0.9406459112313319,False
+test,Dense,run,High-level only,514,smape,bram,22.00740268473234,False
+test,Dense,run,High-level only,514,smape,dsp,25.9250894695055,False
+test,Dense,run,High-level only,514,smape,ff,25.094109333777496,False
+test,Dense,run,High-level only,514,smape,lut,21.160982666925097,False
+test,Dense,run,High-level only,514,smape,cycles_max,23.9574023514953,False
+test,Dense,run,High-level only,514,smape,interval_max,34.89177802136458,False
+test,Dense,run,High-level only,514,rmse,bram,15.229569780611762,False
+test,Dense,run,High-level only,514,rmse,dsp,992.1418914799585,False
+test,Dense,run,High-level only,514,rmse,ff,28414.753129310517,False
+test,Dense,run,High-level only,514,rmse,lut,88005.3602761725,False
+test,Dense,run,High-level only,514,rmse,cycles_max,605.2128239950816,False
+test,Dense,run,High-level only,514,rmse,interval_max,356.0906471829701,False
+test,Dense,run,Late fusion,514,r2,bram,0.8600575302371032,True
+test,Dense,run,Late fusion,514,r2,dsp,0.8858875942383346,True
+test,Dense,run,Late fusion,514,r2,ff,0.9702903096307732,True
+test,Dense,run,Late fusion,514,r2,lut,0.8528416102070273,True
+test,Dense,run,Late fusion,514,r2,cycles_max,0.979042667223118,True
+test,Dense,run,Late fusion,514,r2,interval_max,0.9791865768241946,False
+test,Dense,run,Late fusion,514,smape,bram,18.086755866158644,False
+test,Dense,run,Late fusion,514,smape,dsp,13.676522504358863,False
+test,Dense,run,Late fusion,514,smape,ff,13.574342929276465,False
+test,Dense,run,Late fusion,514,smape,lut,15.441954862544007,False
+test,Dense,run,Late fusion,514,smape,cycles_max,14.871415316561608,False
+test,Dense,run,Late fusion,514,smape,interval_max,18.240601866466676,False
+test,Dense,run,Late fusion,514,rmse,bram,14.03469380551888,False
+test,Dense,run,Late fusion,514,rmse,dsp,403.1462460383437,True
+test,Dense,run,Late fusion,514,rmse,ff,11144.629329218229,True
+test,Dense,run,Late fusion,514,rmse,lut,52343.77210565073,False
+test,Dense,run,Late fusion,514,rmse,cycles_max,415.1023493684687,True
+test,Dense,run,Late fusion,514,rmse,interval_max,210.8662152754463,False
 test,Conv1D,paper,MLP,4693,r2,bram,0.39,False
 test,Conv1D,paper,MLP,4693,r2,dsp,-0.07,False
 test,Conv1D,paper,MLP,4693,r2,ff,0.31,False
@@ -233,42 +269,60 @@ test,Conv1D,paper,Transformer,4693,rmse,ff,4275.9,True
 test,Conv1D,paper,Transformer,4693,rmse,lut,3421.7,False
 test,Conv1D,paper,Transformer,4693,rmse,cycles_max,24561.6,False
 test,Conv1D,paper,Transformer,4693,rmse,interval_max,27547.3,False
-test,Conv1D,run,Hierarchy only,55,r2,bram,0.5894160536217992,False
-test,Conv1D,run,Hierarchy only,55,r2,dsp,0.8572138713636888,False
-test,Conv1D,run,Hierarchy only,55,r2,ff,0.8135023683171632,False
-test,Conv1D,run,Hierarchy only,55,r2,lut,0.8475829333536012,False
-test,Conv1D,run,Hierarchy only,55,r2,cycles_max,0.303024837272324,False
-test,Conv1D,run,Hierarchy only,55,r2,interval_max,0.28704483859248275,False
-test,Conv1D,run,Hierarchy only,55,smape,bram,36.418182139191565,False
-test,Conv1D,run,Hierarchy only,55,smape,dsp,12.717697665937344,False
-test,Conv1D,run,Hierarchy only,55,smape,ff,12.896356341806587,False
-test,Conv1D,run,Hierarchy only,55,smape,lut,13.575631086077015,False
-test,Conv1D,run,Hierarchy only,55,smape,cycles_max,51.22821323437968,False
-test,Conv1D,run,Hierarchy only,55,smape,interval_max,50.423747724100416,False
-test,Conv1D,run,Hierarchy only,55,rmse,bram,7.120121012248386,False
-test,Conv1D,run,Hierarchy only,55,rmse,dsp,0.8849189857071248,False
-test,Conv1D,run,Hierarchy only,55,rmse,ff,6965.618485656293,False
-test,Conv1D,run,Hierarchy only,55,rmse,lut,4219.4813035107245,False
-test,Conv1D,run,Hierarchy only,55,rmse,cycles_max,116832.48336199007,False
-test,Conv1D,run,Hierarchy only,55,rmse,interval_max,118163.94422498086,False
-test,Conv1D,run,Late fusion,55,r2,bram,0.8279494329430734,True
-test,Conv1D,run,Late fusion,55,r2,dsp,0.9528042475969295,True
-test,Conv1D,run,Late fusion,55,r2,ff,0.8930096062033691,False
-test,Conv1D,run,Late fusion,55,r2,lut,0.9287197497972073,False
-test,Conv1D,run,Late fusion,55,r2,cycles_max,0.8989964310455718,False
-test,Conv1D,run,Late fusion,55,r2,interval_max,0.8883959781017249,False
-test,Conv1D,run,Late fusion,55,smape,bram,25.76936461276144,True
-test,Conv1D,run,Late fusion,55,smape,dsp,9.005447815427752,True
-test,Conv1D,run,Late fusion,55,smape,ff,11.440223675046438,False
-test,Conv1D,run,Late fusion,55,smape,lut,10.856428281826862,False
-test,Conv1D,run,Late fusion,55,smape,cycles_max,20.318598157721247,False
-test,Conv1D,run,Late fusion,55,smape,interval_max,21.472917113881252,False
-test,Conv1D,run,Late fusion,55,rmse,bram,4.6090821274597324,True
-test,Conv1D,run,Late fusion,55,rmse,dsp,0.5087588307733805,True
-test,Conv1D,run,Late fusion,55,rmse,ff,5275.886165263803,False
-test,Conv1D,run,Late fusion,55,rmse,lut,2885.538512122644,True
-test,Conv1D,run,Late fusion,55,rmse,cycles_max,44475.7537490252,False
-test,Conv1D,run,Late fusion,55,rmse,interval_max,46751.31091673247,False
+test,Conv1D,run,Hierarchy only,55,r2,bram,0.5889686204885675,False
+test,Conv1D,run,Hierarchy only,55,r2,dsp,0.8570758576312791,False
+test,Conv1D,run,Hierarchy only,55,r2,ff,0.8136141267738306,False
+test,Conv1D,run,Hierarchy only,55,r2,lut,0.8479418919946948,False
+test,Conv1D,run,Hierarchy only,55,r2,cycles_max,0.30383142802662044,False
+test,Conv1D,run,Hierarchy only,55,r2,interval_max,0.2921830152875431,False
+test,Conv1D,run,Hierarchy only,55,smape,bram,36.46348568049758,False
+test,Conv1D,run,Hierarchy only,55,smape,dsp,12.763120840200946,False
+test,Conv1D,run,Hierarchy only,55,smape,ff,12.877353781513568,False
+test,Conv1D,run,Hierarchy only,55,smape,lut,13.527313445710261,False
+test,Conv1D,run,Hierarchy only,55,smape,cycles_max,51.26556989516029,False
+test,Conv1D,run,Hierarchy only,55,smape,interval_max,50.38495990832303,False
+test,Conv1D,run,Hierarchy only,55,rmse,bram,7.123999525558726,False
+test,Conv1D,run,Hierarchy only,55,rmse,dsp,0.8853465534102438,False
+test,Conv1D,run,Hierarchy only,55,rmse,ff,6963.531104107758,False
+test,Conv1D,run,Hierarchy only,55,rmse,lut,4214.509707701947,False
+test,Conv1D,run,Hierarchy only,55,rmse,cycles_max,116764.86023428632,False
+test,Conv1D,run,Hierarchy only,55,rmse,interval_max,117737.37806408036,False
+test,Conv1D,run,High-level only,55,r2,bram,0.6356600171530538,False
+test,Conv1D,run,High-level only,55,r2,dsp,0.9358568094462328,False
+test,Conv1D,run,High-level only,55,r2,ff,0.8633829117831826,False
+test,Conv1D,run,High-level only,55,r2,lut,0.8922430853837688,False
+test,Conv1D,run,High-level only,55,r2,cycles_max,0.7723271689359433,False
+test,Conv1D,run,High-level only,55,r2,interval_max,0.7282732983881884,False
+test,Conv1D,run,High-level only,55,smape,bram,32.717061960050046,False
+test,Conv1D,run,High-level only,55,smape,dsp,10.282317815330014,False
+test,Conv1D,run,High-level only,55,smape,ff,13.531772847425552,False
+test,Conv1D,run,High-level only,55,smape,lut,14.16345055085458,False
+test,Conv1D,run,High-level only,55,smape,cycles_max,26.81888684166726,False
+test,Conv1D,run,High-level only,55,smape,interval_max,26.76930604868622,False
+test,Conv1D,run,High-level only,55,rmse,bram,6.7071776479429435,False
+test,Conv1D,run,High-level only,55,rmse,dsp,0.593110732428036,False
+test,Conv1D,run,High-level only,55,rmse,ff,5961.774372564392,False
+test,Conv1D,run,High-level only,55,rmse,lut,3547.8466609144525,False
+test,Conv1D,run,High-level only,55,rmse,cycles_max,66774.48712924836,False
+test,Conv1D,run,High-level only,55,rmse,interval_max,72949.11521738155,False
+test,Conv1D,run,Late fusion,55,r2,bram,0.8281807586439733,True
+test,Conv1D,run,Late fusion,55,r2,dsp,0.9529381314315943,True
+test,Conv1D,run,Late fusion,55,r2,ff,0.8930125198655093,False
+test,Conv1D,run,Late fusion,55,r2,lut,0.9284852282984482,False
+test,Conv1D,run,Late fusion,55,r2,cycles_max,0.8992727866570824,False
+test,Conv1D,run,Late fusion,55,r2,interval_max,0.888386376495907,False
+test,Conv1D,run,Late fusion,55,smape,bram,25.751445458907657,True
+test,Conv1D,run,Late fusion,55,smape,dsp,8.993158705960067,True
+test,Conv1D,run,Late fusion,55,smape,ff,11.444948304267815,False
+test,Conv1D,run,Late fusion,55,smape,lut,10.848301568560554,False
+test,Conv1D,run,Late fusion,55,smape,cycles_max,20.28294905815007,False
+test,Conv1D,run,Late fusion,55,smape,interval_max,21.52180234297128,False
+test,Conv1D,run,Late fusion,55,rmse,bram,4.605982580056441,True
+test,Conv1D,run,Late fusion,55,rmse,dsp,0.5080367005516321,True
+test,Conv1D,run,Late fusion,55,rmse,ff,5275.8143258495875,False
+test,Conv1D,run,Late fusion,55,rmse,lut,2890.2815166934215,True
+test,Conv1D,run,Late fusion,55,rmse,cycles_max,44414.86707342563,False
+test,Conv1D,run,Late fusion,55,rmse,interval_max,46753.321946428834,False
 test,Conv2D,paper,MLP,6484,r2,bram,-0.5,False
 test,Conv2D,paper,MLP,6484,r2,dsp,0.15,False
 test,Conv2D,paper,MLP,6484,r2,ff,0.51,False
@@ -323,40 +377,58 @@ test,Conv2D,paper,Transformer,6484,rmse,ff,22659.7,True
 test,Conv2D,paper,Transformer,6484,rmse,lut,12971.7,False
 test,Conv2D,paper,Transformer,6484,rmse,cycles_max,999953.4,True
 test,Conv2D,paper,Transformer,6484,rmse,interval_max,1024014.3,True
-test,Conv2D,run,Hierarchy only,24,r2,bram,0.9192699805019102,True
-test,Conv2D,run,Hierarchy only,24,r2,dsp,0.8855568820357337,True
-test,Conv2D,run,Hierarchy only,24,r2,ff,0.5907396359232452,False
-test,Conv2D,run,Hierarchy only,24,r2,lut,0.9013958842892643,False
-test,Conv2D,run,Hierarchy only,24,r2,cycles_max,0.11823765046546375,False
+test,Conv2D,run,Hierarchy only,24,r2,bram,0.9192713947583515,True
+test,Conv2D,run,Hierarchy only,24,r2,dsp,0.8892484680714485,True
+test,Conv2D,run,Hierarchy only,24,r2,ff,0.5907416243153807,False
+test,Conv2D,run,Hierarchy only,24,r2,lut,0.8984497666459161,False
+test,Conv2D,run,Hierarchy only,24,r2,cycles_max,0.11735088068307553,False
 test,Conv2D,run,Hierarchy only,24,r2,interval_max,0.010581117454691924,False
-test,Conv2D,run,Hierarchy only,24,smape,bram,30.079055495536256,False
-test,Conv2D,run,Hierarchy only,24,smape,dsp,13.295904092841184,False
-test,Conv2D,run,Hierarchy only,24,smape,ff,25.53643186589822,False
-test,Conv2D,run,Hierarchy only,24,smape,lut,10.551623700380027,False
-test,Conv2D,run,Hierarchy only,24,smape,cycles_max,70.71510144036232,False
+test,Conv2D,run,Hierarchy only,24,smape,bram,30.025799229135576,False
+test,Conv2D,run,Hierarchy only,24,smape,dsp,13.231490599121804,False
+test,Conv2D,run,Hierarchy only,24,smape,ff,25.521679596612866,False
+test,Conv2D,run,Hierarchy only,24,smape,lut,10.49859229863163,False
+test,Conv2D,run,Hierarchy only,24,smape,cycles_max,70.88059484152085,False
 test,Conv2D,run,Hierarchy only,24,smape,interval_max,80.75530540788478,False
-test,Conv2D,run,Hierarchy only,24,rmse,bram,32.7209282147735,False
-test,Conv2D,run,Hierarchy only,24,rmse,dsp,4.887414643709042,True
-test,Conv2D,run,Hierarchy only,24,rmse,ff,103093.53372201999,False
-test,Conv2D,run,Hierarchy only,24,rmse,lut,14210.517714164314,False
-test,Conv2D,run,Hierarchy only,24,rmse,cycles_max,3630212.443472143,False
+test,Conv2D,run,Hierarchy only,24,rmse,bram,32.72064160524182,False
+test,Conv2D,run,Hierarchy only,24,rmse,dsp,4.807941956663231,True
+test,Conv2D,run,Hierarchy only,24,rmse,ff,103093.28328166631,False
+test,Conv2D,run,Hierarchy only,24,rmse,lut,14421.247882000456,False
+test,Conv2D,run,Hierarchy only,24,rmse,cycles_max,3632037.3987710103,False
 test,Conv2D,run,Hierarchy only,24,rmse,interval_max,3845443.3416358754,False
-test,Conv2D,run,Late fusion,24,r2,bram,0.6084076640310848,False
-test,Conv2D,run,Late fusion,24,r2,dsp,0.8399400038398486,False
-test,Conv2D,run,Late fusion,24,r2,ff,0.9633594773952127,True
-test,Conv2D,run,Late fusion,24,r2,lut,0.9806291973420911,True
+test,Conv2D,run,High-level only,24,r2,bram,0.16449651216036698,False
+test,Conv2D,run,High-level only,24,r2,dsp,0.4272382379318924,False
+test,Conv2D,run,High-level only,24,r2,ff,0.4648672668741044,False
+test,Conv2D,run,High-level only,24,r2,lut,0.6376237607378406,False
+test,Conv2D,run,High-level only,24,r2,cycles_max,0.10350790965307011,False
+test,Conv2D,run,High-level only,24,r2,interval_max,0.08624973965713412,False
+test,Conv2D,run,High-level only,24,smape,bram,42.889216129221275,False
+test,Conv2D,run,High-level only,24,smape,dsp,22.00629810089401,False
+test,Conv2D,run,High-level only,24,smape,ff,26.540500252296294,False
+test,Conv2D,run,High-level only,24,smape,lut,21.6829498758252,False
+test,Conv2D,run,High-level only,24,smape,cycles_max,55.573839126340566,False
+test,Conv2D,run,High-level only,24,smape,interval_max,56.13607096594236,False
+test,Conv2D,run,High-level only,24,rmse,bram,105.26456982045505,False
+test,Conv2D,run,High-level only,24,rmse,dsp,10.933805731892766,False
+test,Conv2D,run,High-level only,24,rmse,ff,117886.02973354145,False
+test,Conv2D,run,High-level only,24,rmse,lut,27242.20368726039,False
+test,Conv2D,run,High-level only,24,rmse,cycles_max,3660408.0075354488,False
+test,Conv2D,run,High-level only,24,rmse,interval_max,3695473.3656910392,False
+test,Conv2D,run,Late fusion,24,r2,bram,0.6084032125350936,False
+test,Conv2D,run,Late fusion,24,r2,dsp,0.8399436325796749,False
+test,Conv2D,run,Late fusion,24,r2,ff,0.9633569368585445,True
+test,Conv2D,run,Late fusion,24,r2,lut,0.980620767942594,True
 test,Conv2D,run,Late fusion,24,r2,cycles_max,0.5911280618557646,False
 test,Conv2D,run,Late fusion,24,r2,interval_max,0.6732295582506018,False
-test,Conv2D,run,Late fusion,24,smape,bram,32.47760331603826,False
-test,Conv2D,run,Late fusion,24,smape,dsp,11.115439830266821,True
-test,Conv2D,run,Late fusion,24,smape,ff,16.386849061688096,False
-test,Conv2D,run,Late fusion,24,smape,lut,13.237038922823322,False
+test,Conv2D,run,Late fusion,24,smape,bram,32.474642029736444,False
+test,Conv2D,run,Late fusion,24,smape,dsp,11.105031618863036,True
+test,Conv2D,run,Late fusion,24,smape,ff,16.39849593521186,False
+test,Conv2D,run,Late fusion,24,smape,lut,13.247524975911851,False
 test,Conv2D,run,Late fusion,24,smape,cycles_max,38.098602237495605,False
 test,Conv2D,run,Late fusion,24,smape,interval_max,37.75945652177818,False
-test,Conv2D,run,Late fusion,24,rmse,bram,72.06513061447467,False
-test,Conv2D,run,Late fusion,24,rmse,dsp,5.779972152824542,False
-test,Conv2D,run,Late fusion,24,rmse,ff,30846.963010808573,False
-test,Conv2D,run,Late fusion,24,rmse,lut,6298.4862755123,True
+test,Conv2D,run,Late fusion,24,rmse,bram,72.06554021994815,False
+test,Conv2D,run,Late fusion,24,rmse,dsp,5.779906633223997,False
+test,Conv2D,run,Late fusion,24,rmse,ff,30848.032407158084,False
+test,Conv2D,run,Late fusion,24,rmse,lut,6299.856551264623,True
 test,Conv2D,run,Late fusion,24,rmse,cycles_max,2472008.2630406423,False
 test,Conv2D,run,Late fusion,24,rmse,interval_max,2209925.851667068,False
 exemplar,Jet,paper,MLP,124,r2,bram,-1.22,False
@@ -413,46 +485,64 @@ exemplar,Jet,paper,Transformer,124,rmse,ff,7764.8,False
 exemplar,Jet,paper,Transformer,124,rmse,lut,17520.1,False
 exemplar,Jet,paper,Transformer,124,rmse,cycles_max,944.2,False
 exemplar,Jet,paper,Transformer,124,rmse,interval_max,542.0,False
-exemplar,Jet,run,Hierarchy only,115,r2,bram,-0.971412744657471,True
-exemplar,Jet,run,Hierarchy only,115,r2,dsp,0.4124420043172581,True
-exemplar,Jet,run,Hierarchy only,115,r2,ff,0.4728675241909668,False
-exemplar,Jet,run,Hierarchy only,115,r2,lut,0.18340410795195317,False
-exemplar,Jet,run,Hierarchy only,115,r2,cycles_max,0.4448814168046701,False
-exemplar,Jet,run,Hierarchy only,115,r2,interval_max,0.7152586751488286,True
-exemplar,Jet,run,Hierarchy only,115,smape,bram,56.07885400720382,True
-exemplar,Jet,run,Hierarchy only,115,smape,dsp,74.86180204779305,False
-exemplar,Jet,run,Hierarchy only,115,smape,ff,57.244740052805255,False
-exemplar,Jet,run,Hierarchy only,115,smape,lut,41.84594759264514,False
-exemplar,Jet,run,Hierarchy only,115,smape,cycles_max,100.3163937436058,False
-exemplar,Jet,run,Hierarchy only,115,smape,interval_max,67.06684801888876,False
-exemplar,Jet,run,Hierarchy only,115,rmse,bram,2.1135149645106055,True
-exemplar,Jet,run,Hierarchy only,115,rmse,dsp,512.300243497299,True
-exemplar,Jet,run,Hierarchy only,115,rmse,ff,7783.258372744303,False
-exemplar,Jet,run,Hierarchy only,115,rmse,lut,15733.637322519717,False
-exemplar,Jet,run,Hierarchy only,115,rmse,cycles_max,788.5728600998291,False
-exemplar,Jet,run,Hierarchy only,115,rmse,interval_max,302.6728291074499,True
-exemplar,Jet,run,Late fusion,115,r2,bram,-3.6883528561497307,False
-exemplar,Jet,run,Late fusion,115,r2,dsp,0.04332070541227273,False
-exemplar,Jet,run,Late fusion,115,r2,ff,0.7897129569632302,True
-exemplar,Jet,run,Late fusion,115,r2,lut,0.8356077896822626,True
-exemplar,Jet,run,Late fusion,115,r2,cycles_max,0.4282497672568705,False
-exemplar,Jet,run,Late fusion,115,r2,interval_max,0.077647584336344,False
-exemplar,Jet,run,Late fusion,115,smape,bram,75.7910225208911,False
-exemplar,Jet,run,Late fusion,115,smape,dsp,72.26061181486992,True
-exemplar,Jet,run,Late fusion,115,smape,ff,42.008807639723926,True
-exemplar,Jet,run,Late fusion,115,smape,lut,21.67288472349011,True
-exemplar,Jet,run,Late fusion,115,smape,cycles_max,79.8808427554623,True
-exemplar,Jet,run,Late fusion,115,smape,interval_max,78.5287799057574,False
-exemplar,Jet,run,Late fusion,115,rmse,bram,3.2593176792690337,False
-exemplar,Jet,run,Late fusion,115,rmse,dsp,653.7058617447145,False
-exemplar,Jet,run,Late fusion,115,rmse,ff,4915.954085698778,True
-exemplar,Jet,run,Late fusion,115,rmse,lut,7059.373445191451,True
-exemplar,Jet,run,Late fusion,115,rmse,cycles_max,800.2987123207254,False
-exemplar,Jet,run,Late fusion,115,rmse,interval_max,544.7492364931618,False
+exemplar,Jet,run,Hierarchy only,124,r2,bram,-1.0649937526145026,True
+exemplar,Jet,run,Hierarchy only,124,r2,dsp,0.4079375269327551,True
+exemplar,Jet,run,Hierarchy only,124,r2,ff,0.3450954666677214,False
+exemplar,Jet,run,Hierarchy only,124,r2,lut,0.037693181014274435,False
+exemplar,Jet,run,Hierarchy only,124,r2,cycles_max,0.44771440564593523,False
+exemplar,Jet,run,Hierarchy only,124,r2,interval_max,0.7232111801306088,True
+exemplar,Jet,run,Hierarchy only,124,smape,bram,58.72749126168894,True
+exemplar,Jet,run,Hierarchy only,124,smape,dsp,72.66579233180899,True
+exemplar,Jet,run,Hierarchy only,124,smape,ff,58.54627662373909,False
+exemplar,Jet,run,Hierarchy only,124,smape,lut,42.618397553211274,False
+exemplar,Jet,run,Hierarchy only,124,smape,cycles_max,104.8372714590898,False
+exemplar,Jet,run,Hierarchy only,124,smape,interval_max,69.0791453826105,False
+exemplar,Jet,run,Hierarchy only,124,rmse,bram,2.147741905521285,True
+exemplar,Jet,run,Hierarchy only,124,rmse,dsp,514.1628552806696,True
+exemplar,Jet,run,Hierarchy only,124,rmse,ff,8531.692714304882,False
+exemplar,Jet,run,Hierarchy only,124,rmse,lut,16898.578696983415,False
+exemplar,Jet,run,Hierarchy only,124,rmse,cycles_max,770.5308935553528,False
+exemplar,Jet,run,Hierarchy only,124,rmse,interval_max,290.96047328074644,True
+exemplar,Jet,run,High-level only,124,r2,bram,-1.7057534279598388,False
+exemplar,Jet,run,High-level only,124,r2,dsp,0.039531354308469435,False
+exemplar,Jet,run,High-level only,124,r2,ff,-0.5740399812150261,False
+exemplar,Jet,run,High-level only,124,r2,lut,0.5467069400556264,False
+exemplar,Jet,run,High-level only,124,r2,cycles_max,0.5215703676526634,False
+exemplar,Jet,run,High-level only,124,r2,interval_max,0.46779482296019337,False
+exemplar,Jet,run,High-level only,124,smape,bram,96.60334497327955,False
+exemplar,Jet,run,High-level only,124,smape,dsp,105.39992095149474,False
+exemplar,Jet,run,High-level only,124,smape,ff,66.10590150415011,False
+exemplar,Jet,run,High-level only,124,smape,lut,41.786913468457236,False
+exemplar,Jet,run,High-level only,124,smape,cycles_max,101.73576862315619,False
+exemplar,Jet,run,High-level only,124,smape,interval_max,117.71275062773951,False
+exemplar,Jet,run,High-level only,124,rmse,bram,2.4584808431367278,False
+exemplar,Jet,run,High-level only,124,rmse,dsp,654.875174529575,False
+exemplar,Jet,run,High-level only,124,rmse,ff,13226.778673134726,False
+exemplar,Jet,run,High-level only,124,rmse,lut,11597.995393410081,False
+exemplar,Jet,run,High-level only,124,rmse,cycles_max,717.1619403051337,False
+exemplar,Jet,run,High-level only,124,rmse,interval_max,403.4588719300008,False
+exemplar,Jet,run,Late fusion,124,r2,bram,-3.5886690478683176,False
+exemplar,Jet,run,Late fusion,124,r2,dsp,0.04312579405518935,False
+exemplar,Jet,run,Late fusion,124,r2,ff,0.7774084453932497,True
+exemplar,Jet,run,Late fusion,124,r2,lut,0.8429712094392784,True
+exemplar,Jet,run,Late fusion,124,r2,cycles_max,0.4461137336176947,False
+exemplar,Jet,run,Late fusion,124,r2,interval_max,0.10016670821813123,False
+exemplar,Jet,run,Late fusion,124,smape,bram,76.8582390996978,False
+exemplar,Jet,run,Late fusion,124,smape,dsp,73.39139003629899,False
+exemplar,Jet,run,Late fusion,124,smape,ff,43.62723759532769,True
+exemplar,Jet,run,Late fusion,124,smape,lut,20.884607035289587,True
+exemplar,Jet,run,Late fusion,124,smape,cycles_max,82.2190537285322,True
+exemplar,Jet,run,Late fusion,124,smape,interval_max,77.53164586416007,False
+exemplar,Jet,run,Late fusion,124,rmse,bram,3.201592749866824,False
+exemplar,Jet,run,Late fusion,124,rmse,dsp,653.6486296526892,False
+exemplar,Jet,run,Late fusion,124,rmse,ff,4973.940068122198,True
+exemplar,Jet,run,Late fusion,124,rmse,lut,6826.263364819674,True
+exemplar,Jet,run,Late fusion,124,rmse,cycles_max,771.6466884412664,False
+exemplar,Jet,run,Late fusion,124,rmse,interval_max,524.6150568278083,False
 exemplar,Quarks,paper,MLP,126,r2,bram,,False
 exemplar,Quarks,paper,MLP,126,r2,dsp,0.19,False
 exemplar,Quarks,paper,MLP,126,r2,ff,0.51,True
-exemplar,Quarks,paper,MLP,126,r2,lut,-0.41,True
+exemplar,Quarks,paper,MLP,126,r2,lut,-0.41,False
 exemplar,Quarks,paper,MLP,126,r2,cycles_max,-36.68,False
 exemplar,Quarks,paper,MLP,126,r2,interval_max,-13.18,False
 exemplar,Quarks,paper,MLP,126,smape,bram,129.9,True
@@ -464,7 +554,7 @@ exemplar,Quarks,paper,MLP,126,smape,interval_max,136.3,False
 exemplar,Quarks,paper,MLP,126,rmse,bram,2.3,False
 exemplar,Quarks,paper,MLP,126,rmse,dsp,108.6,False
 exemplar,Quarks,paper,MLP,126,rmse,ff,1327.1,True
-exemplar,Quarks,paper,MLP,126,rmse,lut,3298.1,True
+exemplar,Quarks,paper,MLP,126,rmse,lut,3298.1,False
 exemplar,Quarks,paper,MLP,126,rmse,cycles_max,441.1,False
 exemplar,Quarks,paper,MLP,126,rmse,interval_max,266.6,False
 exemplar,Quarks,paper,GNN,126,r2,bram,,False
@@ -503,42 +593,60 @@ exemplar,Quarks,paper,Transformer,126,rmse,ff,1655.9,False
 exemplar,Quarks,paper,Transformer,126,rmse,lut,10193.2,False
 exemplar,Quarks,paper,Transformer,126,rmse,cycles_max,164.0,True
 exemplar,Quarks,paper,Transformer,126,rmse,interval_max,134.5,False
-exemplar,Quarks,run,Hierarchy only,117,r2,bram,,False
-exemplar,Quarks,run,Hierarchy only,117,r2,dsp,0.30957789241952305,True
-exemplar,Quarks,run,Hierarchy only,117,r2,ff,-4.162502635326979,False
-exemplar,Quarks,run,Hierarchy only,117,r2,lut,-6.492889653467098,False
-exemplar,Quarks,run,Hierarchy only,117,r2,cycles_max,-76.43193928611743,False
-exemplar,Quarks,run,Hierarchy only,117,r2,interval_max,0.18927901311832052,True
-exemplar,Quarks,run,Hierarchy only,117,smape,bram,143.7367781074783,False
-exemplar,Quarks,run,Hierarchy only,117,smape,dsp,39.28007687338951,True
-exemplar,Quarks,run,Hierarchy only,117,smape,ff,92.88537186347897,False
-exemplar,Quarks,run,Hierarchy only,117,smape,lut,100.12810282837857,False
-exemplar,Quarks,run,Hierarchy only,117,smape,cycles_max,176.70402321659603,False
-exemplar,Quarks,run,Hierarchy only,117,smape,interval_max,114.38174705873456,True
-exemplar,Quarks,run,Hierarchy only,117,rmse,bram,3.985040116046052,False
-exemplar,Quarks,run,Hierarchy only,117,rmse,dsp,98.87784048189482,True
-exemplar,Quarks,run,Hierarchy only,117,rmse,ff,4343.928148087214,False
-exemplar,Quarks,run,Hierarchy only,117,rmse,lut,7649.744139077475,False
-exemplar,Quarks,run,Hierarchy only,117,rmse,cycles_max,653.5199371699683,False
-exemplar,Quarks,run,Hierarchy only,117,rmse,interval_max,65.91360354244706,True
-exemplar,Quarks,run,Late fusion,117,r2,bram,,False
-exemplar,Quarks,run,Late fusion,117,r2,dsp,0.29501662026322995,False
-exemplar,Quarks,run,Late fusion,117,r2,ff,-0.13751185642265829,False
-exemplar,Quarks,run,Late fusion,117,r2,lut,-2.195109170280767,False
-exemplar,Quarks,run,Late fusion,117,r2,cycles_max,-14.375780392099514,False
-exemplar,Quarks,run,Late fusion,117,r2,interval_max,-1.2447151406179344,False
-exemplar,Quarks,run,Late fusion,117,smape,bram,130.64605060421175,False
-exemplar,Quarks,run,Late fusion,117,smape,dsp,48.02550815017843,False
-exemplar,Quarks,run,Late fusion,117,smape,ff,93.58620107376488,False
-exemplar,Quarks,run,Late fusion,117,smape,lut,89.55571291064766,True
-exemplar,Quarks,run,Late fusion,117,smape,cycles_max,149.53289275140645,False
-exemplar,Quarks,run,Late fusion,117,smape,interval_max,120.91625474397205,False
-exemplar,Quarks,run,Late fusion,117,rmse,bram,2.208943608073926,False
-exemplar,Quarks,run,Late fusion,117,rmse,dsp,99.91508619319822,False
-exemplar,Quarks,run,Late fusion,117,rmse,ff,2039.0621160932485,False
-exemplar,Quarks,run,Late fusion,117,rmse,lut,4995.340446582258,False
-exemplar,Quarks,run,Late fusion,117,rmse,cycles_max,291.21742461903125,False
-exemplar,Quarks,run,Late fusion,117,rmse,interval_max,109.67811192810387,False
+exemplar,Quarks,run,Hierarchy only,126,r2,bram,,False
+exemplar,Quarks,run,Hierarchy only,126,r2,dsp,0.28019711784768864,False
+exemplar,Quarks,run,Hierarchy only,126,r2,ff,-4.111262845353479,False
+exemplar,Quarks,run,Hierarchy only,126,r2,lut,-6.597938784277449,False
+exemplar,Quarks,run,Hierarchy only,126,r2,cycles_max,-79.74793415231294,False
+exemplar,Quarks,run,Hierarchy only,126,r2,interval_max,0.13284917800848084,True
+exemplar,Quarks,run,Hierarchy only,126,smape,bram,143.73050749523233,False
+exemplar,Quarks,run,Hierarchy only,126,smape,dsp,39.71330776487559,True
+exemplar,Quarks,run,Hierarchy only,126,smape,ff,93.44765339609084,False
+exemplar,Quarks,run,Hierarchy only,126,smape,lut,100.123382587781,False
+exemplar,Quarks,run,Hierarchy only,126,smape,cycles_max,177.02535177085855,False
+exemplar,Quarks,run,Hierarchy only,126,smape,interval_max,114.99089823860801,True
+exemplar,Quarks,run,Hierarchy only,126,rmse,bram,3.974628493930887,False
+exemplar,Quarks,run,Hierarchy only,126,rmse,dsp,102.24867000699588,False
+exemplar,Quarks,run,Hierarchy only,126,rmse,ff,4298.273806757641,False
+exemplar,Quarks,run,Hierarchy only,126,rmse,lut,7658.503544130635,False
+exemplar,Quarks,run,Hierarchy only,126,rmse,cycles_max,645.6778888202447,False
+exemplar,Quarks,run,Hierarchy only,126,rmse,interval_max,65.94375588870142,True
+exemplar,Quarks,run,High-level only,126,r2,bram,,False
+exemplar,Quarks,run,High-level only,126,r2,dsp,0.3056849766218259,True
+exemplar,Quarks,run,High-level only,126,r2,ff,-0.0038951872262380505,False
+exemplar,Quarks,run,High-level only,126,r2,lut,0.329731512250346,True
+exemplar,Quarks,run,High-level only,126,r2,cycles_max,-27.437750021450125,False
+exemplar,Quarks,run,High-level only,126,r2,interval_max,-3.9669919033842076,False
+exemplar,Quarks,run,High-level only,126,smape,bram,138.16962365456268,False
+exemplar,Quarks,run,High-level only,126,smape,dsp,53.96201339989345,False
+exemplar,Quarks,run,High-level only,126,smape,ff,84.81080512199463,False
+exemplar,Quarks,run,High-level only,126,smape,lut,67.76174644094466,True
+exemplar,Quarks,run,High-level only,126,smape,cycles_max,146.4583441075166,False
+exemplar,Quarks,run,High-level only,126,smape,interval_max,123.63034134358672,False
+exemplar,Quarks,run,High-level only,126,rmse,bram,3.010199225542277,False
+exemplar,Quarks,run,High-level only,126,rmse,dsp,100.42206746233634,True
+exemplar,Quarks,run,High-level only,126,rmse,ff,1904.9086586274832,False
+exemplar,Quarks,run,High-level only,126,rmse,lut,2274.6805989845557,True
+exemplar,Quarks,run,High-level only,126,rmse,cycles_max,383.1755772469087,False
+exemplar,Quarks,run,High-level only,126,rmse,interval_max,157.82401413437563,False
+exemplar,Quarks,run,Late fusion,126,r2,bram,,False
+exemplar,Quarks,run,Late fusion,126,r2,dsp,0.26497138647907925,False
+exemplar,Quarks,run,Late fusion,126,r2,ff,-0.15265429806602904,False
+exemplar,Quarks,run,Late fusion,126,r2,lut,-2.1928944818079086,False
+exemplar,Quarks,run,Late fusion,126,r2,cycles_max,-15.073745119367032,False
+exemplar,Quarks,run,Late fusion,126,r2,interval_max,-1.3043577201915681,False
+exemplar,Quarks,run,Late fusion,126,smape,bram,130.76053343118122,False
+exemplar,Quarks,run,Late fusion,126,smape,dsp,49.254300834409875,False
+exemplar,Quarks,run,Late fusion,126,smape,ff,92.72590486765857,False
+exemplar,Quarks,run,Late fusion,126,smape,lut,88.74069756214627,False
+exemplar,Quarks,run,Late fusion,126,smape,cycles_max,150.07446001781489,False
+exemplar,Quarks,run,Late fusion,126,smape,interval_max,120.21637902141677,False
+exemplar,Quarks,run,Late fusion,126,rmse,bram,2.2258955074457654,False
+exemplar,Quarks,run,Late fusion,126,rmse,dsp,103.32442567087465,False
+exemplar,Quarks,run,Late fusion,126,rmse,ff,2041.1715514574646,False
+exemplar,Quarks,run,Late fusion,126,rmse,lut,4964.646215000745,False
+exemplar,Quarks,run,Late fusion,126,rmse,cycles_max,288.07710428924634,False
+exemplar,Quarks,run,Late fusion,126,rmse,interval_max,107.49822870610517,False
 exemplar,Anomaly,paper,MLP,133,r2,bram,-0.8,False
 exemplar,Anomaly,paper,MLP,133,r2,dsp,0.26,False
 exemplar,Anomaly,paper,MLP,133,r2,ff,0.59,False
@@ -593,42 +701,60 @@ exemplar,Anomaly,paper,Transformer,133,rmse,ff,68319.0,False
 exemplar,Anomaly,paper,Transformer,133,rmse,lut,223829.6,False
 exemplar,Anomaly,paper,Transformer,133,rmse,cycles_max,820.9,False
 exemplar,Anomaly,paper,Transformer,133,rmse,interval_max,434.9,False
-exemplar,Anomaly,run,Hierarchy only,122,r2,bram,0.08128123719703717,True
-exemplar,Anomaly,run,Hierarchy only,122,r2,dsp,0.5500189570802593,False
-exemplar,Anomaly,run,Hierarchy only,122,r2,ff,0.48466406221016833,False
-exemplar,Anomaly,run,Hierarchy only,122,r2,lut,-0.2929604246841542,False
-exemplar,Anomaly,run,Hierarchy only,122,r2,cycles_max,-0.3740491936560273,False
-exemplar,Anomaly,run,Hierarchy only,122,r2,interval_max,0.6547448728703729,True
-exemplar,Anomaly,run,Hierarchy only,122,smape,bram,68.04960124996121,True
-exemplar,Anomaly,run,Hierarchy only,122,smape,dsp,87.6894021551097,False
-exemplar,Anomaly,run,Hierarchy only,122,smape,ff,48.60647085822482,False
-exemplar,Anomaly,run,Hierarchy only,122,smape,lut,39.44440037169494,True
-exemplar,Anomaly,run,Hierarchy only,122,smape,cycles_max,60.29297937098629,False
-exemplar,Anomaly,run,Hierarchy only,122,smape,interval_max,75.29680498031631,False
-exemplar,Anomaly,run,Hierarchy only,122,rmse,bram,3.1739750916124216,True
-exemplar,Anomaly,run,Hierarchy only,122,rmse,dsp,406.24484653788295,False
-exemplar,Anomaly,run,Hierarchy only,122,rmse,ff,14062.93261281517,False
-exemplar,Anomaly,run,Hierarchy only,122,rmse,lut,22051.512343520757,False
-exemplar,Anomaly,run,Hierarchy only,122,rmse,cycles_max,1124.9617059659633,False
-exemplar,Anomaly,run,Hierarchy only,122,rmse,interval_max,299.20102449939844,True
-exemplar,Anomaly,run,Late fusion,122,r2,bram,-5.451648059246074,False
-exemplar,Anomaly,run,Late fusion,122,r2,dsp,0.4668347667415962,False
-exemplar,Anomaly,run,Late fusion,122,r2,ff,0.5957196198608007,True
-exemplar,Anomaly,run,Late fusion,122,r2,lut,-1.0736167022784109,False
-exemplar,Anomaly,run,Late fusion,122,r2,cycles_max,0.5458014802332822,True
-exemplar,Anomaly,run,Late fusion,122,r2,interval_max,0.11577101274229773,False
-exemplar,Anomaly,run,Late fusion,122,smape,bram,92.09565105467752,False
-exemplar,Anomaly,run,Late fusion,122,smape,dsp,39.80352626316284,True
-exemplar,Anomaly,run,Late fusion,122,smape,ff,42.07996059700519,False
-exemplar,Anomaly,run,Late fusion,122,smape,lut,45.67504017692781,False
-exemplar,Anomaly,run,Late fusion,122,smape,cycles_max,29.93062941397451,True
-exemplar,Anomaly,run,Late fusion,122,smape,interval_max,65.27878263128456,True
-exemplar,Anomaly,run,Late fusion,122,rmse,bram,8.410998498024716,False
-exemplar,Anomaly,run,Late fusion,122,rmse,dsp,442.2029818962261,False
-exemplar,Anomaly,run,Late fusion,122,rmse,ff,12455.811107288197,True
-exemplar,Anomaly,run,Late fusion,122,rmse,lut,27926.081739020727,False
-exemplar,Anomaly,run,Late fusion,122,rmse,cycles_max,646.7842796269221,True
-exemplar,Anomaly,run,Late fusion,122,rmse,interval_max,478.82341745233845,False
+exemplar,Anomaly,run,Hierarchy only,133,r2,bram,0.08879037993247607,True
+exemplar,Anomaly,run,Hierarchy only,133,r2,dsp,0.5538499954063174,False
+exemplar,Anomaly,run,Hierarchy only,133,r2,ff,0.4716294081818234,False
+exemplar,Anomaly,run,Hierarchy only,133,r2,lut,-0.31134615975024005,False
+exemplar,Anomaly,run,Hierarchy only,133,r2,cycles_max,-0.2901063018453369,False
+exemplar,Anomaly,run,Hierarchy only,133,r2,interval_max,0.6611918157501742,True
+exemplar,Anomaly,run,Hierarchy only,133,smape,bram,67.19537432994714,True
+exemplar,Anomaly,run,Hierarchy only,133,smape,dsp,87.73046142126256,False
+exemplar,Anomaly,run,Hierarchy only,133,smape,ff,50.33040517259002,False
+exemplar,Anomaly,run,Hierarchy only,133,smape,lut,40.03407852702156,True
+exemplar,Anomaly,run,Hierarchy only,133,smape,cycles_max,58.87978842268941,False
+exemplar,Anomaly,run,Hierarchy only,133,smape,interval_max,76.78417120824544,False
+exemplar,Anomaly,run,Hierarchy only,133,rmse,bram,3.133438922716767,True
+exemplar,Anomaly,run,Hierarchy only,133,rmse,dsp,389.7160551492768,False
+exemplar,Anomaly,run,Hierarchy only,133,rmse,ff,14429.395412233398,False
+exemplar,Anomaly,run,Hierarchy only,133,rmse,lut,21976.805612768912,False
+exemplar,Anomaly,run,Hierarchy only,133,rmse,cycles_max,1132.1887882636172,False
+exemplar,Anomaly,run,Hierarchy only,133,rmse,interval_max,306.0036174242139,True
+exemplar,Anomaly,run,High-level only,133,r2,bram,-0.5122810813659273,False
+exemplar,Anomaly,run,High-level only,133,r2,dsp,0.1979894164301651,False
+exemplar,Anomaly,run,High-level only,133,r2,ff,-0.3987950141124694,False
+exemplar,Anomaly,run,High-level only,133,r2,lut,-1.6816958963818727,False
+exemplar,Anomaly,run,High-level only,133,r2,cycles_max,0.40950872309094766,False
+exemplar,Anomaly,run,High-level only,133,r2,interval_max,0.5281042219645633,False
+exemplar,Anomaly,run,High-level only,133,smape,bram,71.71314241530038,False
+exemplar,Anomaly,run,High-level only,133,smape,dsp,77.65550540459249,False
+exemplar,Anomaly,run,High-level only,133,smape,ff,48.71871281020341,False
+exemplar,Anomaly,run,High-level only,133,smape,lut,60.844835718992165,False
+exemplar,Anomaly,run,High-level only,133,smape,cycles_max,48.563884710678984,False
+exemplar,Anomaly,run,High-level only,133,smape,interval_max,82.24398768307053,False
+exemplar,Anomaly,run,High-level only,133,rmse,bram,4.036717387588207,False
+exemplar,Anomaly,run,High-level only,133,rmse,dsp,522.5139583569253,False
+exemplar,Anomaly,run,High-level only,133,rmse,ff,23477.71647887521,False
+exemplar,Anomaly,run,High-level only,133,rmse,lut,31427.559417369095,False
+exemplar,Anomaly,run,High-level only,133,rmse,cycles_max,765.9719124665428,False
+exemplar,Anomaly,run,High-level only,133,rmse,interval_max,361.137560575078,False
+exemplar,Anomaly,run,Late fusion,133,r2,bram,-5.683831719493879,False
+exemplar,Anomaly,run,Late fusion,133,r2,dsp,0.47278375025441277,False
+exemplar,Anomaly,run,Late fusion,133,r2,ff,0.5935380471662337,True
+exemplar,Anomaly,run,Late fusion,133,r2,lut,-1.0357074499331618,False
+exemplar,Anomaly,run,Late fusion,133,r2,cycles_max,0.5389168223176984,True
+exemplar,Anomaly,run,Late fusion,133,r2,interval_max,0.10330034405542687,False
+exemplar,Anomaly,run,Late fusion,133,smape,bram,91.62341529583455,False
+exemplar,Anomaly,run,Late fusion,133,smape,dsp,38.983764165057664,True
+exemplar,Anomaly,run,Late fusion,133,smape,ff,42.488773243981555,False
+exemplar,Anomaly,run,Late fusion,133,smape,lut,44.898241766521835,False
+exemplar,Anomaly,run,Late fusion,133,smape,cycles_max,30.754208757151023,True
+exemplar,Anomaly,run,Late fusion,133,smape,interval_max,66.82481262750862,True
+exemplar,Anomaly,run,Late fusion,133,rmse,bram,8.486426207842843,False
+exemplar,Anomaly,run,Late fusion,133,rmse,dsp,423.64515177500203,False
+exemplar,Anomaly,run,Late fusion,133,rmse,ff,12655.775595361756,True
+exemplar,Anomaly,run,Late fusion,133,rmse,lut,27381.899708116696,False
+exemplar,Anomaly,run,Late fusion,133,rmse,cycles_max,676.8551541181351,True
+exemplar,Anomaly,run,Late fusion,133,rmse,interval_max,497.8208887219036,False
 exemplar,BiPC,paper,MLP,119,r2,bram,-0.71,False
 exemplar,BiPC,paper,MLP,119,r2,dsp,-0.04,False
 exemplar,BiPC,paper,MLP,119,r2,ff,0.16,False
@@ -664,7 +790,7 @@ exemplar,BiPC,paper,GNN,119,rmse,dsp,1776.3,False
 exemplar,BiPC,paper,GNN,119,rmse,ff,30980.1,False
 exemplar,BiPC,paper,GNN,119,rmse,lut,55222.2,False
 exemplar,BiPC,paper,GNN,119,rmse,cycles_max,2090.1,False
-exemplar,BiPC,paper,GNN,119,rmse,interval_max,559.7,True
+exemplar,BiPC,paper,GNN,119,rmse,interval_max,559.7,False
 exemplar,BiPC,paper,Transformer,119,r2,bram,-17.38,False
 exemplar,BiPC,paper,Transformer,119,r2,dsp,0.12,False
 exemplar,BiPC,paper,Transformer,119,r2,ff,-16.7,False
@@ -683,42 +809,60 @@ exemplar,BiPC,paper,Transformer,119,rmse,ff,112115.9,False
 exemplar,BiPC,paper,Transformer,119,rmse,lut,179918.2,False
 exemplar,BiPC,paper,Transformer,119,rmse,cycles_max,1832.6,False
 exemplar,BiPC,paper,Transformer,119,rmse,interval_max,563.7,False
-exemplar,BiPC,run,Hierarchy only,106,r2,bram,-0.0757692255089224,False
-exemplar,BiPC,run,Hierarchy only,106,r2,dsp,0.42841795348313527,False
-exemplar,BiPC,run,Hierarchy only,106,r2,ff,0.30588357946541433,False
-exemplar,BiPC,run,Hierarchy only,106,r2,lut,-0.07097112485136359,False
-exemplar,BiPC,run,Hierarchy only,106,r2,cycles_max,0.5627861873864226,True
-exemplar,BiPC,run,Hierarchy only,106,r2,interval_max,0.45707979494409146,True
-exemplar,BiPC,run,Hierarchy only,106,smape,bram,42.66239343002415,False
-exemplar,BiPC,run,Hierarchy only,106,smape,dsp,20.645929974123508,True
-exemplar,BiPC,run,Hierarchy only,106,smape,ff,60.584735785054235,False
-exemplar,BiPC,run,Hierarchy only,106,smape,lut,49.03544337774585,False
-exemplar,BiPC,run,Hierarchy only,106,smape,cycles_max,71.03992753121418,False
-exemplar,BiPC,run,Hierarchy only,106,smape,interval_max,79.45519467816396,False
-exemplar,BiPC,run,Hierarchy only,106,rmse,bram,2.7789632382209026,False
-exemplar,BiPC,run,Hierarchy only,106,rmse,dsp,1165.5513698514922,False
-exemplar,BiPC,run,Hierarchy only,106,rmse,ff,22695.494690453826,False
-exemplar,BiPC,run,Hierarchy only,106,rmse,lut,51213.8667801357,False
-exemplar,BiPC,run,Hierarchy only,106,rmse,cycles_max,1635.9558867834785,True
-exemplar,BiPC,run,Hierarchy only,106,rmse,interval_max,578.9342834722586,False
-exemplar,BiPC,run,Late fusion,106,r2,bram,0.5323446789718509,True
-exemplar,BiPC,run,Late fusion,106,r2,dsp,0.4643864436983789,True
-exemplar,BiPC,run,Late fusion,106,r2,ff,0.3466506142143113,True
-exemplar,BiPC,run,Late fusion,106,r2,lut,0.6225002983127506,True
-exemplar,BiPC,run,Late fusion,106,r2,cycles_max,0.5051308008252435,False
-exemplar,BiPC,run,Late fusion,106,r2,interval_max,0.1588417868891695,False
-exemplar,BiPC,run,Late fusion,106,smape,bram,22.54232010775837,True
-exemplar,BiPC,run,Late fusion,106,smape,dsp,81.132190627537,False
-exemplar,BiPC,run,Late fusion,106,smape,ff,54.249283951935354,True
-exemplar,BiPC,run,Late fusion,106,smape,lut,34.536099857570406,True
-exemplar,BiPC,run,Late fusion,106,smape,cycles_max,60.818320947555534,True
-exemplar,BiPC,run,Late fusion,106,smape,interval_max,102.21251992359272,False
-exemplar,BiPC,run,Late fusion,106,rmse,bram,1.8322561312839134,True
-exemplar,BiPC,run,Late fusion,106,rmse,dsp,1128.282649743308,True
-exemplar,BiPC,run,Late fusion,106,rmse,ff,22018.931366509856,True
-exemplar,BiPC,run,Late fusion,106,rmse,lut,30405.839098398075,True
-exemplar,BiPC,run,Late fusion,106,rmse,cycles_max,1740.4833133503316,False
-exemplar,BiPC,run,Late fusion,106,rmse,interval_max,720.6097121973962,False
+exemplar,BiPC,run,Hierarchy only,119,r2,bram,-0.03033494057881647,False
+exemplar,BiPC,run,Hierarchy only,119,r2,dsp,0.5172555566624302,True
+exemplar,BiPC,run,Hierarchy only,119,r2,ff,0.3035899390559196,False
+exemplar,BiPC,run,Hierarchy only,119,r2,lut,-0.025006079884841048,False
+exemplar,BiPC,run,Hierarchy only,119,r2,cycles_max,0.5809895764066699,True
+exemplar,BiPC,run,Hierarchy only,119,r2,interval_max,0.47922678990022316,True
+exemplar,BiPC,run,Hierarchy only,119,smape,bram,39.49337163331437,False
+exemplar,BiPC,run,Hierarchy only,119,smape,dsp,19.799562859382256,True
+exemplar,BiPC,run,Hierarchy only,119,smape,ff,61.46444444221281,False
+exemplar,BiPC,run,Hierarchy only,119,smape,lut,49.55110586033609,False
+exemplar,BiPC,run,Hierarchy only,119,smape,cycles_max,69.08901576020199,False
+exemplar,BiPC,run,Hierarchy only,119,smape,interval_max,75.46866165080235,False
+exemplar,BiPC,run,Hierarchy only,119,rmse,bram,2.6343068320095897,False
+exemplar,BiPC,run,Hierarchy only,119,rmse,dsp,1174.082107000856,True
+exemplar,BiPC,run,Hierarchy only,119,rmse,ff,22237.85400972186,False
+exemplar,BiPC,run,Hierarchy only,119,rmse,lut,50214.75522090695,False
+exemplar,BiPC,run,Hierarchy only,119,rmse,cycles_max,1569.1962780897804,True
+exemplar,BiPC,run,Hierarchy only,119,rmse,interval_max,546.5820284456289,True
+exemplar,BiPC,run,High-level only,119,r2,bram,-1.4152303649537625,False
+exemplar,BiPC,run,High-level only,119,r2,dsp,0.0877561172824941,False
+exemplar,BiPC,run,High-level only,119,r2,ff,-6.105576258469088,False
+exemplar,BiPC,run,High-level only,119,r2,lut,-0.3938166780127801,False
+exemplar,BiPC,run,High-level only,119,r2,cycles_max,0.5196017176832347,False
+exemplar,BiPC,run,High-level only,119,r2,interval_max,0.37914321427247966,False
+exemplar,BiPC,run,High-level only,119,smape,bram,60.73004323617102,False
+exemplar,BiPC,run,High-level only,119,smape,dsp,94.00993336557607,False
+exemplar,BiPC,run,High-level only,119,smape,ff,87.88651549743663,False
+exemplar,BiPC,run,High-level only,119,smape,lut,47.26259224840499,False
+exemplar,BiPC,run,High-level only,119,smape,cycles_max,83.29309607437004,False
+exemplar,BiPC,run,High-level only,119,smape,interval_max,125.04231230693381,False
+exemplar,BiPC,run,High-level only,119,rmse,bram,4.033261904749055,False
+exemplar,BiPC,run,High-level only,119,rmse,dsp,1613.9694413327416,False
+exemplar,BiPC,run,High-level only,119,rmse,ff,71032.97576191787,False
+exemplar,BiPC,run,High-level only,119,rmse,lut,58555.94008106372,False
+exemplar,BiPC,run,High-level only,119,rmse,cycles_max,1680.2177907643172,False
+exemplar,BiPC,run,High-level only,119,rmse,interval_max,596.7971584597383,False
+exemplar,BiPC,run,Late fusion,119,r2,bram,0.5534615879932971,True
+exemplar,BiPC,run,Late fusion,119,r2,dsp,0.49106822263471017,False
+exemplar,BiPC,run,Late fusion,119,r2,ff,0.36232301595484584,True
+exemplar,BiPC,run,Late fusion,119,r2,lut,0.6386807099852125,True
+exemplar,BiPC,run,Late fusion,119,r2,cycles_max,0.5059125983211398,False
+exemplar,BiPC,run,Late fusion,119,r2,interval_max,0.18539349241977687,False
+exemplar,BiPC,run,Late fusion,119,smape,bram,20.579683965195404,True
+exemplar,BiPC,run,Late fusion,119,smape,dsp,84.4734692455691,False
+exemplar,BiPC,run,Late fusion,119,smape,ff,56.738142255317136,True
+exemplar,BiPC,run,Late fusion,119,smape,lut,34.34592452823191,True
+exemplar,BiPC,run,Late fusion,119,smape,cycles_max,59.44684666709747,True
+exemplar,BiPC,run,Late fusion,119,smape,interval_max,102.4097874330127,False
+exemplar,BiPC,run,Late fusion,119,rmse,bram,1.7342294465284467,True
+exemplar,BiPC,run,Late fusion,119,rmse,dsp,1205.5066545962775,False
+exemplar,BiPC,run,Late fusion,119,rmse,ff,21279.466106791497,True
+exemplar,BiPC,run,Late fusion,119,rmse,lut,29813.55077918001,True
+exemplar,BiPC,run,Late fusion,119,rmse,cycles_max,1703.988839920734,False
+exemplar,BiPC,run,Late fusion,119,rmse,interval_max,683.6045869745267,False
 exemplar,Cookie-box,paper,MLP,130,r2,bram,-0.54,False
 exemplar,Cookie-box,paper,MLP,130,r2,dsp,0.2,False
 exemplar,Cookie-box,paper,MLP,130,r2,ff,0.34,False
@@ -773,42 +917,60 @@ exemplar,Cookie-box,paper,Transformer,130,rmse,ff,11657.6,False
 exemplar,Cookie-box,paper,Transformer,130,rmse,lut,103672.4,False
 exemplar,Cookie-box,paper,Transformer,130,rmse,cycles_max,762.4,False
 exemplar,Cookie-box,paper,Transformer,130,rmse,interval_max,503.6,False
-exemplar,Cookie-box,run,Hierarchy only,120,r2,bram,-0.7187318865346561,False
-exemplar,Cookie-box,run,Hierarchy only,120,r2,dsp,0.43196333673351495,False
-exemplar,Cookie-box,run,Hierarchy only,120,r2,ff,0.3964188214600658,False
-exemplar,Cookie-box,run,Hierarchy only,120,r2,lut,0.23619988367466016,False
-exemplar,Cookie-box,run,Hierarchy only,120,r2,cycles_max,0.2668086391624691,False
-exemplar,Cookie-box,run,Hierarchy only,120,r2,interval_max,0.7508906994576476,True
-exemplar,Cookie-box,run,Hierarchy only,120,smape,bram,66.0462276921688,False
-exemplar,Cookie-box,run,Hierarchy only,120,smape,dsp,78.21159861870645,False
-exemplar,Cookie-box,run,Hierarchy only,120,smape,ff,65.02318618426658,False
-exemplar,Cookie-box,run,Hierarchy only,120,smape,lut,38.69938835470854,False
-exemplar,Cookie-box,run,Hierarchy only,120,smape,cycles_max,57.62207286265335,False
-exemplar,Cookie-box,run,Hierarchy only,120,smape,interval_max,69.11134518545218,True
-exemplar,Cookie-box,run,Hierarchy only,120,rmse,bram,3.7995881910237426,False
-exemplar,Cookie-box,run,Hierarchy only,120,rmse,dsp,573.48972349559,False
-exemplar,Cookie-box,run,Hierarchy only,120,rmse,ff,11396.41437525153,False
-exemplar,Cookie-box,run,Hierarchy only,120,rmse,lut,20639.43037311246,False
-exemplar,Cookie-box,run,Hierarchy only,120,rmse,cycles_max,771.0461967405373,False
-exemplar,Cookie-box,run,Hierarchy only,120,rmse,interval_max,255.06172854483222,True
-exemplar,Cookie-box,run,Late fusion,120,r2,bram,-0.10595285792585729,True
-exemplar,Cookie-box,run,Late fusion,120,r2,dsp,0.23143110100849673,False
-exemplar,Cookie-box,run,Late fusion,120,r2,ff,0.7541845801556496,True
-exemplar,Cookie-box,run,Late fusion,120,r2,lut,0.8714693623213595,True
-exemplar,Cookie-box,run,Late fusion,120,r2,cycles_max,0.7172816462545506,True
-exemplar,Cookie-box,run,Late fusion,120,r2,interval_max,0.1538419677895494,False
-exemplar,Cookie-box,run,Late fusion,120,smape,bram,59.93505502109151,True
-exemplar,Cookie-box,run,Late fusion,120,smape,dsp,72.45524075569789,True
-exemplar,Cookie-box,run,Late fusion,120,smape,ff,60.64894607405215,True
-exemplar,Cookie-box,run,Late fusion,120,smape,lut,27.461649707844987,True
-exemplar,Cookie-box,run,Late fusion,120,smape,cycles_max,24.49407485041427,True
-exemplar,Cookie-box,run,Late fusion,120,smape,interval_max,83.02334324548731,False
-exemplar,Cookie-box,run,Late fusion,120,rmse,bram,3.047900391654885,True
-exemplar,Cookie-box,run,Late fusion,120,rmse,dsp,667.0814427740238,False
-exemplar,Cookie-box,run,Late fusion,120,rmse,ff,7272.85532908793,True
-exemplar,Cookie-box,run,Late fusion,120,rmse,lut,8466.641637924766,True
-exemplar,Cookie-box,run,Late fusion,120,rmse,cycles_max,478.7940352984071,True
-exemplar,Cookie-box,run,Late fusion,120,rmse,interval_max,470.0846478256969,False
+exemplar,Cookie-box,run,Hierarchy only,130,r2,bram,-0.6946128251720396,False
+exemplar,Cookie-box,run,Hierarchy only,130,r2,dsp,0.43790535634832817,False
+exemplar,Cookie-box,run,Hierarchy only,130,r2,ff,0.41645135777444287,False
+exemplar,Cookie-box,run,Hierarchy only,130,r2,lut,0.25032850294813125,False
+exemplar,Cookie-box,run,Hierarchy only,130,r2,cycles_max,0.27662637278944324,False
+exemplar,Cookie-box,run,Hierarchy only,130,r2,interval_max,0.7495387436164133,True
+exemplar,Cookie-box,run,Hierarchy only,130,smape,bram,64.58983474844298,False
+exemplar,Cookie-box,run,Hierarchy only,130,smape,dsp,75.86549812111672,False
+exemplar,Cookie-box,run,Hierarchy only,130,smape,ff,63.866507818636876,False
+exemplar,Cookie-box,run,Hierarchy only,130,smape,lut,39.55825500018248,False
+exemplar,Cookie-box,run,Hierarchy only,130,smape,cycles_max,56.312330596688085,False
+exemplar,Cookie-box,run,Hierarchy only,130,smape,interval_max,68.65220708894606,True
+exemplar,Cookie-box,run,Hierarchy only,130,rmse,bram,3.6718797120388342,False
+exemplar,Cookie-box,run,Hierarchy only,130,rmse,dsp,551.0815324448727,False
+exemplar,Cookie-box,run,Hierarchy only,130,rmse,ff,10986.551238615613,False
+exemplar,Cookie-box,run,Hierarchy only,130,rmse,lut,19891.092425951665,False
+exemplar,Cookie-box,run,Hierarchy only,130,rmse,cycles_max,752.4364438358965,False
+exemplar,Cookie-box,run,Hierarchy only,130,rmse,interval_max,249.483866245756,True
+exemplar,Cookie-box,run,High-level only,130,r2,bram,-0.47633248580284304,False
+exemplar,Cookie-box,run,High-level only,130,r2,dsp,0.3849384867941428,False
+exemplar,Cookie-box,run,High-level only,130,r2,ff,0.5714254491733428,False
+exemplar,Cookie-box,run,High-level only,130,r2,lut,0.6674355945572711,False
+exemplar,Cookie-box,run,High-level only,130,r2,cycles_max,0.2583583094238353,False
+exemplar,Cookie-box,run,High-level only,130,r2,interval_max,-0.15556297003538444,False
+exemplar,Cookie-box,run,High-level only,130,smape,bram,63.189874580163014,False
+exemplar,Cookie-box,run,High-level only,130,smape,dsp,94.92477610107261,False
+exemplar,Cookie-box,run,High-level only,130,smape,ff,55.28545737942136,True
+exemplar,Cookie-box,run,High-level only,130,smape,lut,36.97231928079369,False
+exemplar,Cookie-box,run,High-level only,130,smape,cycles_max,39.13788636186557,False
+exemplar,Cookie-box,run,High-level only,130,smape,interval_max,113.79034943266578,False
+exemplar,Cookie-box,run,High-level only,130,rmse,bram,3.427246087177573,False
+exemplar,Cookie-box,run,High-level only,130,rmse,dsp,576.4616363605845,False
+exemplar,Cookie-box,run,High-level only,130,rmse,ff,9415.340776225688,False
+exemplar,Cookie-box,run,High-level only,130,rmse,lut,13248.326364870169,False
+exemplar,Cookie-box,run,High-level only,130,rmse,cycles_max,761.8782125308901,False
+exemplar,Cookie-box,run,High-level only,130,rmse,interval_max,535.8817864699832,False
+exemplar,Cookie-box,run,Late fusion,130,r2,bram,-0.09049425153458479,True
+exemplar,Cookie-box,run,Late fusion,130,r2,dsp,0.23971575761228203,False
+exemplar,Cookie-box,run,Late fusion,130,r2,ff,0.7627396783194067,True
+exemplar,Cookie-box,run,Late fusion,130,r2,lut,0.8724305710926592,True
+exemplar,Cookie-box,run,Late fusion,130,r2,cycles_max,0.7124393698278667,True
+exemplar,Cookie-box,run,Late fusion,130,r2,interval_max,0.16430805436365026,False
+exemplar,Cookie-box,run,Late fusion,130,smape,bram,57.959535141766146,True
+exemplar,Cookie-box,run,Late fusion,130,smape,dsp,70.02234926678327,True
+exemplar,Cookie-box,run,Late fusion,130,smape,ff,59.209300059108315,False
+exemplar,Cookie-box,run,Late fusion,130,smape,lut,27.48276305742757,True
+exemplar,Cookie-box,run,Late fusion,130,smape,cycles_max,24.539065008620994,True
+exemplar,Cookie-box,run,Late fusion,130,smape,interval_max,79.89933076904241,False
+exemplar,Cookie-box,run,Late fusion,130,rmse,bram,2.9455397739366243,True
+exemplar,Cookie-box,run,Late fusion,130,rmse,dsp,640.9130708534896,False
+exemplar,Cookie-box,run,Late fusion,130,rmse,ff,7005.439898426637,True
+exemplar,Cookie-box,run,Late fusion,130,rmse,lut,8205.337357871555,True
+exemplar,Cookie-box,run,Late fusion,130,rmse,cycles_max,474.40930642708787,True
+exemplar,Cookie-box,run,Late fusion,130,rmse,interval_max,455.71707007588645,False
 exemplar,AutoMLP,paper,MLP,127,r2,bram,-1.09,False
 exemplar,AutoMLP,paper,MLP,127,r2,dsp,0.41,False
 exemplar,AutoMLP,paper,MLP,127,r2,ff,0.69,False
@@ -863,49 +1025,67 @@ exemplar,AutoMLP,paper,Transformer,127,rmse,ff,2528.0,False
 exemplar,AutoMLP,paper,Transformer,127,rmse,lut,12540.5,False
 exemplar,AutoMLP,paper,Transformer,127,rmse,cycles_max,177.1,False
 exemplar,AutoMLP,paper,Transformer,127,rmse,interval_max,87.5,False
-exemplar,AutoMLP,run,Hierarchy only,110,r2,bram,-28.93630868372975,False
-exemplar,AutoMLP,run,Hierarchy only,110,r2,dsp,0.7226649491179293,True
-exemplar,AutoMLP,run,Hierarchy only,110,r2,ff,-18.49895744233243,False
-exemplar,AutoMLP,run,Hierarchy only,110,r2,lut,-40.664022033620526,False
-exemplar,AutoMLP,run,Hierarchy only,110,r2,cycles_max,-26.569137635956693,False
-exemplar,AutoMLP,run,Hierarchy only,110,r2,interval_max,-2.1968756145113577,False
-exemplar,AutoMLP,run,Hierarchy only,110,smape,bram,89.18565948401357,False
-exemplar,AutoMLP,run,Hierarchy only,110,smape,dsp,68.29332633418538,True
-exemplar,AutoMLP,run,Hierarchy only,110,smape,ff,93.80751690275429,False
-exemplar,AutoMLP,run,Hierarchy only,110,smape,lut,110.53089599983213,False
-exemplar,AutoMLP,run,Hierarchy only,110,smape,cycles_max,140.73057046426476,False
-exemplar,AutoMLP,run,Hierarchy only,110,smape,interval_max,79.38454375596577,False
-exemplar,AutoMLP,run,Hierarchy only,110,rmse,bram,3.3647240076513065,False
-exemplar,AutoMLP,run,Hierarchy only,110,rmse,dsp,73.58490247485084,True
-exemplar,AutoMLP,run,Hierarchy only,110,rmse,ff,11743.507168057,False
-exemplar,AutoMLP,run,Hierarchy only,110,rmse,lut,20241.650219786196,False
-exemplar,AutoMLP,run,Hierarchy only,110,rmse,cycles_max,1052.457188595586,False
-exemplar,AutoMLP,run,Hierarchy only,110,rmse,interval_max,185.20542923124188,False
-exemplar,AutoMLP,run,Late fusion,110,r2,bram,-3.7993770855578557,False
-exemplar,AutoMLP,run,Late fusion,110,r2,dsp,0.11043568176442364,False
-exemplar,AutoMLP,run,Late fusion,110,r2,ff,0.8034193189896063,True
-exemplar,AutoMLP,run,Late fusion,110,r2,lut,0.11787962201368862,True
-exemplar,AutoMLP,run,Late fusion,110,r2,cycles_max,0.49992801644203244,True
-exemplar,AutoMLP,run,Late fusion,110,r2,interval_max,0.34514671179403866,True
-exemplar,AutoMLP,run,Late fusion,110,smape,bram,70.37347160068606,False
-exemplar,AutoMLP,run,Late fusion,110,smape,dsp,84.60263251893726,False
-exemplar,AutoMLP,run,Late fusion,110,smape,ff,51.679736508796836,True
-exemplar,AutoMLP,run,Late fusion,110,smape,lut,54.089609274161496,True
-exemplar,AutoMLP,run,Late fusion,110,smape,cycles_max,80.29801760718046,False
-exemplar,AutoMLP,run,Late fusion,110,smape,interval_max,66.5423474146187,True
-exemplar,AutoMLP,run,Late fusion,110,rmse,bram,1.347233146992912,False
-exemplar,AutoMLP,run,Late fusion,110,rmse,dsp,131.78774145604945,False
-exemplar,AutoMLP,run,Late fusion,110,rmse,ff,1179.1323080383108,True
-exemplar,AutoMLP,run,Late fusion,110,rmse,lut,2945.2980320618676,True
-exemplar,AutoMLP,run,Late fusion,110,rmse,cycles_max,141.74544444973483,True
-exemplar,AutoMLP,run,Late fusion,110,rmse,interval_max,83.82293254805646,True
+exemplar,AutoMLP,run,Hierarchy only,127,r2,bram,-25.857131888026515,False
+exemplar,AutoMLP,run,Hierarchy only,127,r2,dsp,0.7062983380995376,True
+exemplar,AutoMLP,run,Hierarchy only,127,r2,ff,-16.825583413397336,False
+exemplar,AutoMLP,run,Hierarchy only,127,r2,lut,-36.51754545739776,False
+exemplar,AutoMLP,run,Hierarchy only,127,r2,cycles_max,-26.09879471471398,False
+exemplar,AutoMLP,run,Hierarchy only,127,r2,interval_max,-2.3313388449455426,False
+exemplar,AutoMLP,run,Hierarchy only,127,smape,bram,89.3698826077985,False
+exemplar,AutoMLP,run,Hierarchy only,127,smape,dsp,71.25516708086673,True
+exemplar,AutoMLP,run,Hierarchy only,127,smape,ff,95.44530130668937,False
+exemplar,AutoMLP,run,Hierarchy only,127,smape,lut,111.99380750207798,False
+exemplar,AutoMLP,run,Hierarchy only,127,smape,cycles_max,140.31110979426248,False
+exemplar,AutoMLP,run,Hierarchy only,127,smape,interval_max,81.24170520337178,False
+exemplar,AutoMLP,run,Hierarchy only,127,rmse,bram,3.2736640764281186,False
+exemplar,AutoMLP,run,Hierarchy only,127,rmse,dsp,73.37159879708828,True
+exemplar,AutoMLP,run,Hierarchy only,127,rmse,ff,11566.816474334722,False
+exemplar,AutoMLP,run,Hierarchy only,127,rmse,lut,19890.522709181536,False
+exemplar,AutoMLP,run,Hierarchy only,127,rmse,cycles_max,1028.0542077559176,False
+exemplar,AutoMLP,run,Hierarchy only,127,rmse,interval_max,180.94248519869404,False
+exemplar,AutoMLP,run,High-level only,127,r2,bram,-9.923396324035469,False
+exemplar,AutoMLP,run,High-level only,127,r2,dsp,0.26169176032216956,False
+exemplar,AutoMLP,run,High-level only,127,r2,ff,0.18436385040775127,False
+exemplar,AutoMLP,run,High-level only,127,r2,lut,-1.5238385382207014,False
+exemplar,AutoMLP,run,High-level only,127,r2,cycles_max,-0.6944187777602366,False
+exemplar,AutoMLP,run,High-level only,127,r2,interval_max,0.09722856734710716,False
+exemplar,AutoMLP,run,High-level only,127,smape,bram,86.86430463171727,False
+exemplar,AutoMLP,run,High-level only,127,smape,dsp,128.19866700035428,False
+exemplar,AutoMLP,run,High-level only,127,smape,ff,71.03866594501058,False
+exemplar,AutoMLP,run,High-level only,127,smape,lut,70.61218772083524,False
+exemplar,AutoMLP,run,High-level only,127,smape,cycles_max,103.63625922818501,False
+exemplar,AutoMLP,run,High-level only,127,smape,interval_max,109.52951289698076,False
+exemplar,AutoMLP,run,High-level only,127,rmse,bram,2.0877723533851387,False
+exemplar,AutoMLP,run,High-level only,127,rmse,dsp,116.33051166360724,False
+exemplar,AutoMLP,run,High-level only,127,rmse,ff,2474.2307575357318,False
+exemplar,AutoMLP,run,High-level only,127,rmse,lut,5158.931618253538,False
+exemplar,AutoMLP,run,High-level only,127,rmse,cycles_max,257.0700045935793,False
+exemplar,AutoMLP,run,High-level only,127,rmse,interval_max,94.19330824082118,False
+exemplar,AutoMLP,run,Late fusion,127,r2,bram,-3.585748942214029,False
+exemplar,AutoMLP,run,Late fusion,127,r2,dsp,0.12013299281634293,False
+exemplar,AutoMLP,run,Late fusion,127,r2,ff,0.8047420813813558,True
+exemplar,AutoMLP,run,Late fusion,127,r2,lut,0.18012408088532217,True
+exemplar,AutoMLP,run,Late fusion,127,r2,cycles_max,0.48265480741824085,True
+exemplar,AutoMLP,run,Late fusion,127,r2,interval_max,0.36685818829512784,True
+exemplar,AutoMLP,run,Late fusion,127,smape,bram,70.99246891323409,False
+exemplar,AutoMLP,run,Late fusion,127,smape,dsp,84.3961325395197,False
+exemplar,AutoMLP,run,Late fusion,127,smape,ff,53.66301967343826,True
+exemplar,AutoMLP,run,Late fusion,127,smape,lut,56.564729713576256,True
+exemplar,AutoMLP,run,Late fusion,127,smape,cycles_max,79.75144674747128,False
+exemplar,AutoMLP,run,Late fusion,127,smape,interval_max,65.62017466506732,True
+exemplar,AutoMLP,run,Late fusion,127,rmse,bram,1.352724743485537,False
+exemplar,AutoMLP,run,Late fusion,127,rmse,dsp,126.99402764739379,False
+exemplar,AutoMLP,run,Late fusion,127,rmse,ff,1210.5878094317127,True
+exemplar,AutoMLP,run,Late fusion,127,rmse,lut,2940.3772432417964,True
+exemplar,AutoMLP,run,Late fusion,127,rmse,cycles_max,142.0467286559872,True
+exemplar,AutoMLP,run,Late fusion,127,rmse,interval_max,78.88267757790726,True
 exemplar,Particle Tracking,paper,MLP,128,r2,bram,-1.41,False
 exemplar,Particle Tracking,paper,MLP,128,r2,dsp,0.28,False
 exemplar,Particle Tracking,paper,MLP,128,r2,ff,0.33,False
 exemplar,Particle Tracking,paper,MLP,128,r2,lut,-0.08,False
 exemplar,Particle Tracking,paper,MLP,128,r2,cycles_max,0.52,True
 exemplar,Particle Tracking,paper,MLP,128,r2,interval_max,0.5,False
-exemplar,Particle Tracking,paper,MLP,128,smape,bram,65.6,True
+exemplar,Particle Tracking,paper,MLP,128,smape,bram,65.6,False
 exemplar,Particle Tracking,paper,MLP,128,smape,dsp,75.2,False
 exemplar,Particle Tracking,paper,MLP,128,smape,ff,58.1,False
 exemplar,Particle Tracking,paper,MLP,128,smape,lut,71.2,False
@@ -927,7 +1107,7 @@ exemplar,Particle Tracking,paper,GNN,128,smape,bram,144.4,False
 exemplar,Particle Tracking,paper,GNN,128,smape,dsp,158.5,False
 exemplar,Particle Tracking,paper,GNN,128,smape,ff,84.8,False
 exemplar,Particle Tracking,paper,GNN,128,smape,lut,81.4,False
-exemplar,Particle Tracking,paper,GNN,128,smape,cycles_max,83.5,True
+exemplar,Particle Tracking,paper,GNN,128,smape,cycles_max,83.5,False
 exemplar,Particle Tracking,paper,GNN,128,smape,interval_max,100.9,False
 exemplar,Particle Tracking,paper,GNN,128,rmse,bram,2.0,True
 exemplar,Particle Tracking,paper,GNN,128,rmse,dsp,670.2,False
@@ -948,44 +1128,62 @@ exemplar,Particle Tracking,paper,Transformer,128,smape,lut,89.1,False
 exemplar,Particle Tracking,paper,Transformer,128,smape,cycles_max,108.0,False
 exemplar,Particle Tracking,paper,Transformer,128,smape,interval_max,124.5,False
 exemplar,Particle Tracking,paper,Transformer,128,rmse,bram,7.0,False
-exemplar,Particle Tracking,paper,Transformer,128,rmse,dsp,512.5,False
+exemplar,Particle Tracking,paper,Transformer,128,rmse,dsp,512.5,True
 exemplar,Particle Tracking,paper,Transformer,128,rmse,ff,7384.7,False
 exemplar,Particle Tracking,paper,Transformer,128,rmse,lut,16204.8,False
 exemplar,Particle Tracking,paper,Transformer,128,rmse,cycles_max,927.1,False
 exemplar,Particle Tracking,paper,Transformer,128,rmse,interval_max,529.5,False
-exemplar,Particle Tracking,run,Hierarchy only,109,r2,bram,-3.898547445302335,False
-exemplar,Particle Tracking,run,Hierarchy only,109,r2,dsp,0.36369129829778535,True
-exemplar,Particle Tracking,run,Hierarchy only,109,r2,ff,0.11764996656580762,False
-exemplar,Particle Tracking,run,Hierarchy only,109,r2,lut,-0.1480726460386088,False
-exemplar,Particle Tracking,run,Hierarchy only,109,r2,cycles_max,0.4167165000739357,False
-exemplar,Particle Tracking,run,Hierarchy only,109,r2,interval_max,0.76807565136996,True
-exemplar,Particle Tracking,run,Hierarchy only,109,smape,bram,65.89856225094245,False
-exemplar,Particle Tracking,run,Hierarchy only,109,smape,dsp,71.32671906689,True
-exemplar,Particle Tracking,run,Hierarchy only,109,smape,ff,62.38962939865688,False
-exemplar,Particle Tracking,run,Hierarchy only,109,smape,lut,44.017596798195214,False
-exemplar,Particle Tracking,run,Hierarchy only,109,smape,cycles_max,111.15279394861949,False
-exemplar,Particle Tracking,run,Hierarchy only,109,smape,interval_max,66.16990468022827,False
-exemplar,Particle Tracking,run,Hierarchy only,109,rmse,bram,3.0194036402535356,False
-exemplar,Particle Tracking,run,Hierarchy only,109,rmse,dsp,503.3661993460808,True
-exemplar,Particle Tracking,run,Hierarchy only,109,rmse,ff,9306.66330442964,False
-exemplar,Particle Tracking,run,Hierarchy only,109,rmse,lut,17621.94724906517,False
-exemplar,Particle Tracking,run,Hierarchy only,109,rmse,cycles_max,740.8158892837007,False
-exemplar,Particle Tracking,run,Hierarchy only,109,rmse,interval_max,242.21956985090057,True
-exemplar,Particle Tracking,run,Late fusion,109,r2,bram,-2.8375613778459745,False
-exemplar,Particle Tracking,run,Late fusion,109,r2,dsp,0.04861513975538512,False
-exemplar,Particle Tracking,run,Late fusion,109,r2,ff,0.699978341944292,True
-exemplar,Particle Tracking,run,Late fusion,109,r2,lut,0.8187455953240385,True
-exemplar,Particle Tracking,run,Late fusion,109,r2,cycles_max,0.4882345555514719,False
-exemplar,Particle Tracking,run,Late fusion,109,r2,interval_max,0.15009385438849832,False
-exemplar,Particle Tracking,run,Late fusion,109,smape,bram,78.16679053503852,False
-exemplar,Particle Tracking,run,Late fusion,109,smape,dsp,83.74695228638349,False
-exemplar,Particle Tracking,run,Late fusion,109,smape,ff,46.12374132255737,True
-exemplar,Particle Tracking,run,Late fusion,109,smape,lut,22.659696813382205,True
-exemplar,Particle Tracking,run,Late fusion,109,smape,cycles_max,85.21694415729277,False
-exemplar,Particle Tracking,run,Late fusion,109,smape,interval_max,71.05159964696962,False
-exemplar,Particle Tracking,run,Late fusion,109,rmse,bram,2.672484421090637,False
-exemplar,Particle Tracking,run,Late fusion,109,rmse,dsp,615.5002539919694,False
-exemplar,Particle Tracking,run,Late fusion,109,rmse,ff,5426.875426635486,True
-exemplar,Particle Tracking,run,Late fusion,109,rmse,lut,7001.861188741096,True
-exemplar,Particle Tracking,run,Late fusion,109,rmse,cycles_max,693.9144353122041,False
-exemplar,Particle Tracking,run,Late fusion,109,rmse,interval_max,463.68339175222815,False
+exemplar,Particle Tracking,run,Hierarchy only,127,r2,bram,-3.739989377051061,False
+exemplar,Particle Tracking,run,Hierarchy only,127,r2,dsp,0.3419520245503038,True
+exemplar,Particle Tracking,run,Hierarchy only,127,r2,ff,0.21228898835464272,False
+exemplar,Particle Tracking,run,Hierarchy only,127,r2,lut,-0.10770398909834067,False
+exemplar,Particle Tracking,run,Hierarchy only,127,r2,cycles_max,0.48465277784397676,False
+exemplar,Particle Tracking,run,Hierarchy only,127,r2,interval_max,0.7125013176668591,True
+exemplar,Particle Tracking,run,Hierarchy only,127,smape,bram,64.82852730420174,True
+exemplar,Particle Tracking,run,Hierarchy only,127,smape,dsp,73.07728563290483,True
+exemplar,Particle Tracking,run,Hierarchy only,127,smape,ff,59.21439588707065,False
+exemplar,Particle Tracking,run,Hierarchy only,127,smape,lut,43.91798723818598,False
+exemplar,Particle Tracking,run,Hierarchy only,127,smape,cycles_max,105.7597317222521,False
+exemplar,Particle Tracking,run,Hierarchy only,127,smape,interval_max,62.99589729296358,False
+exemplar,Particle Tracking,run,Hierarchy only,127,rmse,bram,3.0034876901346026,False
+exemplar,Particle Tracking,run,Hierarchy only,127,rmse,dsp,513.3745024210816,False
+exemplar,Particle Tracking,run,Hierarchy only,127,rmse,ff,8790.785084919225,False
+exemplar,Particle Tracking,run,Hierarchy only,127,rmse,lut,16896.609164906207,False
+exemplar,Particle Tracking,run,Hierarchy only,127,rmse,cycles_max,721.2558738345483,False
+exemplar,Particle Tracking,run,Hierarchy only,127,rmse,interval_max,289.8291103612854,True
+exemplar,Particle Tracking,run,High-level only,127,r2,bram,-1.5736001743689134,False
+exemplar,Particle Tracking,run,High-level only,127,r2,dsp,0.04635462947431779,False
+exemplar,Particle Tracking,run,High-level only,127,r2,ff,-0.9828200209940334,False
+exemplar,Particle Tracking,run,High-level only,127,r2,lut,0.4197989355324019,False
+exemplar,Particle Tracking,run,High-level only,127,r2,cycles_max,0.47146973283704763,False
+exemplar,Particle Tracking,run,High-level only,127,r2,interval_max,0.4494022640146159,False
+exemplar,Particle Tracking,run,High-level only,127,smape,bram,86.22400884452483,False
+exemplar,Particle Tracking,run,High-level only,127,smape,dsp,117.28174154603617,False
+exemplar,Particle Tracking,run,High-level only,127,smape,ff,75.19300555717531,False
+exemplar,Particle Tracking,run,High-level only,127,smape,lut,47.57748225253471,False
+exemplar,Particle Tracking,run,High-level only,127,smape,cycles_max,101.0437155143484,False
+exemplar,Particle Tracking,run,High-level only,127,smape,interval_max,115.83841788875743,False
+exemplar,Particle Tracking,run,High-level only,127,rmse,bram,2.2131340029412536,False
+exemplar,Particle Tracking,run,High-level only,127,rmse,dsp,618.0149325501853,False
+exemplar,Particle Tracking,run,High-level only,127,rmse,ff,13947.162214119337,False
+exemplar,Particle Tracking,run,High-level only,127,rmse,lut,12228.606192814663,False
+exemplar,Particle Tracking,run,High-level only,127,rmse,cycles_max,730.422806108641,False
+exemplar,Particle Tracking,run,High-level only,127,rmse,interval_max,401.0894928324172,False
+exemplar,Particle Tracking,run,Late fusion,127,r2,bram,-2.9051812257501557,False
+exemplar,Particle Tracking,run,Late fusion,127,r2,dsp,0.041718291131847995,False
+exemplar,Particle Tracking,run,Late fusion,127,r2,ff,0.6938988605160124,True
+exemplar,Particle Tracking,run,Late fusion,127,r2,lut,0.8128900732124156,True
+exemplar,Particle Tracking,run,Late fusion,127,r2,cycles_max,0.5000003181681338,False
+exemplar,Particle Tracking,run,Late fusion,127,r2,interval_max,0.12086154661670845,False
+exemplar,Particle Tracking,run,Late fusion,127,smape,bram,76.88902897980235,False
+exemplar,Particle Tracking,run,Late fusion,127,smape,dsp,82.9124379380458,False
+exemplar,Particle Tracking,run,Late fusion,127,smape,ff,46.59263130685583,True
+exemplar,Particle Tracking,run,Late fusion,127,smape,lut,23.114822960877106,True
+exemplar,Particle Tracking,run,Late fusion,127,smape,cycles_max,82.92023171823669,True
+exemplar,Particle Tracking,run,Late fusion,127,smape,interval_max,71.76805410716112,False
+exemplar,Particle Tracking,run,Late fusion,127,rmse,bram,2.726200345624934,False
+exemplar,Particle Tracking,run,Late fusion,127,rmse,dsp,619.5154128475444,False
+exemplar,Particle Tracking,run,Late fusion,127,rmse,ff,5479.951029040782,True
+exemplar,Particle Tracking,run,Late fusion,127,rmse,lut,6944.422141317656,True
+exemplar,Particle Tracking,run,Late fusion,127,rmse,cycles_max,710.4348498740948,False
+exemplar,Particle Tracking,run,Late fusion,127,rmse,interval_max,506.81879580663366,False

@@ -11,6 +11,7 @@ from __future__ import annotations
 import csv
 import json
 import math
+import textwrap
 from collections import Counter
 from pathlib import Path
 from typing import Iterable, Mapping
@@ -116,6 +117,7 @@ def _run_metadata(run_dir: Path) -> dict:
             "scale_percent": data.get("scale_percent"),
             "tensor_source_revision": data.get("tensor_source_revision"),
             "split_manifest_path": data.get("split_manifest_path"),
+            "split_sha256": data.get("split_sha256"),
         }
     return {"experiment_name": run_dir.name}
 
@@ -337,13 +339,23 @@ def _render_table(
     from matplotlib.patches import Rectangle
 
     lookup = _lookup(records)
+    wrapped_models = {
+        model: textwrap.fill(
+            model.replace("_", "_ "),
+            width=20,
+            break_long_words=True,
+            break_on_hyphens=True,
+        ).replace("_ ", "_")
+        for model in models
+    }
+    max_model_lines = max(text.count("\n") + 1 for text in wrapped_models.values())
     rows_per_cohort = len(models)
     row_count = len(cohorts) * rows_per_cohort
-    widths = [1.75, 1.75, 0.72] + [0.78] * (len(targets) * len(metrics))
+    widths = [1.65, 2.15, 0.72] + [0.78] * (len(targets) * len(metrics))
     x_edges = [0.0]
     for width in widths:
         x_edges.append(x_edges[-1] + width)
-    row_height = 0.43
+    row_height = 0.43 + 0.16 * (max_model_lines - 1)
     header_height = 1.05
     total_height = header_height + row_count * row_height
     figure, axis = plt.subplots(
@@ -410,10 +422,11 @@ def _render_table(
             axis.text(
                 (x_edges[1] + x_edges[2]) / 2,
                 row_bottom + row_height / 2,
-                model,
+                wrapped_models[model],
                 ha="center",
                 va="center",
-                fontsize=8.5,
+                fontsize=8.0,
+                linespacing=1.0,
             )
             axis.text(
                 (x_edges[2] + x_edges[3]) / 2,
@@ -469,13 +482,49 @@ def _write_report(
     runs: list[dict],
     coverage: dict,
 ) -> None:
-    run_lines = "\n".join(
-        f"- **{run['display_name']}**: `{run['run_dir']}` "
-        f"(model `{run['metadata'].get('model')}`, seed {run['metadata'].get('seed')}, "
-        f"scale {run['metadata'].get('scale_percent')}%)"
-        for run in runs
-    )
+    run_lines = []
+    for run in runs:
+        metadata = run["metadata"]
+        details = []
+        if metadata.get("model") is not None:
+            details.append(f"model `{metadata['model']}`")
+        if metadata.get("seed") is not None:
+            details.append(f"seed {metadata['seed']}")
+        if metadata.get("scale_percent") is not None:
+            details.append(f"scale {metadata['scale_percent']}%")
+        suffix = f" ({', '.join(details)})" if details else ""
+        run_lines.append(
+            f"- **{run['display_name']}**: `{run['run_dir']}`{suffix}"
+        )
+    run_lines = "\n".join(run_lines)
     coverage_lines = []
+    overview_lines = [
+        "| model | split SHA-256 | test N | test SMAPE | test R² | exemplar N | exemplar SMAPE | exemplar R² |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for run in runs:
+        with (Path(run["run_dir"]) / "metrics.csv").open(newline="") as handle:
+            metric_rows = list(csv.DictReader(handle))
+        values = {}
+        for split in ("test", "exemplar"):
+            selected = [
+                row
+                for row in metric_rows
+                if row["split"] == split and row["kernel_family"] == "all"
+            ]
+            values[split] = {
+                "n_samples": int(selected[0]["n_samples"]),
+                "smape": sum(float(row["smape"]) for row in selected) / len(selected),
+                "r2": sum(float(row["r2"]) for row in selected) / len(selected),
+            }
+        split_hash = run["metadata"].get("split_sha256") or "not recorded"
+        overview_lines.append(
+            f"| {run['display_name']} | `{split_hash}` | "
+            f"{values['test']['n_samples']} | {values['test']['smape']:.2f} | "
+            f"{values['test']['r2']:.3f} | {values['exemplar']['n_samples']} | "
+            f"{values['exemplar']['smape']:.2f} | "
+            f"{values['exemplar']['r2']:.3f} |"
+        )
     for model, cohort_coverage in coverage.items():
         selected = sum(row["selected"] for row in cohort_coverage.values())
         total = sum(row["paper_total"] for row in cohort_coverage.values())
@@ -497,6 +546,14 @@ the original run reports and metrics are unchanged.
 ## Inputs
 
 {run_lines}
+
+## ll-hls4ml run overview
+
+{chr(10).join(overview_lines)}
+
+Rows are computed independently from each run's persisted predictions. Matching
+split hashes establish identical evaluation membership; differing hashes or
+sample counts must be treated as separate evaluation cohorts.
 
 Static baselines are transcribed from Tables {source['test_table']} and
 {source['exemplar_table']} of [{source['title']}]({source['url']})

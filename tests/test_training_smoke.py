@@ -172,6 +172,25 @@ class TrainingSmokeTests(unittest.TestCase):
                         "hurdle_heads": True,
                     },
                 ),
+                *(
+                    (
+                        name,
+                        {
+                            "edge_pos_vocab_size": 2,
+                            "use_context": True,
+                            "split_heads": True,
+                            "hurdle_heads": True,
+                            "attention_heads": 4,
+                            "attention_layers": 1,
+                            "cfg_recurrent_steps": 2,
+                        },
+                    )
+                    for name in (
+                        "hierarchical_sequence",
+                        "hierarchical_block_attention",
+                        "hierarchical_memory_dual",
+                    )
+                ),
             ):
                 model = build(
                     name,
@@ -273,6 +292,11 @@ class TrainingSmokeTests(unittest.TestCase):
             )
             self.assertTrue((result_dir / "metrics.csv").is_file())
             self.assertTrue((result_dir / "predictions.csv").is_file())
+            self.assertTrue((result_dir / "learning_curves.csv").is_file())
+            self.assertTrue((result_dir / "macro_metrics.csv").is_file())
+            self.assertTrue(
+                (result_dir / "structural_error_slices.csv").is_file()
+            )
             self.assertTrue((result_dir / "split_manifest.json").is_file())
             self.assertTrue(
                 (result_dir / "data_scale_manifest.json").is_file()
@@ -308,36 +332,50 @@ class TrainingSmokeTests(unittest.TestCase):
             if os.environ.get("LL_HLS4ML_SKIP_DDP_SMOKE") == "1":
                 return
 
-            ddp_config = json.loads(config_path.read_text())
-            ddp_config.update(
-                {
-                    "experiment_name": "cli_ddp_smoke",
-                    "batch_size": 2,
-                    "epochs": 2,
-                }
-            )
-            config_path.write_text(json.dumps(ddp_config))
             ddp_environment = environment.copy()
             ddp_environment["CUDA_VISIBLE_DEVICES"] = ""
-            subprocess.run(
-                [
-                    sys.executable,
-                    "-m",
-                    "torch.distributed.run",
-                    "--standalone",
-                    "--nproc_per_node=2",
-                    str(repository / "scripts" / "train.py"),
-                    "--config",
-                    str(config_path),
-                ],
-                check=True,
-                cwd=repository,
-                env=ddp_environment,
-                timeout=60,
-            )
-            self.assertTrue(
-                (root / "results" / "cli_ddp_smoke" / "summary.json").is_file()
-            )
+            for model_name in (
+                "hierarchical_sequence",
+                "hierarchical_block_attention",
+                "hierarchical_memory_dual",
+            ):
+                experiment = f"cli_ddp_smoke_{model_name}"
+                ddp_config = json.loads(config_path.read_text())
+                ddp_config.update(
+                    {
+                        "experiment_name": experiment,
+                        "model": model_name,
+                        "batch_size": 2,
+                        "epochs": 1,
+                        "use_context": True,
+                        "split_heads": True,
+                        "hurdle_heads": True,
+                        "loss": "log_huber_hurdle",
+                        "attention_heads": 4,
+                        "attention_layers": 1,
+                        "cfg_recurrent_steps": 2,
+                    }
+                )
+                config_path.write_text(json.dumps(ddp_config))
+                subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "torch.distributed.run",
+                        "--standalone",
+                        "--nproc_per_node=2",
+                        str(repository / "scripts" / "train.py"),
+                        "--config",
+                        str(config_path),
+                    ],
+                    check=True,
+                    cwd=repository,
+                    env=ddp_environment,
+                    timeout=60,
+                )
+                self.assertTrue(
+                    (root / "results" / experiment / "summary.json").is_file()
+                )
 
 
 if __name__ == "__main__":

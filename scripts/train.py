@@ -37,6 +37,19 @@ from ll_hls4ml.data.splits import (
 )
 from ll_hls4ml.data.vocab import load_vocab
 from ll_hls4ml.models.registry import build
+from ll_hls4ml.reporting.accounting import (
+    cohort_membership,
+    format_cohort_table,
+    format_hurdle_table,
+    graph_structure_rows,
+    hurdle_calibration_rows,
+    hurdle_confusion_rows,
+    macro_metric_rows,
+    paired_delta_rows,
+    read_prediction_rows,
+    split_sha256,
+    structural_error_rows,
+)
 from ll_hls4ml.training import compute_target_z_stats, make_loader
 from ll_hls4ml.io.schema import LABEL_KEYS
 from ll_hls4ml.training.distributed import (
@@ -46,6 +59,7 @@ from ll_hls4ml.training.distributed import (
     unwrap_model,
 )
 from ll_hls4ml.training.loops import _json_converter, fit
+from ll_hls4ml.training.telemetry import NvidiaSmiMonitor
 from ll_hls4ml.training.targets import (
     apply_hurdle_prediction,
     LogHuberLoss,
@@ -54,7 +68,12 @@ from ll_hls4ml.training.targets import (
     relative_percentage_error,
     wahls4ml_metrics_raw,
 )
-from ll_hls4ml.viz.training import prediction_scatter_plots, rpe_box_plots
+from ll_hls4ml.viz.training import (
+    hurdle_calibration_figure,
+    learning_curve_figure,
+    prediction_scatter_plots,
+    rpe_box_plots,
+)
 
 
 DISPLAY_LABELS = ["LUT", "FF", "DSP", "BRAM", "Cycles", "II"]
@@ -89,6 +108,9 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
     hierarchical_models = {
         "hierarchical",
         "hierarchical_high_level_fusion",
+        "hierarchical_sequence",
+        "hierarchical_block_attention",
+        "hierarchical_memory_dual",
     }
     if model_name not in hierarchical_models:
         common["pool"] = config.get("pool", "mean")
@@ -97,6 +119,9 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         "hetero_relational",
         "hierarchical",
         "hierarchical_high_level_fusion",
+        "hierarchical_sequence",
+        "hierarchical_block_attention",
+        "hierarchical_memory_dual",
         "rgcn",
     }:
         common["edge_pos_vocab_size"] = max_pos
@@ -114,6 +139,31 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
             common["high_level_encoder"] = config.get(
                 "high_level_encoder", "gatv2"
             )
+        else:
+            common["instruction_num_layers"] = config.get(
+                "instruction_num_layers"
+            )
+            common["block_num_layers"] = config.get("block_num_layers")
+            if model_name in {
+                "hierarchical_sequence",
+                "hierarchical_block_attention",
+                "hierarchical_memory_dual",
+            }:
+                common.update(
+                    {
+                        "attention_heads": config.get("attention_heads", 4),
+                        "attention_layers": config.get("attention_layers", 2),
+                        "cfg_recurrent_steps": config.get(
+                            "cfg_recurrent_steps", 8
+                        ),
+                        "sequence_token_budget": config.get(
+                            "sequence_token_budget", 16_384
+                        ),
+                        "attention_pair_budget": config.get(
+                            "attention_pair_budget", 131_072
+                        ),
+                    }
+                )
     elif model_name == "mlp":
         common["num_var_embed_layers"] = config.get("num_var_embed_layers", 2)
         common["node_aggr"] = config.get("node_aggr", "concat")
@@ -154,16 +204,17 @@ def _split_manifest(dataset, splits: dict[str, object], tensor_dir: Path) -> dic
     return manifest
 
 
-def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
+def _predict(model, loader, device):
     base_model = unwrap_model(model)
     base_model.eval()
     predictions = []
     targets = []
-    if device.type == "cuda":
-        torch.cuda.synchronize()
-    started = time.perf_counter()
+    presence_probabilities = []
+    structures = []
+    elapsed = 0.0
     with torch.no_grad():
         for batch in loader:
+            structures.extend(graph_structure_rows(batch))
             batch = batch.to(device, non_blocking=device.type == "cuda")
             precision = getattr(base_model, "inference_precision", "float32")
             amp = (
@@ -171,8 +222,18 @@ def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
                 if device.type == "cuda" and precision == "bf16"
                 else nullcontext()
             )
+            if device.type == "cuda":
+                torch.cuda.synchronize()
+            started = time.perf_counter()
             with amp:
                 raw_prediction = base_model(batch)
+            if device.type == "cuda":
+                torch.cuda.synchronize()
+            elapsed += time.perf_counter() - started
+            if raw_prediction.shape[-1] == len(LABEL_KEYS) + 2:
+                presence_probabilities.append(
+                    raw_prediction[:, len(LABEL_KEYS):].sigmoid().float().cpu()
+                )
             normalized_prediction = apply_hurdle_prediction(
                 raw_prediction,
                 base_model.y_means,
@@ -190,14 +251,17 @@ def _predict(model, loader, device) -> tuple[np.ndarray, np.ndarray, float]:
             )
             predictions.append(prediction.cpu())
             targets.append(batch.y.view(-1, len(LABEL_KEYS)).cpu())
-    if device.type == "cuda":
-        torch.cuda.synchronize()
-    elapsed = time.perf_counter() - started
     prediction_array = torch.cat(predictions).numpy()
     target_array = torch.cat(targets).numpy()
     return (
         np.clip(prediction_array, 0, None),
         target_array,
+        (
+            torch.cat(presence_probabilities).numpy()
+            if presence_probabilities
+            else None
+        ),
+        structures,
         elapsed / len(target_array),
     )
 
@@ -243,14 +307,25 @@ def _prediction_rows(
     manifest: list[dict],
     predictions: np.ndarray,
     targets: np.ndarray,
+    presence_probabilities: np.ndarray | None = None,
+    structures: list[dict] | None = None,
 ) -> list[dict]:
     rows = []
     for row_index, sample in enumerate(manifest):
         row = {"split": split_name, **sample}
+        if structures is not None:
+            row.update(structures[row_index])
         for target_index, target_name in enumerate(LABEL_KEYS):
             row[f"target_{target_name}"] = float(targets[row_index, target_index])
             row[f"prediction_{target_name}"] = float(
                 predictions[row_index, target_index]
+            )
+        if presence_probabilities is not None:
+            row["presence_probability_dsp"] = float(
+                presence_probabilities[row_index, 0]
+            )
+            row["presence_probability_bram"] = float(
+                presence_probabilities[row_index, 1]
             )
         rows.append(row)
     return rows
@@ -260,7 +335,8 @@ def _write_csv(path: Path, rows: list[dict]) -> None:
     if not rows:
         return
     with path.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        fieldnames = list(dict.fromkeys(key for row in rows for key in row))
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
 
@@ -306,13 +382,77 @@ def _save_plots(
     plt.close(figure)
 
 
+def _save_training_plots(run_dir: Path, experiment_name: str, history: list[dict]):
+    if not history:
+        return
+    import matplotlib.pyplot as plt
+
+    figures_dir = run_dir / "figures"
+    figures_dir.mkdir(parents=True, exist_ok=True)
+    for key, filename, suffix in (
+        ("epoch", "training_per_epoch.png", "per epoch"),
+        (
+            "cumulative_training_seconds",
+            "training_per_wall_time.png",
+            "per wall time",
+        ),
+    ):
+        figure, _axes = learning_curve_figure(
+            history, key, f"{experiment_name}: {suffix}"
+        )
+        figure.savefig(figures_dir / filename, dpi=180, bbox_inches="tight")
+        plt.close(figure)
+
+
+def _save_calibration_plots(run_dir: Path, rows: list[dict]):
+    if not rows:
+        return
+    import matplotlib.pyplot as plt
+
+    figures_dir = run_dir / "figures"
+    for split in sorted({row["split"] for row in rows}):
+        figure, _axes = hurdle_calibration_figure(rows, split)
+        figure.savefig(
+            figures_dir / f"{split}__hurdle_calibration.png",
+            dpi=180,
+            bbox_inches="tight",
+        )
+        plt.close(figure)
+
+
 def _write_report(
     run_dir: Path,
     experiment_name: str,
     resolved_config: dict,
     sizes: dict[str, int],
     metric_rows: list[dict],
+    accounting: dict | None = None,
 ) -> None:
+    accounting = accounting or {}
+    cumulative_seconds = resolved_config.get("cumulative_training_seconds")
+    cumulative_text = (
+        f"{float(cumulative_seconds):.1f} seconds"
+        if cumulative_seconds is not None
+        else "not recoverable for this legacy resumed run"
+    )
+    gpu_telemetry = resolved_config.get("gpu_telemetry") or {}
+    gpu_telemetry_text = (
+        f"{gpu_telemetry.get('gpu_utilization_mean_percent', 0):.1f}% mean, "
+        f"{gpu_telemetry.get('gpu_utilization_p10_percent', 0):.1f}/"
+        f"{gpu_telemetry.get('gpu_utilization_p50_percent', 0):.1f}/"
+        f"{gpu_telemetry.get('gpu_utilization_p90_percent', 0):.1f}% p10/p50/p90, "
+        f"{gpu_telemetry.get('gpu_zero_utilization_fraction', 0):.1%} zero samples, "
+        f"{gpu_telemetry.get('gpu_longest_below_25_seconds', 0):.1f}s longest low-utilization streak"
+        if gpu_telemetry
+        else "not sampled"
+    )
+    system_telemetry_text = (
+        f"{gpu_telemetry.get('system_cpu_mean_percent', 0):.1f}% system CPU, "
+        f"{gpu_telemetry.get('training_tree_cpu_mean_percent', 0):.1f}% training-tree CPU, "
+        f"{gpu_telemetry.get('system_disk_read_mean_mb_s', 0):.2f} MiB/s disk reads"
+        if gpu_telemetry.get("system_cpu_mean_percent") is not None
+        else "not sampled"
+    )
     evaluation_rows = [
         row
         for row in metric_rows
@@ -330,16 +470,15 @@ def _write_report(
             f"{row['rmse']:.2f} | {row['rpe_median']:.2f} |"
         )
     macro_table = [
-        "| split | macro R² | macro SMAPE (%) |",
-        "| --- | ---: | ---: |",
+        "| split | scope | macro R² | macro SMAPE (%) | macro RMSE |",
+        "| --- | --- | ---: | ---: | ---: |",
     ]
-    for split_name in ("test", "exemplar"):
-        rows = [row for row in evaluation_rows if row["split"] == split_name]
-        macro_table.append(
-            f"| {split_name} | "
-            f"{np.mean([row['r2'] for row in rows]):.3f} | "
-            f"{np.mean([row['smape'] for row in rows]):.2f} |"
-        )
+    for row in macro_metric_rows(metric_rows):
+        if row["kernel_family"] == "all":
+            macro_table.append(
+                f"| {row['split']} | {row['scope']} | {row['r2']:.3f} | "
+                f"{row['smape']:.2f} | {row['rmse']:.2f} |"
+            )
     family_table = [
         "| test family | samples | macro R² | macro SMAPE (%) |",
         "| --- | ---: | ---: | ---: |",
@@ -364,13 +503,24 @@ def _write_report(
         )
     report = f"""# {experiment_name}
 
-Single-model wa-hls4ml-style evaluation generated by `scripts/train.py`.
+Single-model wa-hls4ml-style evaluation generated from persisted predictions.
 
 - Model: `{resolved_config["model"]}`
 - Device: `{resolved_config["device"]}`
 - Tensor source revision: `{resolved_config.get("tensor_source_revision") or "not recorded"}`
 - Seed: {resolved_config["seed"]}
-- Total wall time: {resolved_config["wall_seconds"]:.1f} seconds
+- Current invocation wall time: {resolved_config["wall_seconds"]:.1f} seconds
+- Cumulative training wall time: {cumulative_text}
+- Wall time to best validation: {resolved_config.get("best_wall_seconds") or "not recorded"} seconds
+- Parameters: {resolved_config.get("parameter_count", "not recorded")}
+- Peak allocated GPU memory: {resolved_config.get("peak_gpu_memory_mb") or 0:.1f} MiB
+- GPU utilization trace: {gpu_telemetry_text}
+- Host utilization trace: {system_telemetry_text}
+- Mean train seconds/sample/epoch: {resolved_config.get("mean_train_seconds_per_sample") or 0:.6f}
+- Stop reason: `{resolved_config.get("stop_reason") or "not recorded"}`
+- Validation cadence: every {resolved_config.get("validation_cadence_epochs", 1)} epoch(s)
+- Checkpoint cadence: every {resolved_config.get("checkpoint_cadence_epochs", 5)} epoch(s)
+- Split SHA-256: `{resolved_config.get("split_sha256", "not recorded")}`
 - Split sizes: `{json.dumps(sizes, sort_keys=True)}`
 - ll-hls4ml state: `{json.dumps(resolved_config["ll_hls4ml_git"])}`
 
@@ -383,6 +533,26 @@ Single-model wa-hls4ml-style evaluation generated by `scripts/train.py`.
 ## Test metrics by kernel family
 
 {chr(10).join(family_table)}
+
+## Cohort membership
+
+{format_cohort_table(accounting.get("cohort_membership", {}))}
+
+## Hurdle confusion matrices
+
+{format_hurdle_table(accounting.get("hurdle_confusion", []))}
+
+Full per-family confusion matrices and per-archive membership are persisted in
+`experiment_accounting.json` and `hurdle_confusion.csv`. Presence reliability
+data and figures are in `hurdle_calibration.csv` and `figures/`.
+
+## Efficiency and structural diagnostics
+
+Learning curves are persisted in `learning_curves.csv` and plotted against both
+epoch and cumulative training wall time. `macro_metrics.csv` separates resource
+and timing quality; `structural_error_slices.csv` bins error by graph size, block
+length, loop/SCC burden, call depth, and memory burden. If an H0 prediction path
+was configured, exact per-sample paired deltas are in `paired_deltas_vs_h0.csv`.
 
 Per-target test and exemplar metrics are in `metrics.csv`. Exact split
 membership is in `split_manifest.json`, per-sample predictions are in
@@ -697,6 +867,9 @@ def main() -> None:
             tensor_dir,
         )
     )
+    membership = cohort_membership(split_manifest)
+    manifest_hash = split_sha256(split_manifest)
+    checkpoint_cadence = int(config.get("checkpoint_interval", 5))
     resolved_config = {
         **config,
         "model": config.get("model", "hetero_gat"),
@@ -727,6 +900,11 @@ def main() -> None:
             str(split_manifest_path) if split_manifest_path else None
         ),
         "split_manifest_coverage": split_coverage,
+        "split_sha256": manifest_hash,
+        "cohort_membership": membership,
+        "validation_cadence_epochs": 1,
+        "checkpoint_cadence_epochs": checkpoint_cadence,
+        "parameter_count": sum(p.numel() for p in model.parameters()),
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
     }
     if main_process:
@@ -742,6 +920,7 @@ def main() -> None:
             )
 
     try:
+        gpu_monitor = None
         if args.evaluate_checkpoint is not None:
             if distributed:
                 raise ValueError(
@@ -764,29 +943,58 @@ def main() -> None:
                 checkpoint.get("epoch"),
             )
             base_model.best_metric = training_state.get("best_metric")
-        else:
-            model = fit(
-                model,
-                train_loader,
-                val_loader,
-                epochs=config.get("epochs", 200),
-                criterion=criterion,
-                optimizer=optimizer,
-                scheduler=None,
-                device=device,
-                patience=config.get("patience", 30),
-                mode="min",
-                restore_best_weights=True,
-                verbose=config.get("verbose", 5),
-                experiment_name=experiment_name,
-                checkpoint_dir=checkpoint_dir,
-                resume_from_backup=resume_checkpoint_path,
-                distributed=distributed,
-                early_stopping_metric=config.get(
-                    "early_stopping_metric", "smape"
-                ),
-                precision=precision,
+            base_model.cumulative_training_seconds = training_state.get(
+                "cumulative_training_seconds"
             )
+            base_model.resumed_from_epoch = training_state.get(
+                "resumed_from_epoch"
+            )
+            base_model.best_wall_seconds = training_state.get(
+                "best_wall_seconds"
+            )
+            base_model.peak_gpu_memory_mb = training_state.get(
+                "peak_gpu_memory_mb"
+            )
+            base_model.stop_reason = "checkpoint_evaluation"
+        else:
+            if main_process:
+                # One writer samples rank 0. Starting one monitor per DDP rank
+                # would corrupt the shared telemetry files on Kaggle.
+                gpu_monitor = NvidiaSmiMonitor(
+                    run_dir / "gpu_telemetry.csv",
+                    interval_ms=int(config.get("gpu_telemetry_interval_ms", 0)),
+                    gpu=local_rank if distributed else 0,
+                )
+                gpu_monitor.start()
+            try:
+                model = fit(
+                    model,
+                    train_loader,
+                    val_loader,
+                    epochs=config.get("epochs", 200),
+                    criterion=criterion,
+                    optimizer=optimizer,
+                    scheduler=None,
+                    device=device,
+                    patience=config.get("patience", 30),
+                    mode="min",
+                    restore_best_weights=True,
+                    verbose=config.get("verbose", 5),
+                    experiment_name=experiment_name,
+                    checkpoint_dir=checkpoint_dir,
+                    resume_from_backup=resume_checkpoint_path,
+                    distributed=distributed,
+                    early_stopping_metric=config.get(
+                        "early_stopping_metric", "smape"
+                    ),
+                    precision=precision,
+                    checkpoint_interval=checkpoint_cadence,
+                    max_training_seconds=config.get("max_training_seconds"),
+                    history_path=run_dir / "learning_curves.csv",
+                )
+            finally:
+                if gpu_monitor is not None:
+                    gpu_monitor.stop()
 
         if main_process:
             base_model = unwrap_model(model)
@@ -802,7 +1010,13 @@ def main() -> None:
                 ("test", test_loader),
                 ("exemplar", exemplar_loader),
             ):
-                predictions, targets, inference_latency = _predict(
+                (
+                    predictions,
+                    targets,
+                    presence_probabilities,
+                    structures,
+                    inference_latency,
+                ) = _predict(
                     model, loader, device
                 )
                 metric_rows.extend(
@@ -836,6 +1050,8 @@ def main() -> None:
                         split_manifest[split_name],
                         predictions,
                         targets,
+                        presence_probabilities,
+                        structures,
                     )
                 )
                 _save_plots(
@@ -847,6 +1063,72 @@ def main() -> None:
                 )
             _write_csv(run_dir / "metrics.csv", metric_rows)
             _write_csv(run_dir / "predictions.csv", prediction_rows)
+            macro_rows = macro_metric_rows(metric_rows)
+            structure_rows = structural_error_rows(prediction_rows)
+            hurdle_rows = hurdle_confusion_rows(prediction_rows)
+            calibration_rows = hurdle_calibration_rows(prediction_rows)
+            _write_csv(run_dir / "macro_metrics.csv", macro_rows)
+            _write_csv(run_dir / "structural_error_slices.csv", structure_rows)
+            _write_csv(run_dir / "hurdle_confusion.csv", hurdle_rows)
+            _write_csv(run_dir / "hurdle_calibration.csv", calibration_rows)
+            history = getattr(base_model, "training_history", [])
+            _write_csv(run_dir / "learning_curves.csv", history)
+            _save_training_plots(run_dir, experiment_name, history)
+            _save_calibration_plots(run_dir, calibration_rows)
+            paired_summary = []
+            baseline_predictions_path = config.get("baseline_predictions_path")
+            if baseline_predictions_path:
+                baseline_predictions_path = _config_path(
+                    baseline_predictions_path, config_dir
+                )
+                paired_rows, paired_summary = paired_delta_rows(
+                    prediction_rows,
+                    read_prediction_rows(baseline_predictions_path),
+                )
+                _write_csv(run_dir / "paired_deltas_vs_h0.csv", paired_rows)
+                _write_csv(
+                    run_dir / "paired_delta_summary_vs_h0.csv", paired_summary
+                )
+            accounting = {
+                "split_sha256": manifest_hash,
+                "cohort_membership": membership,
+                "hurdle_confusion": hurdle_rows,
+                "validation_cadence_epochs": 1,
+                "checkpoint_cadence_epochs": checkpoint_cadence,
+                "cumulative_training_seconds": getattr(
+                    base_model, "cumulative_training_seconds", None
+                ),
+                "best_wall_seconds": getattr(
+                    base_model, "best_wall_seconds", None
+                ),
+                "peak_gpu_memory_mb": getattr(
+                    base_model, "peak_gpu_memory_mb", None
+                ),
+                "mean_train_seconds_per_sample": (
+                    float(
+                        np.mean(
+                            [
+                                row["train_seconds_per_sample"]
+                                for row in history
+                            ]
+                        )
+                    )
+                    if history
+                    else None
+                ),
+                "stop_reason": getattr(base_model, "stop_reason", None),
+                "gpu_telemetry": (
+                    gpu_monitor.summary() if gpu_monitor is not None else None
+                ),
+                "resumed_from_epoch": getattr(
+                    base_model, "resumed_from_epoch", None
+                ),
+                "macro_metrics": macro_rows,
+                "paired_delta_summary_vs_h0": paired_summary,
+            }
+            (run_dir / "experiment_accounting.json").write_text(
+                json.dumps(accounting, indent=2)
+            )
             result = {
                 "resolved_config": resolved_config,
                 "sizes": sizes,
@@ -862,6 +1144,17 @@ def main() -> None:
                 "metrics": metric_rows,
             }
             resolved_config["wall_seconds"] = time.perf_counter() - run_started
+            resolved_config["cumulative_training_seconds"] = accounting[
+                "cumulative_training_seconds"
+            ]
+            for key in (
+                "best_wall_seconds",
+                "peak_gpu_memory_mb",
+                "mean_train_seconds_per_sample",
+                "stop_reason",
+                "gpu_telemetry",
+            ):
+                resolved_config[key] = accounting[key]
             result["resolved_config"] = resolved_config
             (run_dir / "resolved_config.json").write_text(
                 json.dumps(resolved_config, indent=2)
@@ -875,6 +1168,7 @@ def main() -> None:
                 resolved_config,
                 sizes,
                 metric_rows,
+                accounting,
             )
             print(f"Wrote result bundle to {run_dir}")
     finally:

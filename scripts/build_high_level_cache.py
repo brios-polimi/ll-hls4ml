@@ -53,7 +53,9 @@ def build_manifest(
     tensor_root: Path,
     archives: int,
     families: tuple[str, ...],
+    exemplar_archives: int | None = None,
 ) -> tuple[dict, dict]:
+    exemplar_archives = exemplar_archives or archives
     index_path = tensor_root / "labels.json"
     if not index_path.is_file():
         raise FileNotFoundError(f"Tensor index not found: {index_path}")
@@ -71,7 +73,7 @@ def build_manifest(
         path
         for path in labels
         if Path(path).parts[0] == "exemplar"
-        and _archive_number(path) <= archives
+        and _archive_number(path) <= exemplar_archives
     )
     main_ids = {Path(path).stem for path in main_paths}
     exemplar_ids = {Path(path).stem for path in exemplar_paths}
@@ -123,6 +125,7 @@ def build_manifest(
 
     report = {
         "archives": archives,
+        "exemplar_archives": exemplar_archives,
         "sizes": {name: len(rows) for name, rows in manifest.items()},
         "main_duplicate_graph_ids_removed": main_duplicates,
         "exemplar_duplicate_graph_ids_removed": exemplar_duplicates,
@@ -145,6 +148,11 @@ def main() -> None:
         default=Path("../wa_hls4ml_models/GNN"),
     )
     parser.add_argument("--archives", type=int, default=8)
+    parser.add_argument(
+        "--exemplar-archives",
+        type=int,
+        help="Optional independent exemplar archive limit",
+    )
     parser.add_argument("--families", nargs="+", default=list(DEFAULT_FAMILIES))
     parser.add_argument(
         "--cache",
@@ -157,6 +165,8 @@ def main() -> None:
 
     if args.archives < 1:
         parser.error("--archives must be positive")
+    if args.exemplar_archives is not None and args.exemplar_archives < 1:
+        parser.error("--exemplar-archives must be positive")
     for name in ("tensor_root", "label_root", "wa_gnn_dir", "cache"):
         setattr(args, name, getattr(args, name).resolve())
     manifest_path = (
@@ -175,6 +185,7 @@ def main() -> None:
         args.tensor_root,
         args.archives,
         tuple(args.families),
+        args.exemplar_archives,
     )
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, indent=2))

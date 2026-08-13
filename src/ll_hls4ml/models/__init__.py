@@ -10,6 +10,11 @@ from ll_hls4ml.models.hetero_relational import (
 )
 from ll_hls4ml.models.input_projection import CDFGInputProjection
 from ll_hls4ml.models.hierarchical import CDFGHierarchical
+from ll_hls4ml.models.hierarchical_experimental import (
+    CDFGHierarchicalBlockAttention,
+    CDFGHierarchicalMemoryDual,
+    CDFGHierarchicalSequence,
+)
 from ll_hls4ml.models.fusion import HierarchicalHighLevelFusion
 
 __all__ = [
@@ -22,5 +27,8 @@ __all__ = [
     "EdgeAwareRelationConv",
     "CDFGInputProjection",
     "CDFGHierarchical",
+    "CDFGHierarchicalSequence",
+    "CDFGHierarchicalBlockAttention",
+    "CDFGHierarchicalMemoryDual",
     "HierarchicalHighLevelFusion",
 ]
