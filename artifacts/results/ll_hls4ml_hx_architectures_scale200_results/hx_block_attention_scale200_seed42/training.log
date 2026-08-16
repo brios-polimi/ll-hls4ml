@@ -1,0 +1,106 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W813 23:05:34.245652220 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W813 23:05:46.069673586 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W813 23:05:46.099238958 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.62 MB
+    total size: 496.43 MB
+  3layer: 800
+    avg size: 0.92 MB
+    total size: 737.16 MB
+  conv1d: 346
+    avg size: 5.82 MB
+    total size: 2015.27 MB
+  conv2d: 194
+    avg size: 6.05 MB
+    total size: 1173.97 MB
+  dense_latency: 550
+    avg size: 6.11 MB
+    total size: 3358.46 MB
+  dense_resource: 414
+    avg size: 6.10 MB
+    total size: 2526.88 MB
+  rule4ml: 800
+    avg size: 5.82 MB
+    total size: 4658.69 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 2.67 MB
+    total size: 2131.49 MB
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hierarchical_experimental.py:230: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  self.encoder = nn.TransformerEncoder(layer, num_layers=layers)
+/kaggle/working/ll-hls4ml/src/ll_hls4ml/models/hierarchical_experimental.py:230: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.norm_first was True
+  self.encoder = nn.TransformerEncoder(layer, num_layers=layers)
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch   1/400  train=0.3725  val=0.3047
+Epoch   2/400  train=0.2516  val=0.1990
+Epoch   4/400  train=0.1724  val=0.1520
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch   6/400  train=0.1559  val=0.1580
+Epoch   8/400  train=0.1470  val=0.1402
+Epoch  10/400  train=0.1365  val=0.1157
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  12/400  train=0.1261  val=0.1241
+Epoch  14/400  train=0.1245  val=0.1436
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  16/400  train=0.1202  val=0.1177
+Epoch  18/400  train=0.1209  val=0.1099
+Epoch  20/400  train=0.1211  val=0.1043
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  22/400  train=0.1090  val=0.0972
+Epoch  24/400  train=0.1070  val=0.1001
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  26/400  train=0.1054  val=0.0929
+Epoch  28/400  train=0.1012  val=0.0945
+Epoch  30/400  train=0.1005  val=0.0927
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  32/400  train=0.1006  val=0.0881
+Epoch  34/400  train=0.1010  val=0.1107
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  36/400  train=0.0976  val=0.0858
+Epoch  38/400  train=0.0949  val=0.0908
+Epoch  40/400  train=0.0934  val=0.0733
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  42/400  train=0.0947  val=0.0808
+Epoch  44/400  train=0.0938  val=0.0781
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  46/400  train=0.0915  val=0.0755
+Epoch  48/400  train=0.0910  val=0.0749
+Epoch  50/400  train=0.0911  val=0.0769
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  52/400  train=0.0901  val=0.0687
+Epoch  54/400  train=0.0907  val=0.0754
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  56/400  train=0.0896  val=0.0792
+Epoch  58/400  train=0.0921  val=0.0752
+Epoch  60/400  train=0.0885  val=0.0783
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  62/400  train=0.0897  val=0.0753
+Epoch  64/400  train=0.0899  val=0.0747
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  66/400  train=0.0864  val=0.0725
+Epoch  68/400  train=0.0854  val=0.0732
+Epoch  70/400  train=0.0869  val=0.0696
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  72/400  train=0.0848  val=0.0758
+Epoch  74/400  train=0.0855  val=0.0807
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  76/400  train=0.0864  val=0.0724
+Epoch  78/400  train=0.0835  val=0.0730
+Epoch  80/400  train=0.0903  val=0.0730
+Model saved to /kaggle/working/results/hx_block_attention_scale200_seed42/checkpoints/hx_block_attention_scale200_seed42_backup.pt
+Epoch  82/400  train=0.0838  val=0.0711
+Early stopping triggered after 82 epochs.
+Best model restored from epoch 52 with validation smape 26.9301
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/hx_block_attention_scale200_seed42

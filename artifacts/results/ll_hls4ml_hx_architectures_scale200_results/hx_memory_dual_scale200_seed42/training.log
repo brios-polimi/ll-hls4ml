@@ -1,0 +1,289 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W814 01:45:45.143594264 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W814 01:45:58.455760628 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W814 01:45:58.455790097 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.62 MB
+    total size: 496.43 MB
+  3layer: 800
+    avg size: 0.92 MB
+    total size: 737.16 MB
+  conv1d: 346
+    avg size: 5.82 MB
+    total size: 2015.27 MB
+  conv2d: 194
+    avg size: 6.05 MB
+    total size: 1173.97 MB
+  dense_latency: 550
+    avg size: 6.11 MB
+    total size: 3358.46 MB
+  dense_resource: 414
+    avg size: 6.10 MB
+    total size: 2526.88 MB
+  rule4ml: 800
+    avg size: 5.82 MB
+    total size: 4658.69 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 2.67 MB
+    total size: 2131.49 MB
+Training 400 epochs...
+Epoch   1/400  train=0.3567  val=0.2976
+Epoch   2/400  train=0.2834  val=0.2646
+Epoch   4/400  train=0.2314  val=0.2102
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch   6/400  train=0.1502  val=0.1422
+Epoch   8/400  train=0.1431  val=0.1427
+Epoch  10/400  train=0.1271  val=0.1117
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  12/400  train=0.1172  val=0.1161
+Epoch  14/400  train=0.1195  val=0.1445
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  16/400  train=0.1113  val=0.1101
+Epoch  18/400  train=0.1154  val=0.1000
+Epoch  20/400  train=0.1094  val=0.1003
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  22/400  train=0.1089  val=0.0988
+Epoch  24/400  train=0.1045  val=0.1110
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  26/400  train=0.1050  val=0.1133
+Epoch  28/400  train=0.1170  val=0.1117
+Epoch  30/400  train=0.1029  val=0.0936
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  32/400  train=0.1023  val=0.0957
+Epoch  34/400  train=0.0991  val=0.0929
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  36/400  train=0.0979  val=0.0891
+Epoch  38/400  train=0.0983  val=0.1087
+Epoch  40/400  train=0.0956  val=0.0889
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  42/400  train=0.0953  val=0.0850
+Epoch  44/400  train=0.1008  val=0.0841
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  46/400  train=0.0934  val=0.0838
+Epoch  48/400  train=0.0941  val=0.0885
+Epoch  50/400  train=0.0905  val=0.0919
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  52/400  train=0.0897  val=0.0814
+Epoch  54/400  train=0.0911  val=0.0826
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  56/400  train=0.0914  val=0.0950
+Epoch  58/400  train=0.0880  val=0.0834
+Epoch  60/400  train=0.0888  val=0.0859
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  62/400  train=0.0880  val=0.0852
+Epoch  64/400  train=0.0893  val=0.0928
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  66/400  train=0.0861  val=0.0940
+Epoch  68/400  train=0.0886  val=0.0930
+Epoch  70/400  train=0.0887  val=0.0797
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  72/400  train=0.0865  val=0.0879
+Epoch  74/400  train=0.0872  val=0.1126
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  76/400  train=0.0847  val=0.0810
+Epoch  78/400  train=0.0841  val=0.0846
+Epoch  80/400  train=0.0852  val=0.0801
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  82/400  train=0.0839  val=0.0863
+Epoch  84/400  train=0.0830  val=0.0818
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  86/400  train=0.0838  val=0.0833
+Epoch  88/400  train=0.0825  val=0.0767
+Epoch  90/400  train=0.0827  val=0.0810
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  92/400  train=0.0831  val=0.0819
+Epoch  94/400  train=0.0822  val=0.0804
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch  96/400  train=0.0821  val=0.0778
+Epoch  98/400  train=0.0796  val=0.0764
+Epoch 100/400  train=0.0823  val=0.0791
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 102/400  train=0.0813  val=0.0759
+Epoch 104/400  train=0.0875  val=0.0756
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 106/400  train=0.0794  val=0.0743
+Epoch 108/400  train=0.0804  val=0.0790
+Epoch 110/400  train=0.0807  val=0.0835
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 112/400  train=0.0780  val=0.0781
+Epoch 114/400  train=0.0781  val=0.0798
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 116/400  train=0.0772  val=0.0782
+Epoch 118/400  train=0.0815  val=0.0803
+Epoch 120/400  train=0.0772  val=0.0744
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 122/400  train=0.0786  val=0.0743
+Epoch 124/400  train=0.0766  val=0.0745
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 126/400  train=0.0765  val=0.0864
+Epoch 128/400  train=0.0770  val=0.0764
+W0814 07:15:40.602000 4940 torch/distributed/elastic/agent/server/api.py:739] Received 2 death signal, shutting down workers
+W0814 07:15:40.604000 4940 torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 4948 closing signal SIGINT
+W0814 07:15:40.605000 4940 torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 4949 closing signal SIGINT
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 1179, in <module>
+[rank1]:     main()
+[rank1]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 970, in main
+[rank1]:     model = fit(
+[rank1]:             ^^^^
+[rank1]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 414, in fit
+[rank1]:     train_result = train_one_epoch(
+[rank1]:                    ^^^^^^^^^^^^^^^^
+[rank1]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 208, in train_one_epoch
+[rank1]:     loss.backward()
+[rank1]:   File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 630, in backward
+[rank1]:     torch.autograd.backward(
+[rank1]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/__init__.py", line 364, in backward
+[rank1]:     _engine_run_backward(
+[rank1]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 865, in _engine_run_backward
+[rank1]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]: KeyboardInterrupt
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 1179, in <module>
+[rank0]:     main()
+[rank0]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 970, in main
+[rank0]:     model = fit(
+[rank0]:             ^^^^
+[rank0]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 414, in fit
+[rank0]:     train_result = train_one_epoch(
+[rank0]:                    ^^^^^^^^^^^^^^^^
+[rank0]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 208, in train_one_epoch
+[rank0]:     loss.backward()
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 630, in backward
+[rank0]:     torch.autograd.backward(
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/__init__.py", line 364, in backward
+[rank0]:     _engine_run_backward(
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 865, in _engine_run_backward
+[rank0]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 995, in <module>
+    main()
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 991, in main
+    run(args)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 982, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 4940 got signal: 2
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W814 12:37:02.278726322 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W814 12:37:14.045328888 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W814 12:37:14.061772702 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.62 MB
+    total size: 496.43 MB
+  3layer: 800
+    avg size: 0.92 MB
+    total size: 737.16 MB
+  conv1d: 346
+    avg size: 5.82 MB
+    total size: 2015.27 MB
+  conv2d: 194
+    avg size: 6.05 MB
+    total size: 1173.97 MB
+  dense_latency: 550
+    avg size: 6.11 MB
+    total size: 3358.46 MB
+  dense_resource: 414
+    avg size: 6.10 MB
+    total size: 2526.88 MB
+  rule4ml: 800
+    avg size: 5.82 MB
+    total size: 4658.69 MB
+Indexed 799 graphs across 1 type(s)
+  exemplar: 799
+    avg size: 2.67 MB
+    total size: 2131.49 MB
+Training 400 epochs...
+Epoch 126/400  train=0.0761  val=0.0780
+Epoch 128/400  train=0.0743  val=0.0802
+Epoch 130/400  train=0.0775  val=0.1220
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 132/400  train=0.0765  val=0.0750
+Epoch 134/400  train=0.0752  val=0.0758
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 136/400  train=0.0767  val=0.0737
+Epoch 138/400  train=0.0779  val=0.0830
+Epoch 140/400  train=0.0752  val=0.0766
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 142/400  train=0.0771  val=0.0774
+Epoch 144/400  train=0.0745  val=0.0848
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 146/400  train=0.0751  val=0.0808
+Epoch 148/400  train=0.0742  val=0.0715
+Epoch 150/400  train=0.0750  val=0.0733
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 152/400  train=0.0745  val=0.0760
+Epoch 154/400  train=0.0751  val=0.0773
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 156/400  train=0.0755  val=0.0736
+Epoch 158/400  train=0.0736  val=0.0788
+Epoch 160/400  train=0.0729  val=0.0755
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 162/400  train=0.0745  val=0.0759
+Epoch 164/400  train=0.0745  val=0.0771
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 166/400  train=0.0725  val=0.0736
+Epoch 168/400  train=0.0739  val=0.0749
+Epoch 170/400  train=0.0739  val=0.0785
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 172/400  train=0.0726  val=0.0718
+Epoch 174/400  train=0.0736  val=0.0739
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 176/400  train=0.0720  val=0.0723
+Epoch 178/400  train=0.0737  val=0.0798
+Epoch 180/400  train=0.0706  val=0.0700
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 182/400  train=0.0721  val=0.0746
+Epoch 184/400  train=0.0717  val=0.0795
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 186/400  train=0.0735  val=0.0804
+Epoch 188/400  train=0.0718  val=0.0720
+Epoch 190/400  train=0.0706  val=0.0785
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 192/400  train=0.0696  val=0.0738
+Epoch 194/400  train=0.0717  val=0.0813
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 196/400  train=0.0701  val=0.0728
+Epoch 198/400  train=0.0707  val=0.0737
+Epoch 200/400  train=0.0714  val=0.0803
+Model saved to /kaggle/working/results/hx_memory_dual_scale200_seed42/checkpoints/hx_memory_dual_scale200_seed42_backup.pt
+Epoch 202/400  train=0.0705  val=0.0781
+Early stopping triggered after 203 epochs.
+Best model restored from epoch 173 with validation smape 26.3945
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/hx_memory_dual_scale200_seed42
