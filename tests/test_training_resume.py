@@ -6,10 +6,90 @@ from unittest.mock import patch
 import torch
 from torch.utils.data import DataLoader
 
-from ll_hls4ml.training.loops import fit
+from ll_hls4ml.training.loops import fit, train_one_epoch
 
 
 class TrainingResumeTests(unittest.TestCase):
+    def test_default_clipping_limits_gradient_norm(self):
+        class ToyModel(torch.nn.Linear):
+            def __init__(self):
+                super().__init__(1, 1, bias=False)
+                self.register_buffer("y_means", torch.zeros(1))
+                self.register_buffer("y_stds", torch.ones(1))
+
+            def forward(self, batch):
+                return super().forward(batch.x)
+
+        class ToyBatch:
+            def __init__(self):
+                self.x = torch.tensor([[100.0]])
+                self.y = torch.tensor([[0.0]])
+                self.num_graphs = 1
+
+            def to(self, *_args, **_kwargs):
+                return self
+
+        model = ToyModel()
+        model.weight.data.fill_(1.0)
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.0)
+        _, profile = train_one_epoch(
+            model,
+            [ToyBatch()],
+            torch.nn.MSELoss(),
+            optimizer,
+            torch.device("cpu"),
+            return_profile=True,
+            gradient_clip_norm=0.1,
+        )
+
+        self.assertGreater(profile["mean_pre_clip_gradient_norm"], 0.1)
+        self.assertLessEqual(float(model.weight.grad.norm()), 0.100001)
+
+    def test_plateau_scheduler_uses_validation_metric(self):
+        device = torch.device("cpu")
+
+        with tempfile.TemporaryDirectory() as temp:
+            model = torch.nn.Linear(1, 1)
+            optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
+            loader = DataLoader([torch.tensor([0.0])])
+            with (
+                patch(
+                    "ll_hls4ml.training.loops.train_one_epoch",
+                    return_value=0.5,
+                ),
+                patch(
+                    "ll_hls4ml.training.loops.validate_one_epoch",
+                    side_effect=[
+                        {"loss": 0.5, "smape": torch.tensor([20.0])},
+                        {"loss": 0.5, "smape": torch.tensor([20.0])},
+                    ],
+                ),
+            ):
+                fit(
+                    model,
+                    train_loader=loader,
+                    val_loader=loader,
+                    epochs=2,
+                    criterion=torch.nn.MSELoss(),
+                    optimizer=optimizer,
+                    scheduler=None,
+                    device=device,
+                    patience=0,
+                    verbose=0,
+                    experiment_name="scheduler",
+                    checkpoint_dir=temp,
+                    early_stopping_metric="smape",
+                    lr_scheduler_patience=0,
+                    lr_scheduler_factor=0.5,
+                )
+
+            self.assertEqual(model.training_history[-1]["learning_rate"], 0.1)
+            self.assertEqual(model.training_history[-1]["next_learning_rate"], 0.05)
+            checkpoint = torch.load(
+                Path(temp) / "scheduler_checkpoint.pt", weights_only=True
+            )
+            self.assertIsNotNone(checkpoint["scheduler"])
+
     def test_resume_preserves_history_and_early_stopping_state(self):
         device = torch.device("cpu")
 

@@ -905,6 +905,11 @@ def main() -> None:
         "validation_cadence_epochs": 1,
         "checkpoint_cadence_epochs": checkpoint_cadence,
         "parameter_count": sum(p.numel() for p in model.parameters()),
+        "gradient_clip_norm": config.get("gradient_clip_norm", 1.0),
+        "lr_scheduler": "reduce_on_plateau",
+        "lr_scheduler_patience": config.get("lr_scheduler_patience", 8),
+        "lr_scheduler_factor": config.get("lr_scheduler_factor", 0.5),
+        "min_learning_rate": config.get("min_learning_rate", 1e-6),
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
     }
     if main_process:
@@ -991,6 +996,16 @@ def main() -> None:
                     checkpoint_interval=checkpoint_cadence,
                     max_training_seconds=config.get("max_training_seconds"),
                     history_path=run_dir / "learning_curves.csv",
+                    gradient_clip_norm=config.get("gradient_clip_norm", 1.0),
+                    lr_scheduler_patience=config.get(
+                        "lr_scheduler_patience", 8
+                    ),
+                    lr_scheduler_factor=config.get(
+                        "lr_scheduler_factor", 0.5
+                    ),
+                    min_learning_rate=config.get(
+                        "min_learning_rate", 1e-6
+                    ),
                 )
             finally:
                 if gpu_monitor is not None:

@@ -171,6 +171,11 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         "weight_decay": args.weight_decay,
         "epochs": args.epochs,
         "patience": args.patience,
+        "gradient_clip_norm": args.gradient_clip_norm,
+        "lr_scheduler": "reduce_on_plateau",
+        "lr_scheduler_patience": args.lr_scheduler_patience,
+        "lr_scheduler_factor": args.lr_scheduler_factor,
+        "min_learning_rate": args.min_learning_rate,
         "precision": args.precision,
         "validation_cadence_epochs": 1,
         "checkpoint_cadence_epochs": args.backup_interval,
@@ -210,6 +215,10 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         early_stopping_metric="smape",
         checkpoint_interval=args.backup_interval,
         precision=args.precision,
+        gradient_clip_norm=args.gradient_clip_norm,
+        lr_scheduler_patience=args.lr_scheduler_patience,
+        lr_scheduler_factor=args.lr_scheduler_factor,
+        min_learning_rate=args.min_learning_rate,
     )
     wall_seconds = time.perf_counter() - started
     metric_rows, prediction_rows = _evaluate(
@@ -337,6 +346,10 @@ def main():
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--epochs", type=int, default=400)
     parser.add_argument("--patience", type=int, default=30)
+    parser.add_argument("--gradient-clip-norm", type=float, default=1.0)
+    parser.add_argument("--lr-scheduler-patience", type=int, default=8)
+    parser.add_argument("--lr-scheduler-factor", type=float, default=0.5)
+    parser.add_argument("--min-learning-rate", type=float, default=1e-6)
     parser.add_argument("--log-huber-delta", type=float, default=0.35)
     parser.add_argument("--hurdle-classification-weight", type=float, default=0.25)
     parser.add_argument("--num-workers", type=int, default=0)

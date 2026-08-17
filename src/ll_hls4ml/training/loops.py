@@ -177,6 +177,7 @@ def train_one_epoch(
     distributed: bool = False,
     precision: str = "float32",
     return_profile: bool = False,
+    gradient_clip_norm: float | None = 1.0,
 ):
     model.train()
     base_model = unwrap_model(model)
@@ -184,6 +185,8 @@ def train_one_epoch(
     num_samples = 0
     num_targets = len(base_model.y_means)
     data_wait_seconds = 0.0
+    gradient_norm_sum = 0.0
+    optimizer_steps = 0
     step_started = time.perf_counter()
     iterator = iter(train_loader)
 
@@ -206,7 +209,13 @@ def train_one_epoch(
             pred = model(batch)
             loss = criterion(pred, target)
         loss.backward()
+        if gradient_clip_norm is not None:
+            gradient_norm = torch.nn.utils.clip_grad_norm_(
+                model.parameters(), gradient_clip_norm
+            )
+            gradient_norm_sum += float(gradient_norm.detach())
         optimizer.step()
+        optimizer_steps += 1
 
         n = batch.num_graphs
         loss_sum += loss.detach() * n
@@ -230,6 +239,11 @@ def train_one_epoch(
         "data_wait_seconds": data_wait_seconds,
         "compute_submission_seconds": wall_seconds - data_wait_seconds,
         "data_wait_fraction": data_wait_seconds / max(wall_seconds, 1e-12),
+        "mean_pre_clip_gradient_norm": (
+            gradient_norm_sum / max(optimizer_steps, 1)
+            if gradient_clip_norm is not None
+            else 0.0
+        ),
     }
 
 
@@ -323,6 +337,10 @@ def fit(
     precision: str = "float32",
     max_training_seconds: float | None = None,
     history_path: str | Path | None = None,
+    gradient_clip_norm: float | None = 1.0,
+    lr_scheduler_patience: int | None = 8,
+    lr_scheduler_factor: float = 0.5,
+    min_learning_rate: float = 1e-6,
 ):
     """
     Train model with optional early stopping.
@@ -341,6 +359,19 @@ def fit(
     model.to(device)
     if isinstance(criterion, torch.nn.Module):
         criterion.to(device)
+
+    if gradient_clip_norm is not None and gradient_clip_norm <= 0:
+        raise ValueError("gradient_clip_norm must be positive or None")
+    if scheduler is None and lr_scheduler_patience is not None:
+        if lr_scheduler_patience < 0:
+            raise ValueError("lr_scheduler_patience must be non-negative or None")
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode=mode,
+            factor=lr_scheduler_factor,
+            patience=lr_scheduler_patience,
+            min_lr=min_learning_rate,
+        )
 
     fit_started = time.perf_counter()
     prior_training_seconds = 0.0
@@ -417,6 +448,7 @@ def fit(
             distributed=distributed,
             precision=precision,
             return_profile=True,
+            gradient_clip_norm=gradient_clip_norm,
         )
         if isinstance(train_result, tuple):
             train_loss, train_profile = train_result
@@ -429,6 +461,28 @@ def fit(
             model, val_loader, criterion, device,
             pbar=pbar, distributed=distributed, precision=precision,
         )
+        if main:
+            scheduler_metric = val_metrics[early_stopping_metric]
+            if isinstance(scheduler_metric, torch.Tensor):
+                scheduler_metric = scheduler_metric.mean().item()
+            scheduler_metric = float(scheduler_metric)
+        else:
+            scheduler_metric = 0.0
+        if distributed:
+            scheduler_metric_tensor = torch.tensor(
+                scheduler_metric, device=device, dtype=torch.float64
+            )
+            dist.broadcast(scheduler_metric_tensor, src=0)
+            scheduler_metric = float(scheduler_metric_tensor.item())
+        learning_rate = float(optimizer.param_groups[0]["lr"])
+        if scheduler is not None:
+            if isinstance(
+                scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau
+            ):
+                scheduler.step(scheduler_metric)
+            else:
+                scheduler.step()
+        next_learning_rate = float(optimizer.param_groups[0]["lr"])
         _synchronize(device)
         validation_seconds = time.perf_counter() - validation_started
         epoch_seconds = time.perf_counter() - epoch_started
@@ -445,6 +499,8 @@ def fit(
                     "validation_seconds": validation_seconds,
                     "epoch_seconds": epoch_seconds,
                     "cumulative_training_seconds": cumulative_seconds,
+                    "learning_rate": learning_rate,
+                    "next_learning_rate": next_learning_rate,
                     "train_seconds_per_sample": train_seconds
                     / max(len(train_loader.dataset), 1),
                     **train_profile,
@@ -467,13 +523,15 @@ def fit(
         elif log_epoch:
             print(
                 f"Epoch {epoch:3d}/{epochs}  "
-                f"train={train_loss:.4f}  val={val_metrics['loss']:.4f}",
+                f"train={train_loss:.4f}  val={val_metrics['loss']:.4f}  "
+                f"lr={next_learning_rate:.2e}",
                 flush=True,
             )
 
         if main and writer is not None:
             writer.add_scalar("loss/train", train_loss, epoch) 
             writer.add_scalar("loss/val", val_metrics['loss'], epoch) 
+            writer.add_scalar("learning_rate", next_learning_rate, epoch)
             for name, value in val_metrics.items(): 
                 if name != 'loss':
                     for i, lbl in enumerate(LABEL_KEYS):
