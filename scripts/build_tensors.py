@@ -5,10 +5,11 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shutil
 
 from ll_hls4ml.config import load_config
 from ll_hls4ml.data.tensorize import create_graph_tensors
-from ll_hls4ml.data.vocab import load_vocab, vocab_scan
+from ll_hls4ml.data.vocab import load_vocab, save_vocab, vocab_scan
 
 
 def _parse_archive_spec(spec: str) -> list[str]:
@@ -58,11 +59,13 @@ def main():
     vocab_path = Path(args.vocab) if args.vocab else cfg.vocab_path
 
     if vocab_path.exists():
-        vocab, max_pos, _counts = load_vocab(vocab_path)
+        vocab, max_pos, counts = load_vocab(vocab_path)
         print(f"Loaded vocab from {vocab_path}")
     else:
         print("Vocab not found; scanning graphs...")
-        vocab, max_pos, _ = vocab_scan(cfg.graph_dir, kernel_subset=args.kernel)
+        vocab, max_pos, counts = vocab_scan(
+            cfg.graph_dir, kernel_subset=args.kernel
+        )
 
     metadata_by_graph_id = None
     if args.metadata_index:
@@ -80,6 +83,12 @@ def main():
         n_workers=args.workers,
         metadata_by_graph_id=metadata_by_graph_id,
     )
+    bundled_vocab = cfg.tensor_dir / "vocab.json"
+    if vocab_path.exists():
+        if vocab_path.resolve() != bundled_vocab.resolve():
+            shutil.copy2(vocab_path, bundled_vocab)
+    else:
+        save_vocab(vocab, max_pos, bundled_vocab, counts)
     print(f"Tensors and labels index written under {cfg.tensor_dir}")
 
 
