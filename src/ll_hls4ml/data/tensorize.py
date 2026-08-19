@@ -205,10 +205,16 @@ def constant_literal_embedding(node: dict) -> np.ndarray:
     match = SCALAR_LITERAL_RE.match(str(full_text[0]).strip())
     if not match:
         return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
-    try:
-        value = float(match.group(1))
-    except ValueError:
-        return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
+    literal = match.group(1)
+    if literal == "true":
+        value = 1.0
+    elif literal == "false":
+        value = 0.0
+    else:
+        try:
+            value = float(literal)
+        except ValueError:
+            return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
     if not math.isfinite(value):
         return np.zeros(CONSTANT_LITERAL_SIZE, dtype=np.float32)
     integer_value = int(value)
@@ -704,7 +710,7 @@ SHIFT_REG_RE = re.compile(
 
 SCALAR_LITERAL_RE = re.compile(
     r"^(?:i\d+|half|float|double)\s+"
-    r"([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)$"
+    r"(true|false|[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)$"
 )
 
 # i32, i57, float, double
@@ -738,6 +744,16 @@ AC_INT_RE = re.compile(
 # ac_fixed<34, 14, true, (ac_q_mode)0, (ac_o_mode)0>
 AC_FIXED_RE = re.compile(
     r"ac_fixed<(\d+),\s*(\d+),\s*(true|false),\s*\(ac_q_mode\)(\d+),\s*\(ac_o_mode\)(\d+)"
+)
+
+# af_range_ref<18, 8, true, AP_RND, AP_SAT, 0>
+# This helper type carries the same fixed-point properties relevant to HLS
+# arithmetic as ap_fixed, but is emitted by some hls4ml code paths.
+AF_RANGE_REF_RE = re.compile(
+    r'^(?:%"struct\.)?af_range_ref<'
+    r'(\d+),\s*(\d+),\s*(true|false),\s*'
+    r'AP_(RND|RND_ZERO|RND_MIN_INF|RND_INF|RND_CONV|TRN|TRN_ZERO),\s*'
+    r'AP_(SAT|SAT_ZERO|SAT_SYM|WRAP|WRAP_SM)'
 )
 
 
@@ -927,6 +943,21 @@ def type_embedding(type_str):
         emb[QUANT_OFF + quant] = 1
         emb[OVERFLOW_OFF + overflow] = 1
 
+        return emb
+
+
+    m = AF_RANGE_REF_RE.match(type_str)
+    if m:
+        emb[4] = 1       # arb_fixed
+        emb[IS_AP_OFF] = 1
+
+        width = int(m.group(1))
+        int_bits = int(m.group(2))
+        emb[BITS_OFF] = width
+        emb[FRAC_OFF] = (width - int_bits) / width
+        emb[SIGNED_OFF] = (m.group(3) == "true")
+        emb[QUANT_OFF + AP_QUANT_MAP[m.group(4)]] = 1
+        emb[OVERFLOW_OFF + AP_OVERFLOW_MAP[m.group(5)]] = 1
         return emb
 
 
