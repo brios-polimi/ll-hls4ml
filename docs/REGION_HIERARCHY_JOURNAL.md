@@ -269,7 +269,7 @@ graph namespace; the second writes the isolated tensor namespace.
 - Ran the 554-project CPU information probe and real-graph model accounting;
   results are in `docs/REGION_FEATURE_PROBE_2026-08-19.md` and
   `docs/REGION_MODEL_CPU_BENCHMARK_2026-08-19.md`.
-- Pipeline: 21 targeted `unittest` cases pass. ll-hls4ml: 32 targeted cases pass.
+- Pipeline: 21 targeted `unittest` cases pass. ll-hls4ml: 33 targeted cases pass.
   Full discovery additionally reached an existing DDP smoke that requires a
   localhost rendezvous socket; it was interrupted because the sandbox forbids
   that socket, not because of a model assertion.
