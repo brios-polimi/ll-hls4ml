@@ -39,7 +39,7 @@ independently switchable so unchanged H0 is always available.
 | 2 | Explicit natural-loop nodes and nesting | `enrich_natural_loops = false` | implemented, sample-verified |
 | 3 | Loop tensor schema and region-HLS model | Model name `hierarchical` remains H0 | implemented, CPU-verified |
 | 4 | Resource-additive/timing-path composition | `composition: generic` | implemented, CPU-verified |
-| 5 | CPU information screen and GPU config | Existing H0 config | complete; full rebuild running |
+| 5 | CPU information screen and GPU config | Existing H0 config | complete; dataset rebuilt and verified |
 | 6 | Data expansion and structural-OOD evaluation | Deferred by scope | deferred |
 
 ## Stage 1: conservative LLVM canonicalization
@@ -52,8 +52,7 @@ and 568 allocas. The CPU probe found:
 
 - `mem2reg`: 1,594 instructions;
 - `sroa,mem2reg`: 1,132;
-- `sroa,mem2reg,instcombine`: 710, while retaining all sampled functions,
-  blocks, loop-anchor names, Vitis intrinsics, and pragma carriers;
+- `sroa,mem2reg,instcombine`: 710 on the initial three-layer probe;
 - CFG simplification and O1 destroyed important anchors/structure.
 
 ### Implemented
@@ -67,10 +66,12 @@ and 568 allocas. The CPU probe found:
   true/false successor ordering, plus Vitis intrinsic and pragma-carrier counts.
   A failed invariant refuses the rewrite.
 - Eight compiler-helper `unittest` cases pass.
-- A real integration check on
+- An initial integration check on
   `3layer/archive_6/b0051e09-ffb4-48e1-8991-9af53f5ee0e8.ll` produced a 80,063-byte
   canonical IR, restored `target triple = "fpga64-xilinx-none"`, and passed all
-  invariants with `sroa,mem2reg,instcombine`.
+  sampled invariants with `sroa,mem2reg,instcombine`. The later labeled conv1d
+  audit below found that `instcombine` is not safe corpus-wide, so the production
+  dataset uses only `sroa,mem2reg`.
 
 ### Restart point
 
@@ -229,13 +230,17 @@ entire 9.8 GiB source tree was recorded:
 
 `ee6387acae725e93ad19e758404b858a06062ea9db181a35defd83d824db3a5c`
 
+After graph regeneration and tensorization, the same deterministic full-tree
+hash was recomputed and matched exactly. `data/source` was byte-for-byte
+preserved.
+
 The production config now has `allow_downloads: false`,
 `delete_source_after_compile: false`, canonicalization
 `sroa,mem2reg`, and natural-loop enrichment enabled. The processor
 prefers retained sources even if disposable extracted archives remain and fails
 closed before the downloader if a retained archive is absent.
 
-The rebuild command is running from `/home/brend/projects`:
+The completed rebuild command, run from `/home/brend/projects`, was:
 
 ```bash
 /home/brend/anaconda3/bin/conda run -n pipeline-env --no-capture-output \
@@ -251,9 +256,9 @@ intrinsics, and 82 pragma carriers. Adding `instcombine` reduced to 7,486 but
 removed 25 Vitis operations, so it was rejected. The final strict pipeline is
 therefore `sroa,mem2reg`. Local label JSONs are passed to skip unlabelled retained
 projects that are outside the training cohort; this is not a download. Partial
-outputs were removed before the final restart. If interrupted, remove only
-partial `data/ll` and `data/graphs`, recreate `data/ll`, and rerun the exact
-command; the offline/source guards remain active.
+outputs were removed before the final restart. The final run considered 6,487
+retained projects and produced 4,816 labeled LLVM/graph pairs, skipped 1,671
+projects without local synthesis labels, and had zero failures.
 
 After graph completion, tensorize all labeled graphs with:
 
@@ -262,11 +267,32 @@ After graph completion, tensorize all labeled graphs with:
   python scripts/build_tensors.py --config configs/default.yaml --workers 8
 ```
 
-Tensorization now explicitly skips unlabelled graph JSON rather than aborting or
-creating unusable training tensors. Every produced tensor records hierarchy
-schema 3 and canonicalization provenance. After completion, regenerate the full
-source hash and require exact equality, audit graph/tensor counts and schema
-metadata, and copy `artifacts/vocab/vocab.json` beside the tensors before upload.
+The first tensorization attempt exposed a stale positional vocabulary bound of
+4: a valid canonical conv1d operand used position 5. A complete vocabulary scan
+over all 4,816 graphs established the actual maximum as 6 and regenerated the
+instruction vocabulary. The successful rerun produced 4,816 tensors plus
+`labels.json` and automatically bundled `vocab.json`. Tensorization still reports
+`ptr` and `struct` as unparsed type categories; this pre-existing limitation is
+uniform across the cohort and is recorded for later representation work rather
+than changed inside this experiment.
+
+Filesystem and cohort validation:
+
+- 4,816 `.ll`, 4,816 graph JSON, and 4,816 `.pt` files;
+- 26 duplicate main-cohort UUID paths, yielding exactly 3,904 unique main
+  samples and 886 unique exemplar samples;
+- exact saved membership: 2,742 train, 569 validation, 593 test, and 886
+  exemplar, with no missing or unexpected unique tensor paths;
+- one real tensor per archive (65 total) passed schema-3, `sroa,mem2reg`, and
+  feature-width checks; every sample had natural loops and 51 had a nonempty
+  pragma-to-loop relation;
+- both matched H0 and hardware-region models produced finite outputs on a real
+  schema-3 tensor using the rebuilt vocabulary (`max_pos = 6`, 37 instruction
+  tokens);
+- output sizes: 2.3 GiB LLVM IR, 13 GiB graphs, and 5.6 GiB tensors.
+
+The final tensor root is ready to upload as the pinned Kaggle dataset snapshot.
+Do not rebuild it in `/kaggle/working`.
 
 The Kaggle driver is
 `notebooks/04_06_kaggle_region_hierarchy_scale200.ipynb`. Tensor snapshots and
@@ -303,16 +329,17 @@ Paste immutable code and tensor revisions before running.
 - Ran the 554-project CPU information probe and real-graph model accounting;
   results are in `docs/REGION_FEATURE_PROBE_2026-08-19.md` and
   `docs/REGION_MODEL_CPU_BENCHMARK_2026-08-19.md`.
-- Pipeline: 21 targeted `unittest` cases pass. ll-hls4ml: 33 targeted cases pass.
-  Full discovery additionally reached an existing DDP smoke that requires a
-  localhost rendezvous socket; it was interrupted because the sandbox forbids
-  that socket, not because of a model assertion.
-- No GPU training was started; the durable dataset rebuild is now in progress.
-- Began the user-authorized offline in-place rebuild of `ll/` and `graphs/` with
-  canonicalization plus loop hierarchy; `source/` is guarded and fingerprinted.
+- Final verification: all 41 `hls4ml_pipeline` discovery tests pass, and 30
+  focused ll-hls4ml dataset/hierarchy/tensorization/split tests pass.
+- No GPU training was started.
+- Completed the user-authorized offline in-place rebuild of `ll/`, `graphs/`,
+  and `tensors/` with canonicalization plus loop hierarchy; `source/` remained
+  guarded and fingerprinted.
 - Added canonicalization provenance to graph JSON and PyG tensors, made H0 a
   valid matched control on schema 3, and made training tensorization skip
   unlabelled graphs.
 - Added the full-scale Kaggle notebook with two 330-minute primary runs,
   conditional generic-composition ablation, exact cohort assertions, resume
   packaging, cache-only tensor downloads, and paired bootstrap intervals.
+- Rebuilt the corpus vocabulary (`max_pos = 6`) and made tensorization bundle it
+  with the dataset automatically.
