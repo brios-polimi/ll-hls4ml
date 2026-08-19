@@ -18,17 +18,18 @@ import tqdm
 
 from ll_hls4ml.io.schema import (
     DERIVED_DEF_USE_EDGE,
-    EDGE_TYPES,
-    EDGE_TYPE_SET,
     EDGE_TYPES_WITH_ATTR,
     BLOCK_FEATURE_SIZE,
     FUNCTION_FEATURE_SIZE,
+    LOOP_FEATURE_SIZE,
+    LOOP_HIERARCHY_SCHEMA_VERSION,
     GRAPH_CONTEXT_CATEGORICAL_VOCABS,
     GRAPH_CONTEXT_NUMERIC_KEYS,
     NODE_CONSTANT,
     NODE_BLOCK,
     NODE_FUNCTION,
     NODE_INSTRUCTION,
+    NODE_LOOP,
     NODE_PRAGMA,
     NODE_TYPE_NAMES,
     NODE_VARIABLE,
@@ -40,6 +41,8 @@ from ll_hls4ml.io.schema import (
     PRAGMA_NUMERIC_ARGUMENTS,
     PRAGMA_SCHEMA_VERSION,
     PRAGMA_TARGET_ARGUMENTS,
+    REGION_EDGE_TYPES,
+    REGION_EDGE_TYPE_SET,
     pragma_directive_id,
     safe_int,
 )
@@ -192,6 +195,47 @@ def function_embedding(node: dict) -> np.ndarray:
         [
             len(names) == 1 and bool(str(names[0])),
             len(defined_values) == 1 and str(defined_values[0]).lower() == "true",
+        ],
+        dtype=np.float32,
+    )
+
+
+def loop_embedding(node: dict) -> np.ndarray:
+    """Encode stable natural-loop structure without learning LLVM names."""
+
+    version = int(_single_feature(node, "schema_version"))
+    if version != LOOP_HIERARCHY_SCHEMA_VERSION:
+        raise ValueError(
+            f"Unsupported loop schema version {version}; "
+            f"expected {LOOP_HIERARCHY_SCHEMA_VERSION}"
+        )
+    features = node.get("features", {})
+
+    def scaled(name: str) -> float:
+        values = features.get(name, [])
+        if not isinstance(values, list) or len(values) != 1:
+            raise ValueError(
+                f"Loop node {node.get('id')} requires one features.{name} value"
+            )
+        value = _scaled_number(str(values[0]))
+        if value is None:
+            raise ValueError(
+                f"Loop node {node.get('id')} has invalid features.{name}"
+            )
+        return value
+
+    known_values = features.get("trip_count_known", [])
+    labels = features.get("source_loop_labels", [])
+    return np.asarray(
+        [
+            scaled("depth"),
+            scaled("block_count"),
+            scaled("latch_count"),
+            scaled("exit_count"),
+            scaled("trip_count"),
+            len(known_values) == 1
+            and str(known_values[0]).lower() == "true",
+            len(labels) == 1 and bool(str(labels[0])),
         ],
         dtype=np.float32,
     )
@@ -411,16 +455,24 @@ def _json_to_hetero(
     from torch_geometric.data import HeteroData
 
     data = HeteroData()
+    hierarchy_version = safe_int(
+        (graph_data.get("hierarchy_enrichment") or {}).get("schema_version", 2)
+    )
+    if hierarchy_version not in (2, LOOP_HIERARCHY_SCHEMA_VERSION):
+        raise ValueError(f"Unsupported hierarchy schema version {hierarchy_version}")
     inst_map = {}
     var_map = {}
     const_map = {}
     pragma_map = {}
     block_map = {}
     function_map = {}
+    loop_map = {}
     function_id_map = {}
     node_type_map: dict[int, int] = {}
     instruction_function_ids = []
     block_function_ids = []
+    loop_function_ids = []
+    loop_nesting_depths = []
 
     unknown_types = set()
 
@@ -431,6 +483,7 @@ def _json_to_hetero(
         "pragma": [],
         "block": [],
         "function": [],
+        "loop": [],
     }
     nodes = graph_data.get("nodes") or []
     for n in nodes:
@@ -487,6 +540,13 @@ def _json_to_hetero(
             if function_id in function_id_map:
                 raise ValueError(f"Duplicate function hierarchy ID {function_id}")
             function_id_map[function_id] = function_map[node_id]
+        elif node_type == NODE_LOOP:
+            features["loop"].append(loop_embedding(n))
+            loop_map[node_id] = len(loop_map)
+            loop_function_ids.append(safe_int(n.get("function", -1)))
+            loop_nesting_depths.append(
+                safe_int((n.get("features", {}).get("depth") or [-1])[0])
+            )
         else:
             raise ValueError(f"Invalid node type: {node_type} in node {n}")
 
@@ -521,6 +581,12 @@ def _json_to_hetero(
         else np.empty((0, FUNCTION_FEATURE_SIZE), dtype=np.float32),
         dtype=torch.float,
     )
+    data["loop"].x = torch.tensor(
+        np.stack(features["loop"])
+        if features["loop"]
+        else np.empty((0, LOOP_FEATURE_SIZE), dtype=np.float32),
+        dtype=torch.float,
+    )
 
     metadata = synthesis_metadata(graph_data)
     categorical_context, numeric_context = graph_context_embedding(metadata)
@@ -539,8 +605,9 @@ def _json_to_hetero(
         NODE_PRAGMA: pragma_map,
         NODE_BLOCK: block_map,
         NODE_FUNCTION: function_map,
+        NODE_LOOP: loop_map,
     }
-    edge_index = {edge_type: [] for edge_type in EDGE_TYPES}
+    edge_index = {edge_type: [] for edge_type in REGION_EDGE_TYPES}
     edge_attrs = {edge_type: [] for edge_type in EDGE_TYPES_WITH_ATTR}
     edges = graph_data.get("links") or []
     for edge in edges:
@@ -556,7 +623,7 @@ def _json_to_hetero(
             relation,
             NODE_TYPE_NAMES[target_type_id],
         )
-        if edge_type not in EDGE_TYPE_SET:
+        if edge_type not in REGION_EDGE_TYPE_SET:
             raise ValueError(f"Edge is outside the canonical schema: {edge_type}")
         local_source = local_maps[source_type_id].get(source)
         local_target = local_maps[target_type_id].get(target)
@@ -608,8 +675,16 @@ def _json_to_hetero(
         function_id_map.get(function_id, -1)
         for function_id in block_function_ids
     ]
-    if any(owner < 0 for owner in instruction_owner + block_owner):
-        raise ValueError("Every instruction and block must belong to a function node")
+    loop_owner = [
+        function_id_map.get(function_id, -1)
+        for function_id in loop_function_ids
+    ]
+    if any(owner < 0 for owner in instruction_owner + block_owner + loop_owner):
+        raise ValueError(
+            "Every instruction, block, and loop must belong to a function node"
+        )
+    if loop_map and hierarchy_version != LOOP_HIERARCHY_SCHEMA_VERSION:
+        raise ValueError("Loop nodes require hierarchy schema version 3")
 
     block_by_instruction = {}
     for block, instruction in edge_index[("block", "contains", "instruction")]:
@@ -632,6 +707,37 @@ def _json_to_hetero(
     for block, expected_function in enumerate(block_owner):
         if function_by_block[block] != expected_function:
             raise ValueError("Block metadata disagrees with containment edges")
+
+    loop_parent: dict[int, tuple[str, int]] = {}
+    for function, loop in edge_index[("function", "contains", "loop")]:
+        if loop in loop_parent:
+            raise ValueError(f"Loop {loop} has multiple direct owners")
+        loop_parent[loop] = ("function", function)
+        if loop_owner[loop] != function:
+            raise ValueError("Loop metadata disagrees with function containment")
+        if loop_nesting_depths[loop] != 0:
+            raise ValueError("Top-level loop must have nesting depth zero")
+    for parent, child in edge_index[("loop", "contains", "loop")]:
+        if child in loop_parent:
+            raise ValueError(f"Loop {child} has multiple direct owners")
+        loop_parent[child] = ("loop", parent)
+        if loop_owner[parent] != loop_owner[child]:
+            raise ValueError("Nested-loop containment crosses functions")
+        if loop_nesting_depths[child] != loop_nesting_depths[parent] + 1:
+            raise ValueError("Nested-loop depth disagrees with containment")
+    if (
+        hierarchy_version == LOOP_HIERARCHY_SCHEMA_VERSION
+        and len(loop_parent) != len(loop_map)
+    ):
+        raise ValueError("Every loop requires exactly one function or loop owner")
+
+    direct_loop_by_block = {}
+    for loop, block in edge_index[("loop", "contains", "block")]:
+        if block in direct_loop_by_block:
+            raise ValueError(f"Block {block} has multiple direct loop owners")
+        direct_loop_by_block[block] = loop
+        if loop_owner[loop] != block_owner[block]:
+            raise ValueError("Loop/block containment crosses functions")
 
     for relation_edges in (
         edge_index[("instruction", "control", "instruction")],
@@ -674,7 +780,18 @@ def _json_to_hetero(
         ],
         dtype=torch.long,
     )
-    data.hierarchy_schema_version = 2
+    data["loop"].call_depth = torch.tensor(
+        [
+            schedule.depth[owner] if schedule.reachable[owner] else -1
+            for owner in loop_owner
+        ],
+        dtype=torch.long,
+    )
+    data["loop"].nesting_depth = torch.tensor(
+        loop_nesting_depths,
+        dtype=torch.long,
+    )
+    data.hierarchy_schema_version = hierarchy_version
 
     # Always add all expected labels unless it is an inference-mode graph
     if not inference_mode:

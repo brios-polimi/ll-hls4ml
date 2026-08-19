@@ -6,6 +6,7 @@ NODE_CONSTANT = 2
 NODE_PRAGMA = 3
 NODE_BLOCK = 4
 NODE_FUNCTION = 5
+NODE_LOOP = 6
 
 NODE_TYPE_NAMES = {
     NODE_INSTRUCTION: "instruction",
@@ -14,6 +15,7 @@ NODE_TYPE_NAMES = {
     NODE_PRAGMA: "pragma",
     NODE_BLOCK: "block",
     NODE_FUNCTION: "function",
+    NODE_LOOP: "loop",
 }
 # Canonical JSON relations. Endpoint types carry most semantics; the relation
 # remains explicit for validation and for the few same-endpoint alternatives.
@@ -33,6 +35,14 @@ EDGE_TYPES = [
     ("function", "contains", "block"),
 ]
 EDGE_TYPE_SET = frozenset(EDGE_TYPES)
+REGION_EDGE_TYPES = [
+    *EDGE_TYPES,
+    ("pragma", "applies_to", "loop"),
+    ("loop", "contains", "block"),
+    ("loop", "contains", "loop"),
+    ("function", "contains", "loop"),
+]
+REGION_EDGE_TYPE_SET = frozenset(REGION_EDGE_TYPES)
 RELATION_NAMES = tuple(dict.fromkeys(relation for _, relation, _ in EDGE_TYPES))
 
 # Tensor-only adjacency derived once during preprocessing. It is intentionally
@@ -44,10 +54,17 @@ DERIVED_DEF_USE_EDGE = ("instruction", "def_use", "instruction")
 HIERARCHY_LEVEL_KEYS = {
     "function": ("function",),
     "block": ("function", "block"),
+    "loop": ("function", "loop"),
 }
-NODE_TYPES = list(NODE_TYPE_NAMES.values())
+# The six-node list remains the schema-v2/H0 contract. Region-aware models opt
+# into the seventh type explicitly so old model behavior and parameterization
+# do not change merely because a schema-v3 tensor is loaded.
+NODE_TYPES = [NODE_TYPE_NAMES[node_type] for node_type in range(NODE_LOOP)]
+REGION_NODE_TYPES = [*NODE_TYPES, "loop"]
 BLOCK_FEATURE_SIZE = 3
 FUNCTION_FEATURE_SIZE = 2
+LOOP_FEATURE_SIZE = 7
+LOOP_HIERARCHY_SCHEMA_VERSION = 3
 
 PRAGMA_VOCAB = {
     "UNK": 0,

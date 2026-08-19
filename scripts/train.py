@@ -107,6 +107,7 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
     model_name = config.get("model", "hetero_gat")
     hierarchical_models = {
         "hierarchical",
+        "hierarchical_region",
         "hierarchical_high_level_fusion",
         "hierarchical_sequence",
         "hierarchical_block_attention",
@@ -118,6 +119,7 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         "hetero_gat",
         "hetero_relational",
         "hierarchical",
+        "hierarchical_region",
         "hierarchical_high_level_fusion",
         "hierarchical_sequence",
         "hierarchical_block_attention",
@@ -144,6 +146,14 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
                 "instruction_num_layers"
             )
             common["block_num_layers"] = config.get("block_num_layers")
+            if model_name == "hierarchical_region":
+                common["cardinality_messages"] = config.get(
+                    "cardinality_messages", True
+                )
+                common["composition"] = config.get("composition", "generic")
+                common["critical_path_steps"] = config.get(
+                    "critical_path_steps", 3
+                )
             if model_name in {
                 "hierarchical_sequence",
                 "hierarchical_block_attention",
