@@ -246,8 +246,8 @@ class CDFGHierarchical(nn.Module):
             data.hierarchy_schema_version,
             device=data["instruction"].x.device,
         )
-        if not bool(torch.all(versions == 2)):
-            raise ValueError("Hierarchical tensor schema version 2 is required")
+        if not bool(torch.all((versions == 2) | (versions == 3))):
+            raise ValueError("Hierarchical tensor schema version 2 or 3 is required")
         x_dict = {node_type: data[node_type].x for node_type in NODE_TYPES}
         edge_attr_dict = {
             edge_type: data[edge_type].edge_attr.long()

@@ -39,7 +39,7 @@ independently switchable so unchanged H0 is always available.
 | 2 | Explicit natural-loop nodes and nesting | `enrich_natural_loops = false` | implemented, sample-verified |
 | 3 | Loop tensor schema and region-HLS model | Model name `hierarchical` remains H0 | implemented, CPU-verified |
 | 4 | Resource-additive/timing-path composition | `composition: generic` | implemented, CPU-verified |
-| 5 | CPU information screen and GPU config | Existing H0 config | complete; graph generation pending |
+| 5 | CPU information screen and GPU config | Existing H0 config | complete; full rebuild running |
 | 6 | Data expansion and structural-OOD evaluation | Deferred by scope | deferred |
 
 ## Stage 1: conservative LLVM canonicalization
@@ -201,44 +201,78 @@ This makes cardinality messaging a later ablation, not the first GPU run.
 
 ### GPU promotion order
 
-1. Run `configs/hierarchical_region.yaml` for the clean explicit-region effect
-   (mean messages, generic composition). Stop if it is not roughly three
-   validation SMAPE points better than the matched H0 control.
-2. Run `configs/hierarchical_region_hardware.yaml` to test hardware composition
-   without the 2.1× parameter jump from cardinality messages.
-3. Set `cardinality_messages: true` only if either prior model crosses the
-   promotion gate. It is too expensive to justify from sub-point changes.
-4. Test LLVM canonicalization as a separate factorial axis after a viable region
-   model exists; do not confound its effect with the first hierarchy run.
+The user explicitly chose an in-place combined-representation test after
+finalizing the old tensorization changes. The high-signal design is now:
 
-Both region training configs point to isolated `../data/tensors_region_v3`.
-Pipeline fields `ll_directory` and `graphs_directory` default to the old paths;
-set `graphs_directory` to `graphs_region_v3` when generating the experiment so
-the finalized graphs cannot be overwritten.
+1. Retrain unchanged H0 on the canonicalized schema-3 tensors. H0 accepts schema
+   2 or 3 and ignores the loop stores, so this is the matched representation
+   control. Its paired delta from the historical H0 estimates the
+   canonicalization contribution.
+2. Train the mean-message region model with hardware-aligned composition on the
+   identical tensors and cohort. This is the primary architecture bundle.
+3. Only if the bundle materially improves H0, train generic composition as the
+   ablation that retains explicit loops but removes the hardware-aligned
+   composition prior.
+4. Cardinality messaging remains deferred because it roughly doubles parameters
+   and was much slower in the CPU feasibility benchmark.
 
-### Restart point
+This prioritizes finding a genuinely large result within the 21-hour GPU budget,
+while the matched H0 and conditional generic run preserve causal interpretability.
 
-No durable dataset was regenerated. The next action is a deliberately narrow
-one-archive regraph into `graphs_region_v3`, followed by tensorization with
-`configs/tensors_region.yaml` and semantic/count comparison against the source
-graph. Only after that passes should all archives be regenerated. Keep
-`llvm_canonicalization_passes` empty for this first experiment so the region
-effect is isolated.
+### Restart point (full rebuild authorized 2026-08-19)
 
-From each repository root, the intended narrow commands are:
+The user authorized replacing `data/ll`, `data/graphs`, and `data/tensors`, while
+strictly preserving `data/source` and forbidding web downloads. Preflight found
+65 registered archives, 6,487 retained project source trees, and no archive
+missing retained source. Before deletion, a deterministic tar-stream hash of the
+entire 9.8 GiB source tree was recorded:
+
+`ee6387acae725e93ad19e758404b858a06062ea9db181a35defd83d824db3a5c`
+
+The production config now has `allow_downloads: false`,
+`delete_source_after_compile: false`, canonicalization
+`sroa,mem2reg`, and natural-loop enrichment enabled. The processor
+prefers retained sources even if disposable extracted archives remain and fails
+closed before the downloader if a retained archive is absent.
+
+The rebuild command is running from `/home/brend/projects`:
 
 ```bash
 /home/brend/anaconda3/bin/conda run -n pipeline-env --no-capture-output \
-  python -m hls4ml_pipeline --config config.region-v3.example.json fetch \
-  --type 3layer --archives 6 --force-regraph
-
-/home/brend/anaconda3/bin/conda run -n pipeline-env --no-capture-output \
-  python scripts/build_tensors.py --config configs/tensors_region.yaml \
-  --kernel 3layer --archive 6 --workers 1
+  python -m hls4ml_pipeline --config hls4ml_pipeline/config.json fetch \
+  --type all --archives all --labels data/labels --force-recompile
 ```
 
-These commands are documented, not yet executed. The first writes the isolated
-graph namespace; the second writes the isolated tensor namespace.
+It initially exposed a stale broken `bazel-bin` symlink. A later broad pass also
+showed that `instcombine` removed Vitis FIFO pops in labeled conv1d IR. A retained
+conv1d audit measured 34,572 raw instructions; `sroa,mem2reg` reduced this to
+10,957 (-68.3%) while preserving all 2,110 blocks, 69 functions, 302 Vitis
+intrinsics, and 82 pragma carriers. Adding `instcombine` reduced to 7,486 but
+removed 25 Vitis operations, so it was rejected. The final strict pipeline is
+therefore `sroa,mem2reg`. Local label JSONs are passed to skip unlabelled retained
+projects that are outside the training cohort; this is not a download. Partial
+outputs were removed before the final restart. If interrupted, remove only
+partial `data/ll` and `data/graphs`, recreate `data/ll`, and rerun the exact
+command; the offline/source guards remain active.
+
+After graph completion, tensorize all labeled graphs with:
+
+```bash
+/home/brend/anaconda3/bin/conda run -n pipeline-env --no-capture-output \
+  python scripts/build_tensors.py --config configs/default.yaml --workers 8
+```
+
+Tensorization now explicitly skips unlabelled graph JSON rather than aborting or
+creating unusable training tensors. Every produced tensor records hierarchy
+schema 3 and canonicalization provenance. After completion, regenerate the full
+source hash and require exact equality, audit graph/tensor counts and schema
+metadata, and copy `artifacts/vocab/vocab.json` beside the tensors before upload.
+
+The Kaggle driver is
+`notebooks/04_06_kaggle_region_hierarchy_scale200.ipynb`. Tensor snapshots and
+the Hugging Face/Xet cache live entirely under `/tmp`; `/kaggle/working` holds
+only code, small configs, checkpoints, reports, and the resumable result zip.
+Paste immutable code and tensor revisions before running.
 
 ## Validation protocol
 
@@ -273,4 +307,12 @@ graph namespace; the second writes the isolated tensor namespace.
   Full discovery additionally reached an existing DDP smoke that requires a
   localhost rendezvous socket; it was interrupted because the sandbox forbids
   that socket, not because of a model assertion.
-- No dataset was regenerated and no training was started.
+- No GPU training was started; the durable dataset rebuild is now in progress.
+- Began the user-authorized offline in-place rebuild of `ll/` and `graphs/` with
+  canonicalization plus loop hierarchy; `source/` is guarded and fingerprinted.
+- Added canonicalization provenance to graph JSON and PyG tensors, made H0 a
+  valid matched control on schema 3, and made training tensorization skip
+  unlabelled graphs.
+- Added the full-scale Kaggle notebook with two 330-minute primary runs,
+  conditional generic-composition ablation, exact cohort assertions, resume
+  packaging, cache-only tensor downloads, and paired bootstrap intervals.

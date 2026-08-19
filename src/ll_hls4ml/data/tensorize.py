@@ -324,6 +324,8 @@ def _process_one(
         graph_data = load_graph_json(graph_path)
         if metadata_by_graph_id and graph_path.stem in metadata_by_graph_id:
             graph_data["synthesis_metadata"] = metadata_by_graph_id[graph_path.stem]
+        if not inference_mode and not graph_data.get("labels"):
+            return set(), None, synthesis_metadata(graph_data)
         data, unknown_types = _json_to_hetero(graph_data, vocab, max_pos, inference_mode)
         torch.save(data, out_path)
         labels = None if inference_mode else data.y.tolist()
@@ -419,6 +421,7 @@ def create_graph_tensors(
 
     try:
         label_records = []
+        skipped_unlabelled = 0
         for (_graph_path, out_path), (result, labels, metadata) in zip(
             work,
             tqdm.tqdm(
@@ -432,12 +435,19 @@ def create_graph_tensors(
                 for type_name in result
             }
             unknown_types.update(normalized)
+            if labels is None and not inference_mode:
+                out_path.unlink(missing_ok=True)
+                skipped_unlabelled += 1
+                continue
             label_records.append((out_path, labels, metadata))
     finally:
         if pool is not None:
             pool.shutdown()
 
     _update_label_index(pt_dir, label_records)
+
+    if skipped_unlabelled:
+        print(f"Skipped {skipped_unlabelled} unlabelled graph(s)")
 
     if unknown_types:
         print("Types not parsed by embedder:")
@@ -460,6 +470,13 @@ def _json_to_hetero(
     )
     if hierarchy_version not in (2, LOOP_HIERARCHY_SCHEMA_VERSION):
         raise ValueError(f"Unsupported hierarchy schema version {hierarchy_version}")
+    canonicalization = graph_data.get("ir_canonicalization") or {}
+    canonicalization_passes = canonicalization.get("passes") or []
+    if not isinstance(canonicalization_passes, list):
+        raise ValueError("ir_canonicalization.passes must be a list")
+    data.llvm_canonicalization_passes = ",".join(
+        str(item) for item in canonicalization_passes
+    )
     inst_map = {}
     var_map = {}
     const_map = {}

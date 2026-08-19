@@ -1,11 +1,13 @@
 import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 import torch
 from torch_geometric.data import Batch
 
-from ll_hls4ml.data.tensorize import _json_to_hetero
+from ll_hls4ml.data.tensorize import _json_to_hetero, _process_one
 
 
 def _loop_node(node_id, function, depth, block_count, labels=""):
@@ -116,16 +118,40 @@ def region_graph():
         "nodes": nodes,
         "links": links,
         "hierarchy_enrichment": {"schema_version": 3},
+        "ir_canonicalization": {
+            "schema_version": 1,
+            "passes": ["sroa", "mem2reg"],
+        },
     }
 
 
 class RegionTensorizationTests(unittest.TestCase):
+    def test_training_tensorization_skips_unlabelled_graph(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            graph_path = root / "graph.json"
+            tensor_path = root / "graph.pt"
+            graph_path.write_text(json.dumps(region_graph()))
+
+            unknown, labels, metadata = _process_one(
+                {"add": 1}, 1, False, None, (graph_path, tensor_path)
+            )
+
+            self.assertEqual(unknown, set())
+            self.assertIsNone(labels)
+            self.assertEqual(metadata, {})
+            self.assertFalse(tensor_path.exists())
+
     def test_tensorizes_nested_loops_and_schedule(self):
         data, _ = _json_to_hetero(
             region_graph(), {"add": 1}, inference_mode=True
         )
 
         self.assertEqual(data.hierarchy_schema_version, 3)
+        self.assertEqual(
+            data.llvm_canonicalization_passes,
+            "sroa,mem2reg",
+        )
         self.assertEqual(tuple(data["loop"].x.shape), (2, 7))
         np.testing.assert_array_equal(
             data[("loop", "contains", "loop")].edge_index.numpy(),
@@ -231,6 +257,17 @@ class RegionModelTests(unittest.TestCase):
         data, _ = _json_to_hetero(graph, {"add": 1}, inference_mode=True)
 
         prediction = self._model("hierarchical")(Batch.from_data_list([data]))
+
+        self.assertEqual(tuple(prediction.shape), (1, 6))
+
+    def test_h0_is_a_matched_baseline_on_schema_v3_tensor(self):
+        data, _ = _json_to_hetero(
+            region_graph(), {"add": 1}, inference_mode=True
+        )
+
+        prediction = self._model("hierarchical")(
+            Batch.from_data_list([data])
+        )
 
         self.assertEqual(tuple(prediction.shape), (1, 6))
 
