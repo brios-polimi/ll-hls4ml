@@ -1,0 +1,201 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.20 MB
+    total size: 163.47 MB
+  3layer: 800
+    avg size: 0.29 MB
+    total size: 232.90 MB
+  conv1d: 346
+    avg size: 2.57 MB
+    total size: 888.24 MB
+  conv2d: 194
+    avg size: 2.74 MB
+    total size: 530.94 MB
+  dense_latency: 550
+    avg size: 1.76 MB
+    total size: 966.66 MB
+  dense_resource: 414
+    avg size: 1.70 MB
+    total size: 703.82 MB
+  rule4ml: 800
+    avg size: 1.74 MB
+    total size: 1391.63 MB
+Indexed 886 graphs across 1 type(s)
+  exemplar: 886
+    avg size: 0.82 MB
+    total size: 727.87 MB
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch   1/400  train=0.3758  val=0.3077  lr=1.00e-03
+Epoch   2/400  train=0.2899  val=0.2808  lr=1.00e-03
+Epoch   4/400  train=0.2441  val=0.2323  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch   6/400  train=0.2255  val=0.2060  lr=1.00e-03
+Epoch   8/400  train=0.2104  val=0.2013  lr=1.00e-03
+Epoch  10/400  train=0.1957  val=0.1828  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  12/400  train=0.1842  val=0.2037  lr=1.00e-03
+Epoch  14/400  train=0.1787  val=0.1573  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  16/400  train=0.1667  val=0.1953  lr=1.00e-03
+Epoch  18/400  train=0.1693  val=0.1461  lr=1.00e-03
+Epoch  20/400  train=0.1703  val=0.1589  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  22/400  train=0.1574  val=0.1402  lr=1.00e-03
+Epoch  24/400  train=0.1573  val=0.1497  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  26/400  train=0.1599  val=0.1648  lr=1.00e-03
+Epoch  28/400  train=0.1535  val=0.1581  lr=1.00e-03
+Epoch  30/400  train=0.1472  val=0.1396  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  32/400  train=0.1550  val=0.1299  lr=1.00e-03
+Epoch  34/400  train=0.1424  val=0.1971  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  36/400  train=0.1357  val=0.1203  lr=1.00e-03
+Epoch  38/400  train=0.1331  val=0.1232  lr=1.00e-03
+Epoch  40/400  train=0.1365  val=0.1252  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  42/400  train=0.1307  val=0.1130  lr=1.00e-03
+Epoch  44/400  train=0.1235  val=0.1326  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  46/400  train=0.1205  val=0.1106  lr=1.00e-03
+Epoch  48/400  train=0.1171  val=0.1108  lr=1.00e-03
+Epoch  50/400  train=0.1151  val=0.1137  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  52/400  train=0.1155  val=0.1060  lr=1.00e-03
+Epoch  54/400  train=0.1145  val=0.1058  lr=1.00e-03
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  56/400  train=0.1109  val=0.1114  lr=1.00e-03
+Epoch  58/400  train=0.1113  val=0.1022  lr=1.00e-03
+Epoch  60/400  train=0.1088  val=0.1037  lr=5.00e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  62/400  train=0.1018  val=0.0917  lr=5.00e-04
+Epoch  64/400  train=0.1007  val=0.0926  lr=5.00e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  66/400  train=0.1004  val=0.0910  lr=5.00e-04
+Epoch  68/400  train=0.0995  val=0.0896  lr=5.00e-04
+Epoch  70/400  train=0.0993  val=0.0941  lr=5.00e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  72/400  train=0.0990  val=0.0901  lr=5.00e-04
+Epoch  74/400  train=0.0976  val=0.0914  lr=5.00e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  76/400  train=0.0976  val=0.0907  lr=5.00e-04
+Epoch  78/400  train=0.0972  val=0.0899  lr=5.00e-04
+Epoch  80/400  train=0.0962  val=0.0900  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  82/400  train=0.0926  val=0.0856  lr=2.50e-04
+Epoch  84/400  train=0.0910  val=0.0861  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  86/400  train=0.0913  val=0.0848  lr=2.50e-04
+Epoch  88/400  train=0.0909  val=0.0845  lr=2.50e-04
+Epoch  90/400  train=0.0901  val=0.0840  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  92/400  train=0.0894  val=0.0843  lr=2.50e-04
+Epoch  94/400  train=0.0906  val=0.0874  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch  96/400  train=0.0888  val=0.0816  lr=2.50e-04
+Epoch  98/400  train=0.0880  val=0.0821  lr=2.50e-04
+Epoch 100/400  train=0.0888  val=0.0854  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 102/400  train=0.0876  val=0.0836  lr=2.50e-04
+Epoch 104/400  train=0.0860  val=0.0843  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 106/400  train=0.0865  val=0.0804  lr=2.50e-04
+Epoch 108/400  train=0.0858  val=0.0807  lr=2.50e-04
+Epoch 110/400  train=0.0866  val=0.0809  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 112/400  train=0.0866  val=0.0830  lr=2.50e-04
+Epoch 114/400  train=0.0843  val=0.0790  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 116/400  train=0.0831  val=0.0818  lr=2.50e-04
+Epoch 118/400  train=0.0837  val=0.0795  lr=2.50e-04
+Epoch 120/400  train=0.0842  val=0.0829  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 122/400  train=0.0827  val=0.0779  lr=2.50e-04
+Epoch 124/400  train=0.0847  val=0.0853  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 126/400  train=0.0849  val=0.0793  lr=2.50e-04
+Epoch 128/400  train=0.0844  val=0.0800  lr=2.50e-04
+Epoch 130/400  train=0.0819  val=0.0822  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 132/400  train=0.0820  val=0.0797  lr=2.50e-04
+Epoch 134/400  train=0.0828  val=0.0771  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 136/400  train=0.0828  val=0.0812  lr=2.50e-04
+Epoch 138/400  train=0.0818  val=0.0830  lr=2.50e-04
+Epoch 140/400  train=0.0804  val=0.0768  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 142/400  train=0.0801  val=0.0795  lr=2.50e-04
+Epoch 144/400  train=0.0802  val=0.0781  lr=2.50e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 146/400  train=0.0795  val=0.0781  lr=2.50e-04
+Epoch 148/400  train=0.0796  val=0.0768  lr=1.25e-04
+Epoch 150/400  train=0.0778  val=0.0763  lr=1.25e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 152/400  train=0.0777  val=0.0768  lr=1.25e-04
+Epoch 154/400  train=0.0777  val=0.0756  lr=1.25e-04
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 156/400  train=0.0762  val=0.0768  lr=1.25e-04
+Epoch 158/400  train=0.0762  val=0.0756  lr=6.25e-05
+Epoch 160/400  train=0.0744  val=0.0761  lr=6.25e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 162/400  train=0.0763  val=0.0764  lr=6.25e-05
+Epoch 164/400  train=0.0747  val=0.0757  lr=6.25e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 166/400  train=0.0738  val=0.0754  lr=6.25e-05
+Epoch 168/400  train=0.0741  val=0.0756  lr=6.25e-05
+Epoch 170/400  train=0.0741  val=0.0749  lr=6.25e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 172/400  train=0.0748  val=0.0747  lr=6.25e-05
+Epoch 174/400  train=0.0750  val=0.0755  lr=3.13e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 176/400  train=0.0732  val=0.0742  lr=3.13e-05
+Epoch 178/400  train=0.0729  val=0.0742  lr=3.13e-05
+Epoch 180/400  train=0.0733  val=0.0741  lr=3.13e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 182/400  train=0.0729  val=0.0742  lr=3.13e-05
+Epoch 184/400  train=0.0733  val=0.0734  lr=3.13e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 186/400  train=0.0739  val=0.0748  lr=3.13e-05
+Epoch 188/400  train=0.0736  val=0.0744  lr=3.13e-05
+Epoch 190/400  train=0.0723  val=0.0745  lr=3.13e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 192/400  train=0.0742  val=0.0742  lr=3.13e-05
+Epoch 194/400  train=0.0734  val=0.0743  lr=1.56e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 196/400  train=0.0727  val=0.0738  lr=1.56e-05
+Epoch 198/400  train=0.0736  val=0.0735  lr=1.56e-05
+Epoch 200/400  train=0.0732  val=0.0741  lr=1.56e-05
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 202/400  train=0.0733  val=0.0741  lr=7.81e-06
+Epoch 204/400  train=0.0725  val=0.0739  lr=7.81e-06
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 206/400  train=0.0721  val=0.0735  lr=7.81e-06
+Epoch 208/400  train=0.0714  val=0.0740  lr=7.81e-06
+Epoch 210/400  train=0.0722  val=0.0738  lr=7.81e-06
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 212/400  train=0.0723  val=0.0736  lr=3.91e-06
+Epoch 214/400  train=0.0731  val=0.0736  lr=3.91e-06
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 216/400  train=0.0729  val=0.0735  lr=3.91e-06
+Epoch 218/400  train=0.0718  val=0.0738  lr=3.91e-06
+Epoch 220/400  train=0.0714  val=0.0738  lr=1.95e-06
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 222/400  train=0.0714  val=0.0736  lr=1.95e-06
+Epoch 224/400  train=0.0715  val=0.0737  lr=1.95e-06
+Model saved to /kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt
+Epoch 226/400  train=0.0719  val=0.0736  lr=1.95e-06
+Epoch 228/400  train=0.0728  val=0.0737  lr=1.95e-06
+Early stopping triggered after 228 epochs.
+Best model restored from epoch 198 with validation smape 28.5953
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/canonical_h0_scale200_seed42

@@ -1,0 +1,1013 @@
+{
+  "tensor_dir": "/tmp/ll_hls4ml_region_schema3_hf/hub/datasets--BrendanRios--wa-hls4ml-tensors-hierarchical/snapshots/68f9e6285cdf131235bf9a7a0220caff23f1c297",
+  "tensor_source_revision": "68f9e6285cdf131235bf9a7a0220caff23f1c297",
+  "vocab_path": "/tmp/ll_hls4ml_region_schema3_hf/hub/datasets--BrendanRios--wa-hls4ml-tensors-hierarchical/snapshots/68f9e6285cdf131235bf9a7a0220caff23f1c297/vocab.json",
+  "split_manifest_path": "/kaggle/working/configs/matched_full_scale_manifest.json",
+  "require_complete_split_manifest": true,
+  "results_dir": "/kaggle/working/results",
+  "kernel_types": [
+    "2layer",
+    "3layer",
+    "conv1d",
+    "conv2d",
+    "dense_latency",
+    "dense_resource",
+    "rule4ml"
+  ],
+  "scale_percent": 200,
+  "distributed_world_size": 2,
+  "seed": 42,
+  "family_balanced_sampling": false,
+  "batch_size": 8,
+  "num_workers": 2,
+  "worker_tmpdir": "/tmp",
+  "pin_memory": true,
+  "prefetch_factor": 2,
+  "thread_prefetch": false,
+  "precision": "bf16",
+  "gpu_telemetry_interval_ms": 1000,
+  "epochs": 400,
+  "patience": 30,
+  "checkpoint_interval": 5,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "hidden_dim": 64,
+  "num_layers": 3,
+  "dropout": 0.15,
+  "use_global_features": true,
+  "use_context": true,
+  "context_mode": "core",
+  "split_heads": true,
+  "hurdle_heads": true,
+  "hurdle_prediction_mode": "threshold",
+  "loss": "log_huber_hurdle",
+  "log_huber_delta": 0.35,
+  "hurdle_classification_weight": 0.25,
+  "early_stopping_metric": "smape",
+  "verbose": 2,
+  "model": "hierarchical",
+  "architecture_label": "H0 on canonical schema-v3 tensors",
+  "experiment_name": "canonical_h0_scale200_seed42",
+  "checkpoint_dir": "/kaggle/working/results/canonical_h0_scale200_seed42/checkpoints",
+  "baseline_predictions_path": "/kaggle/working/ll-hls4ml/artifacts/results/ll_hls4ml_hierarchy_fusion_scale200_results/hierarchical_scale200_seed42/predictions.csv",
+  "checkpoint_path": "/kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_checkpoint.pt",
+  "backup_checkpoint_path": "/kaggle/working/results/canonical_h0_scale200_seed42/checkpoints/canonical_h0_scale200_seed42_backup.pt",
+  "resume_checkpoint_path": null,
+  "evaluation_checkpoint_path": null,
+  "run_dir": "/kaggle/working/results/canonical_h0_scale200_seed42",
+  "device": "cuda:0",
+  "torch_version": "2.10.0+cu128",
+  "split_manifest_coverage": {
+    "train": {
+      "requested": 2742,
+      "selected": 2742,
+      "missing": 0
+    },
+    "validation": {
+      "requested": 569,
+      "selected": 569,
+      "missing": 0
+    },
+    "test": {
+      "requested": 593,
+      "selected": 593,
+      "missing": 0
+    },
+    "exemplar": {
+      "requested": 886,
+      "selected": 886,
+      "missing": 0
+    }
+  },
+  "split_sha256": "076373d277dbbf0a4fefe6e221cc3392837c8fee4a7cab628c0e3b56593be335",
+  "cohort_membership": {
+    "train": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 76
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_2",
+        "n_samples": 74
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_3",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_4",
+        "n_samples": 72
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_5",
+        "n_samples": 65
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_6",
+        "n_samples": 62
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_7",
+        "n_samples": 76
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_8",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_2",
+        "n_samples": 73
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_3",
+        "n_samples": 73
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_4",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_5",
+        "n_samples": 63
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_6",
+        "n_samples": 71
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_7",
+        "n_samples": 72
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_8",
+        "n_samples": 69
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 37
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_2",
+        "n_samples": 22
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_3",
+        "n_samples": 28
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_4",
+        "n_samples": 37
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_5",
+        "n_samples": 28
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_6",
+        "n_samples": 24
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_7",
+        "n_samples": 33
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_8",
+        "n_samples": 34
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 21
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_3",
+        "n_samples": 21
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_4",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_5",
+        "n_samples": 20
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_6",
+        "n_samples": 24
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_7",
+        "n_samples": 21
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_8",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 45
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_2",
+        "n_samples": 44
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_3",
+        "n_samples": 50
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_4",
+        "n_samples": 53
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_5",
+        "n_samples": 47
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_6",
+        "n_samples": 43
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_7",
+        "n_samples": 52
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_8",
+        "n_samples": 43
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 37
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_2",
+        "n_samples": 39
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_3",
+        "n_samples": 35
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_4",
+        "n_samples": 31
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_5",
+        "n_samples": 38
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_6",
+        "n_samples": 39
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_7",
+        "n_samples": 35
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_8",
+        "n_samples": 44
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 65
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_2",
+        "n_samples": 80
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_3",
+        "n_samples": 67
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_4",
+        "n_samples": 75
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_5",
+        "n_samples": 66
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_6",
+        "n_samples": 65
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_7",
+        "n_samples": 66
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_8",
+        "n_samples": 74
+      }
+    ],
+    "validation": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_2",
+        "n_samples": 12
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_3",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_4",
+        "n_samples": 19
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_5",
+        "n_samples": 18
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_6",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_7",
+        "n_samples": 13
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_8",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_2",
+        "n_samples": 16
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_3",
+        "n_samples": 11
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_4",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_5",
+        "n_samples": 17
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_6",
+        "n_samples": 17
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_7",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_8",
+        "n_samples": 16
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_2",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_3",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_4",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_5",
+        "n_samples": 9
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_6",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_7",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_8",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 1
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_3",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_4",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_5",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_6",
+        "n_samples": 9
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_7",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_8",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_2",
+        "n_samples": 18
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_3",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_4",
+        "n_samples": 11
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_5",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_6",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_7",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_8",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 12
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_2",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_3",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_4",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_5",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_6",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_7",
+        "n_samples": 9
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_8",
+        "n_samples": 9
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_2",
+        "n_samples": 12
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_3",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_4",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_5",
+        "n_samples": 16
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_6",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_7",
+        "n_samples": 19
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_8",
+        "n_samples": 16
+      }
+    ],
+    "test": [
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_1",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_2",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_3",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_4",
+        "n_samples": 9
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_5",
+        "n_samples": 17
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_6",
+        "n_samples": 24
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_7",
+        "n_samples": 11
+      },
+      {
+        "kernel_family": "2layer",
+        "archive": "archive_8",
+        "n_samples": 21
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_1",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_2",
+        "n_samples": 11
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_3",
+        "n_samples": 16
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_4",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_5",
+        "n_samples": 20
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_6",
+        "n_samples": 12
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_7",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "3layer",
+        "archive": "archive_8",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_1",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_2",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_3",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_4",
+        "n_samples": 6
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_5",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_6",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_7",
+        "n_samples": 9
+      },
+      {
+        "kernel_family": "conv1d",
+        "archive": "archive_8",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_1",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_3",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_4",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_5",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_6",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_7",
+        "n_samples": 3
+      },
+      {
+        "kernel_family": "conv2d",
+        "archive": "archive_8",
+        "n_samples": 2
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_1",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_2",
+        "n_samples": 11
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_3",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_4",
+        "n_samples": 14
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_5",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_6",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_7",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "dense_latency",
+        "archive": "archive_8",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_1",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_2",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_3",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_4",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_5",
+        "n_samples": 5
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_6",
+        "n_samples": 10
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_7",
+        "n_samples": 4
+      },
+      {
+        "kernel_family": "dense_resource",
+        "archive": "archive_8",
+        "n_samples": 7
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_1",
+        "n_samples": 20
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_2",
+        "n_samples": 8
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_3",
+        "n_samples": 18
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_4",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_5",
+        "n_samples": 18
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_6",
+        "n_samples": 20
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_7",
+        "n_samples": 15
+      },
+      {
+        "kernel_family": "rule4ml",
+        "archive": "archive_8",
+        "n_samples": 10
+      }
+    ],
+    "exemplar": [
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_1",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_2",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_3",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_4",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_5",
+        "n_samples": 99
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_6",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_7",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_8",
+        "n_samples": 100
+      },
+      {
+        "kernel_family": "exemplar",
+        "archive": "archive_9",
+        "n_samples": 87
+      }
+    ]
+  },
+  "validation_cadence_epochs": 1,
+  "checkpoint_cadence_epochs": 5,
+  "parameter_count": 239696,
+  "gradient_clip_norm": 1.0,
+  "lr_scheduler": "reduce_on_plateau",
+  "lr_scheduler_patience": 8,
+  "lr_scheduler_factor": 0.5,
+  "min_learning_rate": 1e-06,
+  "ll_hls4ml_git": {
+    "commit": "04698fd4a6bca473ce2d14b3b7b6760c39799bac",
+    "dirty": false
+  },
+  "wall_seconds": 15325.018087003,
+  "cumulative_training_seconds": 15285.260659890999,
+  "best_wall_seconds": 13270.040384365,
+  "peak_gpu_memory_mb": 604.34033203125,
+  "mean_train_seconds_per_sample": 0.02090686360044694,
+  "stop_reason": "early_stopping",
+  "gpu_telemetry": {
+    "samples": 15136,
+    "interval_ms": 1000,
+    "gpu_utilization_mean_percent": 35.27140591966173,
+    "gpu_utilization_p10_percent": 10.0,
+    "gpu_utilization_p50_percent": 34.0,
+    "gpu_utilization_p90_percent": 61.0,
+    "gpu_zero_utilization_fraction": 0.0033033826638477802,
+    "gpu_below_25_percent_fraction": 0.29981501057082455,
+    "gpu_active_mean_percent": 44.54444234761276,
+    "gpu_utilization_coefficient_of_variation": 0.5468731586909584,
+    "gpu_longest_below_25_seconds": 8.0,
+    "gpu_active_bursts_per_minute": 10.619714587737844,
+    "memory_utilization_mean_percent": 6.1586945031712474,
+    "resident_gpu_memory_mean_mb": 984.7033562367865,
+    "power_draw_mean_w": 51.66378435517971,
+    "sm_clock_mean_mhz": 1461.9757531712473,
+    "temperature_mean_c": 76.56573731501057,
+    "predominant_pstate": "P0",
+    "system_cpu_mean_percent": 78.69441112502471,
+    "system_cpu_p90_percent": 84.7,
+    "driver_cpu_mean_percent": 115.32265867000592,
+    "driver_cpu_p90_percent": 126.0,
+    "training_tree_cpu_mean_percent": 115.32265867000592,
+    "training_tree_cpu_p90_percent": 126.0,
+    "training_tree_rss_mean_mb": 6868.877195254317,
+    "training_tree_rss_p90_mb": 6894.74296875,
+    "system_disk_read_mean_mb_s": 0.017417984697644193,
+    "system_disk_read_p90_mb_s": 0.0,
+    "system_disk_write_mean_mb_s": 0.06264369212717076,
+    "system_disk_write_p90_mb_s": 0.0932163420361397
+  }
+}

@@ -1,0 +1,868 @@
+{
+  "all": {
+    "containment_edges": {
+      "function_to_top_level_loop": 7366,
+      "loop_to_child_loop": 3013,
+      "loop_to_direct_block": 199756
+    },
+    "directives": {
+      "allocation": 973,
+      "array_partition": 6062,
+      "array_reshape": 754,
+      "dataflow": 171,
+      "function_instantiate": 1298,
+      "inline": 790,
+      "interface": 220,
+      "loop_flatten": 67,
+      "pipeline": 2665,
+      "stream": 785,
+      "unroll": 3108
+    },
+    "loop_pragma_coverage": {
+      "fraction_of_loops": 0.416706811831583,
+      "fraction_of_samples": 0.7772727272727272,
+      "loop_nodes_with_pragma": 4325,
+      "loop_pragma_edges": 4343,
+      "loop_scoped_pragma_nodes": 4343,
+      "samples_with_loop_pragma": 171
+    },
+    "loop_scoped_directives": {
+      "loop_flatten": {
+        "argument_variants": 1,
+        "pragma_nodes": 67
+      },
+      "pipeline": {
+        "argument_variants": 107,
+        "pragma_nodes": 1333
+      },
+      "unroll": {
+        "argument_variants": 1,
+        "pragma_nodes": 2943
+      }
+    },
+    "loop_trip_count_known": {
+      "count": 0,
+      "fraction_of_loops": 0.0
+    },
+    "loops": 10379,
+    "mean_loops_per_sample": 47.17727272727273,
+    "memory_proxy": {
+      "memory_like_variables": 0,
+      "memory_node_type_exists": false,
+      "samples_with_memory_like_variable": 0
+    },
+    "pragma_scope_coverage": {
+      "all_pragma_nodes": 16893,
+      "fraction_scoped": 1.0,
+      "nodes_with_any_semantic_scope": 16893
+    },
+    "samples": 220,
+    "source_anchored_loops": {
+      "count": 5929,
+      "fraction_of_loops": 0.5712496386935157
+    },
+    "symbolic_pragma_resolution": {
+      "injected_nodes_with_resolution_provenance": 2630,
+      "injected_unresolved_numeric_arguments": 0,
+      "pragma_dump_records": 44947,
+      "resolved_numeric_arguments": 2630,
+      "samples_with_unmatched_symbolic_numeric": 220,
+      "unmatched_symbolic_numeric_arguments": 3147
+    }
+  },
+  "families": {
+    "2layer": {
+      "containment_edges": {
+        "function_to_top_level_loop": 240,
+        "loop_to_child_loop": 60,
+        "loop_to_direct_block": 4140
+      },
+      "directives": {
+        "array_partition": 180,
+        "array_reshape": 30,
+        "dataflow": 30,
+        "inline": 60,
+        "interface": 30,
+        "pipeline": 60,
+        "unroll": 180
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.8,
+        "fraction_of_samples": 1.0,
+        "loop_nodes_with_pragma": 240,
+        "loop_pragma_edges": 240,
+        "loop_scoped_pragma_nodes": 240,
+        "samples_with_loop_pragma": 30
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 1,
+          "pragma_nodes": 60
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 180
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 300,
+      "mean_loops_per_sample": 10.0,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 570,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 570
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 240,
+        "fraction_of_loops": 0.8
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 0,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 1980,
+        "resolved_numeric_arguments": 0,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 120
+      }
+    },
+    "3layer": {
+      "containment_edges": {
+        "function_to_top_level_loop": 360,
+        "loop_to_child_loop": 90,
+        "loop_to_direct_block": 6210
+      },
+      "directives": {
+        "array_partition": 270,
+        "array_reshape": 30,
+        "dataflow": 30,
+        "inline": 90,
+        "interface": 30,
+        "pipeline": 90,
+        "unroll": 270
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.8,
+        "fraction_of_samples": 1.0,
+        "loop_nodes_with_pragma": 360,
+        "loop_pragma_edges": 360,
+        "loop_scoped_pragma_nodes": 360,
+        "samples_with_loop_pragma": 30
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 1,
+          "pragma_nodes": 90
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 270
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 450,
+      "mean_loops_per_sample": 15.0,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 810,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 810
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 360,
+        "fraction_of_loops": 0.8
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 0,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 2010,
+        "resolved_numeric_arguments": 0,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 120
+      }
+    },
+    "conv1d": {
+      "containment_edges": {
+        "function_to_top_level_loop": 1502,
+        "loop_to_child_loop": 785,
+        "loop_to_direct_block": 40326
+      },
+      "directives": {
+        "allocation": 137,
+        "array_partition": 767,
+        "array_reshape": 137,
+        "dataflow": 30,
+        "function_instantiate": 137,
+        "inline": 213,
+        "interface": 30,
+        "pipeline": 493,
+        "stream": 427,
+        "unroll": 739
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.5386969829470922,
+        "fraction_of_samples": 1.0,
+        "loop_nodes_with_pragma": 1232,
+        "loop_pragma_edges": 1232,
+        "loop_scoped_pragma_nodes": 1232,
+        "samples_with_loop_pragma": 30
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 72,
+          "pragma_nodes": 493
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 739
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 2287,
+      "mean_loops_per_sample": 76.23333333333333,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 3110,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 3110
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 1232,
+        "fraction_of_loops": 0.5386969829470922
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 498,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 9619,
+        "resolved_numeric_arguments": 498,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 751
+      }
+    },
+    "conv2d": {
+      "containment_edges": {
+        "function_to_top_level_loop": 1403,
+        "loop_to_child_loop": 1051,
+        "loop_to_direct_block": 37326
+      },
+      "directives": {
+        "allocation": 132,
+        "array_partition": 834,
+        "array_reshape": 132,
+        "dataflow": 30,
+        "function_instantiate": 132,
+        "inline": 273,
+        "interface": 30,
+        "loop_flatten": 67,
+        "pipeline": 426,
+        "stream": 358,
+        "unroll": 779
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.4861450692746536,
+        "fraction_of_samples": 1.0,
+        "loop_nodes_with_pragma": 1193,
+        "loop_pragma_edges": 1211,
+        "loop_scoped_pragma_nodes": 1211,
+        "samples_with_loop_pragma": 30
+      },
+      "loop_scoped_directives": {
+        "loop_flatten": {
+          "argument_variants": 1,
+          "pragma_nodes": 67
+        },
+        "pipeline": {
+          "argument_variants": 49,
+          "pragma_nodes": 365
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 779
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 2454,
+      "mean_loops_per_sample": 81.8,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 3193,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 3193
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 1193,
+        "fraction_of_loops": 0.4861450692746536
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 399,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 9804,
+        "resolved_numeric_arguments": 399,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 780
+      }
+    },
+    "dense_latency": {
+      "containment_edges": {
+        "function_to_top_level_loop": 1022,
+        "loop_to_child_loop": 360,
+        "loop_to_direct_block": 40164
+      },
+      "directives": {
+        "allocation": 360,
+        "array_partition": 1382,
+        "array_reshape": 30,
+        "function_instantiate": 360,
+        "interface": 30,
+        "pipeline": 512
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.0,
+        "fraction_of_samples": 0.0,
+        "loop_nodes_with_pragma": 0,
+        "loop_pragma_edges": 0,
+        "loop_scoped_pragma_nodes": 0,
+        "samples_with_loop_pragma": 0
+      },
+      "loop_scoped_directives": {},
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 1382,
+      "mean_loops_per_sample": 46.06666666666667,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 2674,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 2674
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 1260,
+        "fraction_of_loops": 0.9117221418234442
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 720,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 7112,
+        "resolved_numeric_arguments": 720,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 480
+      }
+    },
+    "dense_resource": {
+      "containment_edges": {
+        "function_to_top_level_loop": 963,
+        "loop_to_child_loop": 171,
+        "loop_to_direct_block": 38720
+      },
+      "directives": {
+        "allocation": 171,
+        "array_partition": 1142,
+        "array_reshape": 201,
+        "dataflow": 30,
+        "function_instantiate": 342,
+        "interface": 30,
+        "pipeline": 458,
+        "unroll": 513
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.6031746031746031,
+        "fraction_of_samples": 1.0,
+        "loop_nodes_with_pragma": 684,
+        "loop_pragma_edges": 684,
+        "loop_scoped_pragma_nodes": 684,
+        "samples_with_loop_pragma": 30
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 1,
+          "pragma_nodes": 171
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 513
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 1134,
+      "mean_loops_per_sample": 37.8,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 2887,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 2887
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 855,
+        "fraction_of_loops": 0.753968253968254
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 513,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 7088,
+        "resolved_numeric_arguments": 513,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 510
+      }
+    },
+    "exemplar": {
+      "containment_edges": {
+        "function_to_top_level_loop": 248,
+        "loop_to_child_loop": 56,
+        "loop_to_direct_block": 4389
+      },
+      "directives": {
+        "allocation": 14,
+        "array_partition": 199,
+        "array_reshape": 38,
+        "dataflow": 7,
+        "function_instantiate": 42,
+        "inline": 28,
+        "interface": 10,
+        "pipeline": 97,
+        "unroll": 105
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.3684210526315789,
+        "fraction_of_samples": 0.7,
+        "loop_nodes_with_pragma": 112,
+        "loop_pragma_edges": 112,
+        "loop_scoped_pragma_nodes": 112,
+        "samples_with_loop_pragma": 7
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 1,
+          "pragma_nodes": 28
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 84
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 304,
+      "mean_loops_per_sample": 30.4,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 540,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 540
+      },
+      "samples": 10,
+      "source_anchored_loops": {
+        "count": 126,
+        "fraction_of_loops": 0.4144736842105263
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 56,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 1850,
+        "resolved_numeric_arguments": 56,
+        "samples_with_unmatched_symbolic_numeric": 10,
+        "unmatched_symbolic_numeric_arguments": 108
+      }
+    },
+    "rule4ml": {
+      "containment_edges": {
+        "function_to_top_level_loop": 1628,
+        "loop_to_child_loop": 440,
+        "loop_to_direct_block": 28481
+      },
+      "directives": {
+        "allocation": 159,
+        "array_partition": 1288,
+        "array_reshape": 156,
+        "dataflow": 14,
+        "function_instantiate": 285,
+        "inline": 126,
+        "interface": 30,
+        "pipeline": 529,
+        "unroll": 522
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.2437137330754352,
+        "fraction_of_samples": 0.4666666666666667,
+        "loop_nodes_with_pragma": 504,
+        "loop_pragma_edges": 504,
+        "loop_scoped_pragma_nodes": 504,
+        "samples_with_loop_pragma": 14
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 1,
+          "pragma_nodes": 126
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 378
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 2068,
+      "mean_loops_per_sample": 68.93333333333334,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 3109,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 3109
+      },
+      "samples": 30,
+      "source_anchored_loops": {
+        "count": 663,
+        "fraction_of_loops": 0.32059961315280466
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 444,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 5484,
+        "resolved_numeric_arguments": 444,
+        "samples_with_unmatched_symbolic_numeric": 30,
+        "unmatched_symbolic_numeric_arguments": 278
+      }
+    }
+  },
+  "selection": "first 10 records per split/family",
+  "source": "data/graphs",
+  "split_manifest": "ll-hls4ml/artifacts/results/ll_hls4ml_region_hierarchy_scale200_results/region_hardware_scale200_seed42/split_manifest.json",
+  "splits": {
+    "exemplar": {
+      "containment_edges": {
+        "function_to_top_level_loop": 248,
+        "loop_to_child_loop": 56,
+        "loop_to_direct_block": 4389
+      },
+      "directives": {
+        "allocation": 14,
+        "array_partition": 199,
+        "array_reshape": 38,
+        "dataflow": 7,
+        "function_instantiate": 42,
+        "inline": 28,
+        "interface": 10,
+        "pipeline": 97,
+        "unroll": 105
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.3684210526315789,
+        "fraction_of_samples": 0.7,
+        "loop_nodes_with_pragma": 112,
+        "loop_pragma_edges": 112,
+        "loop_scoped_pragma_nodes": 112,
+        "samples_with_loop_pragma": 7
+      },
+      "loop_scoped_directives": {
+        "pipeline": {
+          "argument_variants": 1,
+          "pragma_nodes": 28
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 84
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 304,
+      "mean_loops_per_sample": 30.4,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 540,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 540
+      },
+      "samples": 10,
+      "source_anchored_loops": {
+        "count": 126,
+        "fraction_of_loops": 0.4144736842105263
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 56,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 1850,
+        "resolved_numeric_arguments": 56,
+        "samples_with_unmatched_symbolic_numeric": 10,
+        "unmatched_symbolic_numeric_arguments": 108
+      }
+    },
+    "test": {
+      "containment_edges": {
+        "function_to_top_level_loop": 2221,
+        "loop_to_child_loop": 969,
+        "loop_to_direct_block": 62181
+      },
+      "directives": {
+        "allocation": 315,
+        "array_partition": 1824,
+        "array_reshape": 208,
+        "dataflow": 54,
+        "function_instantiate": 390,
+        "inline": 219,
+        "interface": 70,
+        "loop_flatten": 21,
+        "pipeline": 804,
+        "stream": 254,
+        "unroll": 903
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.39843260188087776,
+        "fraction_of_samples": 0.7714285714285715,
+        "loop_nodes_with_pragma": 1271,
+        "loop_pragma_edges": 1278,
+        "loop_scoped_pragma_nodes": 1278,
+        "samples_with_loop_pragma": 54
+      },
+      "loop_scoped_directives": {
+        "loop_flatten": {
+          "argument_variants": 1,
+          "pragma_nodes": 21
+        },
+        "pipeline": {
+          "argument_variants": 55,
+          "pragma_nodes": 402
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 855
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 3190,
+      "mean_loops_per_sample": 45.57142857142857,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 5062,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 5062
+      },
+      "samples": 70,
+      "source_anchored_loops": {
+        "count": 1808,
+        "fraction_of_loops": 0.5667711598746081
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 820,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 14342,
+        "resolved_numeric_arguments": 820,
+        "samples_with_unmatched_symbolic_numeric": 70,
+        "unmatched_symbolic_numeric_arguments": 1022
+      }
+    },
+    "train": {
+      "containment_edges": {
+        "function_to_top_level_loop": 2509,
+        "loop_to_child_loop": 1031,
+        "loop_to_direct_block": 67797
+      },
+      "directives": {
+        "allocation": 350,
+        "array_partition": 2097,
+        "array_reshape": 241,
+        "dataflow": 53,
+        "function_instantiate": 444,
+        "inline": 256,
+        "interface": 70,
+        "loop_flatten": 25,
+        "pipeline": 906,
+        "stream": 272,
+        "unroll": 1007
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.4033898305084746,
+        "fraction_of_samples": 0.7571428571428571,
+        "loop_nodes_with_pragma": 1428,
+        "loop_pragma_edges": 1435,
+        "loop_scoped_pragma_nodes": 1435,
+        "samples_with_loop_pragma": 53
+      },
+      "loop_scoped_directives": {
+        "loop_flatten": {
+          "argument_variants": 1,
+          "pragma_nodes": 25
+        },
+        "pipeline": {
+          "argument_variants": 54,
+          "pragma_nodes": 445
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 965
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 3540,
+      "mean_loops_per_sample": 50.57142857142857,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 5721,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 5721
+      },
+      "samples": 70,
+      "source_anchored_loops": {
+        "count": 1986,
+        "fraction_of_loops": 0.5610169491525424
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 923,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 14507,
+        "resolved_numeric_arguments": 923,
+        "samples_with_unmatched_symbolic_numeric": 70,
+        "unmatched_symbolic_numeric_arguments": 1024
+      }
+    },
+    "validation": {
+      "containment_edges": {
+        "function_to_top_level_loop": 2388,
+        "loop_to_child_loop": 957,
+        "loop_to_direct_block": 65389
+      },
+      "directives": {
+        "allocation": 294,
+        "array_partition": 1942,
+        "array_reshape": 267,
+        "dataflow": 57,
+        "function_instantiate": 422,
+        "inline": 287,
+        "interface": 70,
+        "loop_flatten": 21,
+        "pipeline": 858,
+        "stream": 259,
+        "unroll": 1093
+      },
+      "loop_pragma_coverage": {
+        "fraction_of_loops": 0.45261584454409565,
+        "fraction_of_samples": 0.8142857142857143,
+        "loop_nodes_with_pragma": 1514,
+        "loop_pragma_edges": 1518,
+        "loop_scoped_pragma_nodes": 1518,
+        "samples_with_loop_pragma": 57
+      },
+      "loop_scoped_directives": {
+        "loop_flatten": {
+          "argument_variants": 1,
+          "pragma_nodes": 21
+        },
+        "pipeline": {
+          "argument_variants": 52,
+          "pragma_nodes": 458
+        },
+        "unroll": {
+          "argument_variants": 1,
+          "pragma_nodes": 1039
+        }
+      },
+      "loop_trip_count_known": {
+        "count": 0,
+        "fraction_of_loops": 0.0
+      },
+      "loops": 3345,
+      "mean_loops_per_sample": 47.785714285714285,
+      "memory_proxy": {
+        "memory_like_variables": 0,
+        "memory_node_type_exists": false,
+        "samples_with_memory_like_variable": 0
+      },
+      "pragma_scope_coverage": {
+        "all_pragma_nodes": 5570,
+        "fraction_scoped": 1.0,
+        "nodes_with_any_semantic_scope": 5570
+      },
+      "samples": 70,
+      "source_anchored_loops": {
+        "count": 2009,
+        "fraction_of_loops": 0.6005979073243647
+      },
+      "symbolic_pragma_resolution": {
+        "injected_nodes_with_resolution_provenance": 831,
+        "injected_unresolved_numeric_arguments": 0,
+        "pragma_dump_records": 14248,
+        "resolved_numeric_arguments": 831,
+        "samples_with_unmatched_symbolic_numeric": 70,
+        "unmatched_symbolic_numeric_arguments": 993
+      }
+    }
+  }
+}

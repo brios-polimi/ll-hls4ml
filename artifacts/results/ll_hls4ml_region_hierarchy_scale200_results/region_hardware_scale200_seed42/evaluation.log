@@ -1,0 +1,28 @@
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.20 MB
+    total size: 163.47 MB
+  3layer: 800
+    avg size: 0.29 MB
+    total size: 232.90 MB
+  conv1d: 346
+    avg size: 2.57 MB
+    total size: 888.24 MB
+  conv2d: 194
+    avg size: 2.74 MB
+    total size: 530.94 MB
+  dense_latency: 550
+    avg size: 1.76 MB
+    total size: 966.66 MB
+  dense_resource: 414
+    avg size: 1.70 MB
+    total size: 703.82 MB
+  rule4ml: 800
+    avg size: 1.74 MB
+    total size: 1391.63 MB
+Indexed 886 graphs across 1 type(s)
+  exemplar: 886
+    avg size: 0.82 MB
+    total size: 727.87 MB
+Wrote result bundle to /kaggle/working/results/region_hardware_scale200_seed42

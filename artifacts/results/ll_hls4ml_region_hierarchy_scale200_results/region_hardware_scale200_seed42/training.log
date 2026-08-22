@@ -1,0 +1,284 @@
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.20 MB
+    total size: 163.47 MB
+  3layer: 800
+    avg size: 0.29 MB
+    total size: 232.90 MB
+  conv1d: 346
+    avg size: 2.57 MB
+    total size: 888.24 MB
+  conv2d: 194
+    avg size: 2.74 MB
+    total size: 530.94 MB
+  dense_latency: 550
+    avg size: 1.76 MB
+    total size: 966.66 MB
+  dense_resource: 414
+    avg size: 1.70 MB
+    total size: 703.82 MB
+  rule4ml: 800
+    avg size: 1.74 MB
+    total size: 1391.63 MB
+Indexed 886 graphs across 1 type(s)
+  exemplar: 886
+    avg size: 0.82 MB
+    total size: 727.87 MB
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch   1/400  train=0.4033  val=0.3293  lr=1.00e-03
+Epoch   2/400  train=0.3016  val=0.2952  lr=1.00e-03
+Epoch   4/400  train=0.2613  val=0.2608  lr=1.00e-03
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch   6/400  train=0.2411  val=0.2329  lr=1.00e-03
+Epoch   8/400  train=0.2277  val=0.2092  lr=1.00e-03
+Epoch  10/400  train=0.2181  val=0.2170  lr=1.00e-03
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  12/400  train=0.2101  val=0.2085  lr=1.00e-03
+Epoch  14/400  train=0.2013  val=0.1889  lr=1.00e-03
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  16/400  train=0.1927  val=0.1712  lr=1.00e-03
+Epoch  18/400  train=0.1774  val=0.1649  lr=1.00e-03
+Epoch  20/400  train=0.1768  val=0.1555  lr=1.00e-03
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  22/400  train=0.1751  val=0.1561  lr=1.00e-03
+Epoch  24/400  train=0.1695  val=0.1793  lr=1.00e-03
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  26/400  train=0.1680  val=0.1789  lr=5.00e-04
+Epoch  28/400  train=0.1556  val=0.1362  lr=5.00e-04
+Epoch  30/400  train=0.1478  val=0.1334  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  32/400  train=0.1438  val=0.1279  lr=5.00e-04
+Epoch  34/400  train=0.1430  val=0.1289  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  36/400  train=0.1392  val=0.1313  lr=5.00e-04
+Epoch  38/400  train=0.1441  val=0.1302  lr=5.00e-04
+Epoch  40/400  train=0.1386  val=0.1514  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  42/400  train=0.1373  val=0.1290  lr=5.00e-04
+Epoch  44/400  train=0.1329  val=0.1265  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  46/400  train=0.1382  val=0.1282  lr=5.00e-04
+Epoch  48/400  train=0.1340  val=0.1151  lr=5.00e-04
+Epoch  50/400  train=0.1306  val=0.1147  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  52/400  train=0.1318  val=0.1221  lr=5.00e-04
+Epoch  54/400  train=0.1287  val=0.1182  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  56/400  train=0.1265  val=0.1235  lr=5.00e-04
+Epoch  58/400  train=0.1268  val=0.1054  lr=5.00e-04
+Epoch  60/400  train=0.1257  val=0.1052  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  62/400  train=0.1209  val=0.1130  lr=5.00e-04
+Epoch  64/400  train=0.1230  val=0.1099  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  66/400  train=0.1234  val=0.1033  lr=5.00e-04
+Epoch  68/400  train=0.1215  val=0.1040  lr=5.00e-04
+Epoch  70/400  train=0.1183  val=0.1044  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  72/400  train=0.1212  val=0.1093  lr=5.00e-04
+Epoch  74/400  train=0.1171  val=0.1071  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  76/400  train=0.1162  val=0.1052  lr=5.00e-04
+Epoch  78/400  train=0.1148  val=0.1026  lr=5.00e-04
+Epoch  80/400  train=0.1187  val=0.1014  lr=5.00e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  82/400  train=0.1164  val=0.1004  lr=2.50e-04
+Epoch  84/400  train=0.1032  val=0.0929  lr=2.50e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  86/400  train=0.1045  val=0.0879  lr=2.50e-04
+Epoch  88/400  train=0.1019  val=0.0915  lr=2.50e-04
+Epoch  90/400  train=0.1012  val=0.0860  lr=2.50e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  92/400  train=0.1000  val=0.0903  lr=2.50e-04
+Epoch  94/400  train=0.1008  val=0.0881  lr=2.50e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch  96/400  train=0.0990  val=0.0857  lr=2.50e-04
+Epoch  98/400  train=0.0997  val=0.0854  lr=2.50e-04
+Epoch 100/400  train=0.1003  val=0.0956  lr=2.50e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 102/400  train=0.1000  val=0.0911  lr=1.25e-04
+Epoch 104/400  train=0.0938  val=0.0863  lr=1.25e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 106/400  train=0.0933  val=0.0785  lr=1.25e-04
+Epoch 108/400  train=0.0909  val=0.0800  lr=1.25e-04
+Epoch 110/400  train=0.0917  val=0.0791  lr=1.25e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 112/400  train=0.0923  val=0.0808  lr=1.25e-04
+Epoch 114/400  train=0.0926  val=0.0788  lr=1.25e-04
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 116/400  train=0.0912  val=0.0789  lr=1.25e-04
+Epoch 118/400  train=0.0922  val=0.0784  lr=1.25e-04
+Epoch 120/400  train=0.0921  val=0.0783  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 122/400  train=0.0895  val=0.0788  lr=6.25e-05
+Epoch 124/400  train=0.0887  val=0.0769  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 126/400  train=0.0886  val=0.0773  lr=6.25e-05
+Epoch 128/400  train=0.0887  val=0.0762  lr=6.25e-05
+Epoch 130/400  train=0.0887  val=0.0766  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 132/400  train=0.0893  val=0.0767  lr=6.25e-05
+Epoch 134/400  train=0.0890  val=0.0755  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 136/400  train=0.0887  val=0.0759  lr=6.25e-05
+Epoch 138/400  train=0.0885  val=0.0773  lr=6.25e-05
+Epoch 140/400  train=0.0883  val=0.0784  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 142/400  train=0.0876  val=0.0745  lr=6.25e-05
+Epoch 144/400  train=0.0874  val=0.0786  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 146/400  train=0.0878  val=0.0756  lr=6.25e-05
+Epoch 148/400  train=0.0879  val=0.0760  lr=6.25e-05
+Epoch 150/400  train=0.0883  val=0.0764  lr=6.25e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 152/400  train=0.0876  val=0.0756  lr=3.13e-05
+Epoch 154/400  train=0.0873  val=0.0746  lr=3.13e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 156/400  train=0.0853  val=0.0756  lr=3.13e-05
+Epoch 158/400  train=0.0858  val=0.0748  lr=3.13e-05
+Epoch 160/400  train=0.0870  val=0.0749  lr=1.56e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 162/400  train=0.0847  val=0.0749  lr=1.56e-05
+Epoch 164/400  train=0.0869  val=0.0743  lr=1.56e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 166/400  train=0.0856  val=0.0742  lr=1.56e-05
+Epoch 168/400  train=0.0855  val=0.0748  lr=1.56e-05
+Epoch 170/400  train=0.0860  val=0.0742  lr=1.56e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 172/400  train=0.0852  val=0.0745  lr=1.56e-05
+W0820 08:33:59.901000 5020 torch/distributed/elastic/agent/server/api.py:739] Received 2 death signal, shutting down workers
+W0820 08:33:59.902000 5020 torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 5028 closing signal SIGINT
+W0820 08:33:59.903000 5020 torch/distributed/elastic/multiprocessing/api.py:1010] Sending process 5029 closing signal SIGINT
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 1204, in <module>
+[rank1]:     main()
+[rank1]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 985, in main
+[rank1]:     model = fit(
+[rank1]:             ^^^^
+[rank1]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 445, in fit
+[rank1]:     train_result = train_one_epoch(
+[rank1]:                    ^^^^^^^^^^^^^^^^
+[rank1]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 216, in train_one_epoch
+[rank1]:     gradient_norm_sum += float(gradient_norm.detach())
+[rank1]:                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]: KeyboardInterrupt
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 1204, in <module>
+[rank0]:     main()
+[rank0]:   File "/kaggle/working/ll-hls4ml/scripts/train.py", line 985, in main
+[rank0]:     model = fit(
+[rank0]:             ^^^^
+[rank0]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 445, in fit
+[rank0]:     train_result = train_one_epoch(
+[rank0]:                    ^^^^^^^^^^^^^^^^
+[rank0]:   File "/kaggle/working/ll-hls4ml/src/ll_hls4ml/training/loops.py", line 211, in train_one_epoch
+[rank0]:     loss.backward()
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/_tensor.py", line 630, in backward
+[rank0]:     torch.autograd.backward(
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/__init__.py", line 364, in backward
+[rank0]:     _engine_run_backward(
+[rank0]:   File "/usr/local/lib/python3.12/dist-packages/torch/autograd/graph.py", line 865, in _engine_run_backward
+[rank0]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 995, in <module>
+    main()
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 362, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 991, in main
+    run(args)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/run.py", line 982, in run
+    elastic_launch(
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 170, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/launcher/api.py", line 308, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/metrics/api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/agent/server/api.py", line 731, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/agent/server/api.py", line 908, in _invoke_run
+    time.sleep(monitor_interval)
+  File "/usr/local/lib/python3.12/dist-packages/torch/distributed/elastic/multiprocessing/api.py", line 86, in _terminate_process_handler
+    raise SignalException(f"Process {os.getpid()} got signal: {sigval}", sigval=sigval)
+torch.distributed.elastic.multiprocessing.api.SignalException: Process 5020 got signal: 2
+
+*****************************************
+Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+*****************************************
+[W820 10:08:36.012799014 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W820 10:08:44.549746755 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+[W820 10:08:44.583813819 socket.cpp:207] [c10d] The hostname of the client socket cannot be retrieved. err=-3
+Indexed 3904 graphs across 7 type(s)
+  skipped 26 duplicate graph UUID path(s)
+  2layer: 800
+    avg size: 0.20 MB
+    total size: 163.47 MB
+  3layer: 800
+    avg size: 0.29 MB
+    total size: 232.90 MB
+  conv1d: 346
+    avg size: 2.57 MB
+    total size: 888.24 MB
+  conv2d: 194
+    avg size: 2.74 MB
+    total size: 530.94 MB
+  dense_latency: 550
+    avg size: 1.76 MB
+    total size: 966.66 MB
+  dense_resource: 414
+    avg size: 1.70 MB
+    total size: 703.82 MB
+  rule4ml: 800
+    avg size: 1.74 MB
+    total size: 1391.63 MB
+Indexed 886 graphs across 1 type(s)
+  exemplar: 886
+    avg size: 0.82 MB
+    total size: 727.87 MB
+Training 400 epochs...
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+/usr/local/lib/python3.12/dist-packages/torch_geometric/utils/_scatter.py:91: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the 'torch-scatter' package, but it was not found
+  warnings.warn(
+Epoch 172/400  train=0.0856  val=0.0741  lr=1.56e-05
+Epoch 174/400  train=0.0867  val=0.0739  lr=1.56e-05
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 176/400  train=0.0850  val=0.0742  lr=1.56e-05
+Epoch 178/400  train=0.0853  val=0.0738  lr=7.81e-06
+Epoch 180/400  train=0.0869  val=0.0740  lr=7.81e-06
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 182/400  train=0.0847  val=0.0743  lr=7.81e-06
+Epoch 184/400  train=0.0845  val=0.0745  lr=7.81e-06
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 186/400  train=0.0851  val=0.0742  lr=7.81e-06
+Epoch 188/400  train=0.0843  val=0.0746  lr=3.91e-06
+Epoch 190/400  train=0.0849  val=0.0742  lr=3.91e-06
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 192/400  train=0.0845  val=0.0744  lr=3.91e-06
+Epoch 194/400  train=0.0849  val=0.0744  lr=3.91e-06
+Model saved to /kaggle/working/results/region_hardware_scale200_seed42/checkpoints/region_hardware_scale200_seed42_backup.pt
+Epoch 196/400  train=0.0835  val=0.0740  lr=1.95e-06
+Epoch 198/400  train=0.0843  val=0.0744  lr=1.95e-06
+Early stopping triggered after 199 epochs.
+Best model restored from epoch 169 with validation smape 28.8666
+/usr/local/lib/python3.12/dist-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Wrote result bundle to /kaggle/working/results/region_hardware_scale200_seed42
