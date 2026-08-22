@@ -1,9 +1,10 @@
-experiment_name: hierarchical_bottom_up_v2_seed42
+experiment_name: hierarchical_bottom_up_v3_seed42
 model: hierarchical
 tensor_dir: ../../data/tensors
 vocab_path: ../artifacts/vocab/vocab.json
 checkpoint_dir: ../artifacts/checkpoints
 results_dir: ../artifacts/results
+resume_checkpoint_path: ../artifacts/checkpoints/hierarchical_bottom_up_v3_seed42_backup.pt
 kernel_types:
   - 2layer
   - 3layer
@@ -22,7 +23,7 @@ prefetch_factor: 2
 thread_prefetch: true
 precision: bf16
 epochs: 400
-patience: 30
+patience: 10
 learning_rate: 0.001
 weight_decay: 0.0001
 hidden_dim: 64
