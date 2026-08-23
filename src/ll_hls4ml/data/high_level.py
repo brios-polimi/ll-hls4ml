@@ -237,6 +237,15 @@ def build_high_level_cache(
 
 
 def feature_statistics(cache: dict, tensor_paths: list[str]):
+    values = torch.cat(
+        [cache["samples"][path]["features"][:, NUMERICAL_INDICES] for path in tensor_paths]
+    )
+    means = values.mean(dim=0)
+    stds = values.std(dim=0).clamp_min(1e-5)
+    return means, stds
+
+
+def paper_feature_statistics(cache: dict, tensor_paths: list[str]):
     """Paper preprocessing statistics, excluding ``-1`` missing values."""
     rows = [
         cache["samples"][path]["features"][:, NUMERICAL_INDICES]
@@ -258,7 +267,7 @@ def feature_statistics(cache: dict, tensor_paths: list[str]):
     return torch.stack(means), torch.stack(stds)
 
 
-def _processed_layer_features(raw, means, stds):
+def _paper_processed_layer_features(raw, means, stds):
     numerical_raw = raw[:, NUMERICAL_INDICES]
     numerical = (torch.where(numerical_raw == -1, 0, numerical_raw) - means) / stds
 
@@ -271,6 +280,23 @@ def _processed_layer_features(raw, means, stds):
     layer_type = one_hot(raw[:, 9], LAYER_TYPE_CLASSES)
     activation = one_hot(raw[:, 10], ACTIVATION_CLASSES)
     padding = one_hot(raw[:, 14], PADDING_CLASSES)
+    return torch.cat([numerical, layer_type, activation, padding], dim=-1)
+
+
+def _processed_layer_features(raw, means, stds):
+    numerical = (raw[:, NUMERICAL_INDICES] - means) / stds
+    layer_type = F.one_hot(
+        raw[:, 9].long().clamp(0, LAYER_TYPE_CLASSES - 1),
+        LAYER_TYPE_CLASSES,
+    ).float()
+    activation = F.one_hot(
+        raw[:, 10].long().clamp(0, ACTIVATION_CLASSES - 1),
+        ACTIVATION_CLASSES,
+    ).float()
+    padding = F.one_hot(
+        raw[:, 14].long().clamp(0, PADDING_CLASSES - 1),
+        PADDING_CLASSES,
+    ).float()
     return torch.cat([numerical, layer_type, activation, padding], dim=-1)
 
 
@@ -288,7 +314,7 @@ class HighLevelLayerDataset(Dataset):
         self.graphs = []
         for index, path in enumerate(self.tensor_paths):
             raw = cache["samples"][path]["features"]
-            x = _processed_layer_features(raw, means, stds)
+            x = _paper_processed_layer_features(raw, means, stds)
             node_count = len(x)
             edge_index = (
                 torch.stack([torch.arange(node_count - 1), torch.arange(1, node_count)])
@@ -333,7 +359,7 @@ class PaperTransformerDataset(Dataset):
                 raise ValueError(
                     f"{path} has {len(raw)} layers, exceeding max_layers={max_layers}"
                 )
-            processed = _processed_layer_features(raw, means, stds)
+            processed = _paper_processed_layer_features(raw, means, stds)
             features = torch.zeros(
                 (1, max_layers, processed.shape[1]), dtype=torch.float32
             )

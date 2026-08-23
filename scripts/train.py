@@ -782,6 +782,7 @@ def main() -> None:
             HighLevelLayerDataset,
             PaperTransformerDataset,
             feature_statistics,
+            paper_feature_statistics,
         )
 
         cache_path = _config_path(config["high_level_cache"], config_dir)
@@ -790,7 +791,12 @@ def main() -> None:
             dataset.paths[index].relative_to(tensor_dir).as_posix()
             for index in train_ds.indices
         ]
-        high_level_means, high_level_stds = feature_statistics(
+        statistics_fn = (
+            paper_feature_statistics
+            if config.get("model") in {"paper_high_level_gatv2", "paper_transformer"}
+            else feature_statistics
+        )
+        high_level_means, high_level_stds = statistics_fn(
             high_level_cache, train_paths
         )
         if config.get("model") in {"paper_high_level_gatv2", "paper_transformer"}:
