@@ -86,7 +86,12 @@ def _config_path(value: str, config_dir: Path) -> Path:
 
 
 def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
-    y_means, y_stds = compute_target_z_stats(train_ds)
+    target_log_shift = config.get("target_log_shift")
+    y_means, y_stds = compute_target_z_stats(
+        train_ds,
+        log_shift=target_log_shift,
+        unbiased=config.get("target_std_unbiased", True),
+    )
     common = {
         "instruction_vocab_size": vocab_size,
         "y_means": y_means,
@@ -105,6 +110,10 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         ),
     }
     model_name = config.get("model", "hetero_gat")
+    high_level_models = {
+        "paper_high_level_gatv2",
+        "paper_transformer",
+    }
     hierarchical_models = {
         "hierarchical",
         "hierarchical_high_level_fusion",
@@ -112,8 +121,39 @@ def _model_from_config(config: dict, vocab_size: int, max_pos: int, train_ds):
         "hierarchical_block_attention",
         "hierarchical_memory_dual",
     }
-    if model_name not in hierarchical_models:
+    if model_name not in (hierarchical_models | high_level_models):
         common["pool"] = config.get("pool", "mean")
+    if model_name == "paper_high_level_gatv2":
+        from ll_hls4ml.data.high_level import PROCESSED_FEATURE_DIM
+
+        return build(
+            model_name,
+            input_dim=PROCESSED_FEATURE_DIM,
+            y_means=y_means,
+            y_stds=y_stds,
+            hidden_dim=config.get("hidden_dim", 512),
+            num_layers=config.get("num_layers", 5),
+            heads=config.get("heads", 5),
+            mlp_hidden_dim=config.get("mlp_hidden_dim", 512),
+            dropout=config.get("dropout", 0.3),
+            target_log_shift=target_log_shift,
+        )
+    if model_name == "paper_transformer":
+        from ll_hls4ml.data.high_level import PROCESSED_FEATURE_DIM
+
+        return build(
+            model_name,
+            y_means=y_means,
+            y_stds=y_stds,
+            feature_dim=config.get("feature_dim", PROCESSED_FEATURE_DIM),
+            embed_dim=config.get("embed_dim", 512),
+            num_heads=config.get("num_heads", 8),
+            ff_dim=config.get("ff_dim", 512),
+            num_layers=config.get("num_layers", 2),
+            max_layers=config.get("max_layers", 51),
+            dropout=config.get("dropout", 0.1),
+            target_log_shift=target_log_shift,
+        )
     if model_name in {
         "hetero_gat",
         "hetero_relational",
@@ -210,11 +250,14 @@ def _predict(model, loader, device):
     predictions = []
     targets = []
     presence_probabilities = []
-    structures = []
+    structures = None
     elapsed = 0.0
     with torch.no_grad():
         for batch in loader:
-            structures.extend(graph_structure_rows(batch))
+            if hasattr(batch, "node_types") and "instruction" in batch.node_types:
+                if structures is None:
+                    structures = []
+                structures.extend(graph_structure_rows(batch))
             batch = batch.to(device, non_blocking=device.type == "cuda")
             precision = getattr(base_model, "inference_precision", "float32")
             amp = (
@@ -248,6 +291,7 @@ def _predict(model, loader, device):
                 normalized_prediction,
                 base_model.y_means,
                 base_model.y_stds,
+                getattr(base_model, "target_log_shift", None),
             )
             predictions.append(prediction.cpu())
             targets.append(batch.y.view(-1, len(LABEL_KEYS)).cpu())
@@ -728,9 +772,15 @@ def main() -> None:
     if not exemplar_ds:
         raise ValueError("No exemplar tensors found in the tensor directory")
 
-    if config.get("model") == "hierarchical_high_level_fusion":
+    if config.get("model") in {
+        "hierarchical_high_level_fusion",
+        "paper_high_level_gatv2",
+        "paper_transformer",
+    }:
         from ll_hls4ml.data.high_level import (
             CDFGHighLevelDataset,
+            HighLevelLayerDataset,
+            PaperTransformerDataset,
             feature_statistics,
         )
 
@@ -743,22 +793,46 @@ def main() -> None:
         high_level_means, high_level_stds = feature_statistics(
             high_level_cache, train_paths
         )
-        train_ds = CDFGHighLevelDataset(
-            dataset, train_ds.indices, high_level_cache,
-            high_level_means, high_level_stds,
-        )
-        val_ds = CDFGHighLevelDataset(
-            dataset, val_ds.indices, high_level_cache,
-            high_level_means, high_level_stds,
-        )
-        test_ds = CDFGHighLevelDataset(
-            dataset, test_ds.indices, high_level_cache,
-            high_level_means, high_level_stds,
-        )
-        exemplar_ds = CDFGHighLevelDataset(
-            exemplar_dataset, exemplar_ds.indices, high_level_cache,
-            high_level_means, high_level_stds,
-        )
+        if config.get("model") in {"paper_high_level_gatv2", "paper_transformer"}:
+            def high_level_split(source, subset):
+                indices = list(subset.indices)
+                paths = [
+                    source.paths[index].relative_to(tensor_dir).as_posix()
+                    for index in indices
+                ]
+                if config.get("model") == "paper_transformer":
+                    split = PaperTransformerDataset(
+                        high_level_cache, paths, high_level_means, high_level_stds,
+                        max_layers=config.get("max_layers", 51),
+                    )
+                else:
+                    split = HighLevelLayerDataset(
+                        high_level_cache, paths, high_level_means, high_level_stds
+                    )
+                split.indices = indices
+                return split
+
+            train_ds = high_level_split(dataset, train_ds)
+            val_ds = high_level_split(dataset, val_ds)
+            test_ds = high_level_split(dataset, test_ds)
+            exemplar_ds = high_level_split(exemplar_dataset, exemplar_ds)
+        else:
+            train_ds = CDFGHighLevelDataset(
+                dataset, train_ds.indices, high_level_cache,
+                high_level_means, high_level_stds,
+            )
+            val_ds = CDFGHighLevelDataset(
+                dataset, val_ds.indices, high_level_cache,
+                high_level_means, high_level_stds,
+            )
+            test_ds = CDFGHighLevelDataset(
+                dataset, test_ds.indices, high_level_cache,
+                high_level_means, high_level_stds,
+            )
+            exemplar_ds = CDFGHighLevelDataset(
+                exemplar_dataset, exemplar_ds.indices, high_level_cache,
+                high_level_means, high_level_stds,
+            )
 
     batch_size = config.get("batch_size", 4)
     num_workers = config.get("num_workers")
@@ -817,11 +891,17 @@ def main() -> None:
     if precision == "bf16" and device.type == "cuda" and not torch.cuda.is_bf16_supported():
         raise ValueError("This CUDA device does not support bfloat16 training")
     model.inference_precision = precision
-    optimizer = torch.optim.AdamW(
-        model.parameters(),
-        lr=config.get("learning_rate", 1e-3),
-        weight_decay=config.get("weight_decay", 0.0),
-    )
+    optimizer_class = config.get("optimizer", "adamw")
+    optimizer_kwargs = {
+        "lr": config.get("learning_rate", 1e-3),
+        "weight_decay": config.get("weight_decay", 0.0),
+    }
+    if optimizer_class == "adamw":
+        optimizer = torch.optim.AdamW(model.parameters(), **optimizer_kwargs)
+    elif optimizer_class == "adam":
+        optimizer = torch.optim.Adam(model.parameters(), **optimizer_kwargs)
+    else:
+        raise ValueError("optimizer must be 'adamw' or 'adam'")
     loss_name = config.get("loss", "log_huber")
     if loss_name == "log_huber_hurdle":
         criterion = LogHuberHurdleLoss(
@@ -837,6 +917,8 @@ def main() -> None:
             unwrap_model(model).y_stds,
             delta=config.get("log_huber_delta", 0.35),
         )
+    elif loss_name == "mse":
+        criterion = nn.MSELoss()
     else:
         criterion = nn.HuberLoss(delta=config.get("huber_delta", 1.0))
 

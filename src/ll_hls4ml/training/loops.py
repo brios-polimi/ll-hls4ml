@@ -202,6 +202,7 @@ def train_one_epoch(
             batch.y.view(-1, num_targets),
             base_model.y_means,
             base_model.y_stds,
+            getattr(base_model, "target_log_shift", None),
         )
 
         optimizer.zero_grad(set_to_none=True)
@@ -274,6 +275,7 @@ def validate_one_epoch(
                 batch.y.view(-1, num_targets),
                 base_model.y_means,
                 base_model.y_stds,
+                getattr(base_model, "target_log_shift", None),
             )
 
             with _autocast(device, precision):
@@ -308,7 +310,11 @@ def validate_one_epoch(
     # print(preds.std(dim=0))
 
     metrics = wahls4ml_metrics(
-        preds, targets, base_model.y_means, base_model.y_stds
+        preds,
+        targets,
+        base_model.y_means,
+        base_model.y_stds,
+        getattr(base_model, "target_log_shift", None),
     )
     metrics["loss"] = float((loss_sum / max(num_samples, 1)).item())
     return metrics

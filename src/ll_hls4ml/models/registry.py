@@ -13,6 +13,10 @@ from ll_hls4ml.models.hierarchical_experimental import (
     CDFGHierarchicalSequence,
 )
 from ll_hls4ml.models.fusion import HierarchicalHighLevelFusion
+from ll_hls4ml.models.paper_high_level import (
+    PaperHighLevelGATv2,
+    PaperTransformerRegressor,
+)
 from ll_hls4ml.models.mlp import MLP
 
 MODELS: dict[str, type[nn.Module]] = {
@@ -23,6 +27,8 @@ MODELS: dict[str, type[nn.Module]] = {
     "hierarchical_block_attention": CDFGHierarchicalBlockAttention,
     "hierarchical_memory_dual": CDFGHierarchicalMemoryDual,
     "hierarchical_high_level_fusion": HierarchicalHighLevelFusion,
+    "paper_high_level_gatv2": PaperHighLevelGATv2,
+    "paper_transformer": PaperTransformerRegressor,
     # Compatibility alias for existing configs and recorded experiments.
     "rgcn": CDFGHeteroGAT,
     "mlp": MLP,

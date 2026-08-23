@@ -1,5 +1,6 @@
 """Target normalization and wa-hls4ml benchmark metrics."""
 
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Subset
@@ -82,9 +83,19 @@ class LogHuberHurdleLoss(nn.Module):
         )
         return regression_loss + self.classification_weight * classification_loss
 
-def compute_target_z_stats(dataset, std_floor: float = 1e-3) -> tuple[torch.Tensor, torch.Tensor]:
+
+def _target_log(targets: torch.Tensor, log_shift: float | None = None) -> torch.Tensor:
+    return torch.log1p(targets) if log_shift is None else torch.log(targets + log_shift)
+
+
+def compute_target_z_stats(
+    dataset,
+    std_floor: float = 1e-3,
+    log_shift: float | None = None,
+    unbiased: bool = True,
+) -> tuple[torch.Tensor, torch.Tensor]:
     """
-    Compute mean and std of log1p(targets) over dataset
+    Compute target-log mean and standard deviation over a dataset.
 
     Returns tensors of shape (len(LABEL_KEYS)) for mean and std.
     """
@@ -96,20 +107,44 @@ def compute_target_z_stats(dataset, std_floor: float = 1e-3) -> tuple[torch.Tens
     if targets is None:
         targets = torch.stack([graph.y for graph in dataset], dim=0)
 
-    log_ys = torch.log1p(targets)
-    y_means = log_ys.mean(dim=0)
-    y_stds = torch.clamp(log_ys.std(dim=0), min=std_floor)
+    if not unbiased:
+        # Preserve the NumPy preprocessing used by the published baselines,
+        # including its population standard deviation and float32 reductions.
+        targets_np = targets.detach().cpu().numpy()
+        log_ys_np = (
+            np.log1p(targets_np)
+            if log_shift is None
+            else np.log(targets_np + log_shift)
+        )
+        y_means = torch.as_tensor(np.mean(log_ys_np, axis=0)).to(targets)
+        y_stds = torch.as_tensor(np.std(log_ys_np, axis=0)).to(targets)
+        y_stds = torch.clamp(y_stds, min=std_floor)
+    else:
+        log_ys = _target_log(targets, log_shift)
+        y_means = log_ys.mean(dim=0)
+        y_stds = torch.clamp(log_ys.std(dim=0), min=std_floor)
     return y_means, y_stds
 
 
-def normalize_target(y: torch.Tensor, y_means: torch.Tensor, y_stds: torch.Tensor) -> torch.Tensor:
+def normalize_target(
+    y: torch.Tensor,
+    y_means: torch.Tensor,
+    y_stds: torch.Tensor,
+    log_shift: float | None = None,
+) -> torch.Tensor:
     """Normalize targets to have mean 0 and std 1."""
-    return (torch.log1p(y) - y_means) / y_stds
+    return (_target_log(y, log_shift) - y_means) / y_stds
 
 
-def denormalize_target(pred: torch.Tensor, y_means: torch.Tensor, y_stds: torch.Tensor) -> torch.Tensor:
+def denormalize_target(
+    pred: torch.Tensor,
+    y_means: torch.Tensor,
+    y_stds: torch.Tensor,
+    log_shift: float | None = None,
+) -> torch.Tensor:
     """Denormalize model outputs back to original scales."""
-    return torch.expm1(pred * y_stds + y_means)
+    transformed = pred * y_stds + y_means
+    return torch.expm1(transformed) if log_shift is None else torch.exp(transformed) - log_shift
 
 
 def apply_hurdle_prediction(
@@ -174,7 +209,8 @@ def wahls4ml_metrics(
     predictions: torch.Tensor,
     targets: torch.Tensor,
     y_means: torch.Tensor,
-    y_stds: torch.Tensor
+    y_stds: torch.Tensor,
+    log_shift: float | None = None,
 ):
     """
     `predictions` and `targets` in normalized log form,
@@ -185,8 +221,10 @@ def wahls4ml_metrics(
      Symmetric mean absolute percentage error (SMAPE)
      Root mean square error (RMSE)
     """
-    predictions = denormalize_target(predictions.clone(), y_means, y_stds)
-    targets = denormalize_target(targets.clone(), y_means, y_stds)
+    predictions = denormalize_target(
+        predictions.clone(), y_means, y_stds, log_shift
+    )
+    targets = denormalize_target(targets.clone(), y_means, y_stds, log_shift)
 
 
     return wahls4ml_metrics_raw(predictions, targets)

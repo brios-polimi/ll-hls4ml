@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 import sys
 
+import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
@@ -236,28 +237,40 @@ def build_high_level_cache(
 
 
 def feature_statistics(cache: dict, tensor_paths: list[str]):
-    values = torch.cat(
-        [cache["samples"][path]["features"][:, NUMERICAL_INDICES] for path in tensor_paths]
-    )
-    means = values.mean(dim=0)
-    stds = values.std(dim=0).clamp_min(1e-5)
-    return means, stds
+    """Paper preprocessing statistics, excluding ``-1`` missing values."""
+    rows = [
+        cache["samples"][path]["features"][:, NUMERICAL_INDICES]
+        for path in tensor_paths
+    ]
+    values = torch.cat(rows)
+    means = []
+    stds = []
+    for column in values.unbind(dim=1):
+        valid = column[column != -1]
+        if not len(valid):
+            means.append(column.new_tensor(0.0))
+            stds.append(column.new_tensor(1.0))
+            continue
+        valid_np = valid.cpu().numpy()
+        means.append(column.new_tensor(np.mean(valid_np)))
+        std = float(np.std(valid_np))
+        stds.append(column.new_tensor(std if std > 1e-5 else 1.0))
+    return torch.stack(means), torch.stack(stds)
 
 
 def _processed_layer_features(raw, means, stds):
-    numerical = (raw[:, NUMERICAL_INDICES] - means) / stds
-    layer_type = F.one_hot(
-        raw[:, 9].long().clamp(0, LAYER_TYPE_CLASSES - 1),
-        LAYER_TYPE_CLASSES,
-    ).float()
-    activation = F.one_hot(
-        raw[:, 10].long().clamp(0, ACTIVATION_CLASSES - 1),
-        ACTIVATION_CLASSES,
-    ).float()
-    padding = F.one_hot(
-        raw[:, 14].long().clamp(0, PADDING_CLASSES - 1),
-        PADDING_CLASSES,
-    ).float()
+    numerical_raw = raw[:, NUMERICAL_INDICES]
+    numerical = (torch.where(numerical_raw == -1, 0, numerical_raw) - means) / stds
+
+    def one_hot(values, classes):
+        encoded = torch.zeros((len(values), classes), device=values.device)
+        valid = (values >= 0) & (values < classes)
+        encoded[valid] = F.one_hot(values[valid].long(), classes).float()
+        return encoded
+
+    layer_type = one_hot(raw[:, 9], LAYER_TYPE_CLASSES)
+    activation = one_hot(raw[:, 10], ACTIVATION_CLASSES)
+    padding = one_hot(raw[:, 14], PADDING_CLASSES)
     return torch.cat([numerical, layer_type, activation, padding], dim=-1)
 
 
@@ -286,6 +299,50 @@ class HighLevelLayerDataset(Dataset):
             graph.strategy = F.one_hot(raw[0, 8].long(), 2).float().unsqueeze(0)
             graph.io_type = F.one_hot(raw[0, 17].long(), 2).float().unsqueeze(0)
             self.graphs.append(graph)
+
+    def __len__(self):
+        return len(self.graphs)
+
+    def __getitem__(self, index):
+        return self.graphs[index]
+
+
+class PaperTransformerDataset(Dataset):
+    """Padded 33-feature sequences from the paper's shared preprocessing."""
+
+    def __init__(
+        self,
+        cache: dict,
+        tensor_paths: list[str],
+        means: torch.Tensor,
+        stds: torch.Tensor,
+        max_layers: int = 51,
+    ):
+        self.tensor_paths = list(tensor_paths)
+        self.targets = torch.stack(
+            [cache["samples"][path]["target"] for path in self.tensor_paths]
+        )
+        self.families = [
+            cache["samples"][path]["kernel_family"]
+            for path in self.tensor_paths
+        ]
+        self.graphs = []
+        for path in self.tensor_paths:
+            raw = cache["samples"][path]["features"]
+            if len(raw) > max_layers:
+                raise ValueError(
+                    f"{path} has {len(raw)} layers, exceeding max_layers={max_layers}"
+                )
+            processed = _processed_layer_features(raw, means, stds)
+            features = torch.zeros(
+                (1, max_layers, processed.shape[1]), dtype=torch.float32
+            )
+            features[0, : len(raw)] = processed
+            pad_mask = torch.ones((1, max_layers), dtype=torch.bool)
+            pad_mask[0, : len(raw)] = False
+            self.graphs.append(
+                Data(x=features, pad_mask=pad_mask, y=cache["samples"][path]["target"])
+            )
 
     def __len__(self):
         return len(self.graphs)

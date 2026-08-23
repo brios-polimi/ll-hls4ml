@@ -16,6 +16,10 @@ from ll_hls4ml.models.hierarchical_experimental import (
     CDFGHierarchicalSequence,
 )
 from ll_hls4ml.models.fusion import HierarchicalHighLevelFusion
+from ll_hls4ml.models.paper_high_level import (
+    PaperHighLevelGATv2,
+    PaperTransformerRegressor,
+)
 
 __all__ = [
     "build",
@@ -31,4 +35,6 @@ __all__ = [
     "CDFGHierarchicalBlockAttention",
     "CDFGHierarchicalMemoryDual",
     "HierarchicalHighLevelFusion",
+    "PaperHighLevelGATv2",
+    "PaperTransformerRegressor",
 ]
