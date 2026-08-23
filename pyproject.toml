@@ -25,6 +25,7 @@ notebooks = [
     "ipython",
     "jupyter",
     "ipywidgets",
+    "ipympl",
     "pandas",
     "networkx",
     "scikit-learn",

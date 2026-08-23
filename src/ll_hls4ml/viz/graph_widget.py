@@ -25,6 +25,7 @@ class GraphViewer:
         self.widgets = widgets
         self.graph_root = Path(graph_root)
         self.explorer: GraphExplorer | None = None
+        self._figure = None
 
         wide = widgets.Layout(width="100%")
         half = widgets.Layout(width="49%")
@@ -188,18 +189,25 @@ class GraphViewer:
         )
 
     def _show_details(self, change=None) -> None:
+        if self.center.value is not None:
+            self._show_node_details(self.center.value)
+
+    def _show_node_details(self, node_id: int) -> None:
         from IPython.display import clear_output
 
         with self.details_output:
             clear_output(wait=True)
-            if self.explorer is not None and self.center.value is not None:
-                print(json.dumps(self.explorer.details(self.center.value), indent=2))
+            if self.explorer is not None:
+                print(json.dumps(self.explorer.details(node_id), indent=2))
 
     def _render(self, change=None) -> None:
         from IPython.display import clear_output, display
         import matplotlib.pyplot as plt
 
         with self.plot_output:
+            if self._figure is not None:
+                plt.close(self._figure)
+                self._figure = None
             clear_output(wait=True)
             if self.explorer is None:
                 print("Load a graph first.")
@@ -218,7 +226,10 @@ class GraphViewer:
                 print("No nodes match these filters.")
                 return
             figure = plot_slice(
-                self.explorer, graph_slice, layout=self.layout.value
+                self.explorer,
+                graph_slice,
+                layout=self.layout.value,
+                on_select=self._show_node_details,
             )
-            display(figure)
-            plt.close(figure)
+            self._figure = figure
+            display(figure.canvas)
