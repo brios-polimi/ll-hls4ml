@@ -626,7 +626,11 @@ def main() -> None:
 
     config_file = Path(args.config).resolve()
     with config_file.open() as handle:
-        config = yaml.safe_load(handle)
+        config = (
+            json.load(handle)
+            if config_file.suffix == ".json"
+            else yaml.safe_load(handle)
+        )
     config_dir = config_file.parent
     if config.get("worker_tmpdir"):
         os.environ["TMPDIR"] = str(config["worker_tmpdir"])
@@ -654,6 +658,16 @@ def main() -> None:
     )
     vocab, max_pos, _counts = load_vocab(vocab_path)
 
+    model_name = config.get("model", "hetero_gat")
+    paper_model = model_name in {"paper_high_level_gatv2", "paper_transformer"}
+    split_manifest_path = config.get("split_manifest_path")
+    saved_manifest = None
+    if split_manifest_path:
+        split_manifest_path = _config_path(split_manifest_path, config_dir)
+        saved_manifest = json.loads(split_manifest_path.read_text())
+    if paper_model and saved_manifest is None:
+        raise ValueError("Paper models require split_manifest_path")
+
     max_per_type = config.get("max_per_kernel_type")
     configured_kernel_types = config.get("kernel_types")
     if configured_kernel_types is None and isinstance(max_per_type, dict):
@@ -672,23 +686,33 @@ def main() -> None:
         ]
     if not kernel_types:
         raise ValueError("No non-exemplar kernel types found in the tensor directory")
+    main_relative_paths = None
+    exemplar_relative_paths = None
+    if paper_model:
+        main_relative_paths = [
+            row["tensor_path"]
+            for split in ("train", "validation", "test")
+            for row in saved_manifest[split]
+        ]
+        exemplar_relative_paths = [
+            row["tensor_path"] for row in saved_manifest["exemplar"]
+        ]
     dataset = HeteroGraphDataset(
         tensor_dir,
         types=kernel_types,
         max_per_type=max_per_type,
         silent=not main_process,
+        relative_paths=main_relative_paths,
     )
     exemplar_dataset = HeteroGraphDataset(
         tensor_dir,
         types=["exemplar"],
         max_per_type=None,
         silent=not main_process,
+        relative_paths=exemplar_relative_paths,
     )
     split_coverage = None
-    split_manifest_path = config.get("split_manifest_path")
-    if split_manifest_path:
-        split_manifest_path = _config_path(split_manifest_path, config_dir)
-        saved_manifest = json.loads(split_manifest_path.read_text())
+    if saved_manifest is not None:
         strict_manifest = config.get("require_complete_split_manifest", True)
         train_ds, val_ds, test_ds, split_coverage = saved_manifest_split(
             dataset,

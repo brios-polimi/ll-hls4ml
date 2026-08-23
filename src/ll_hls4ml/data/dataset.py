@@ -24,15 +24,20 @@ class HeteroGraphDataset(Dataset):
         transform=None,
         silent: bool = True,
         deduplicate_graph_ids: bool = True,
+        relative_paths: list[str] | None = None,
     ):
         self.root = Path(root)
         self.transform = transform
-        self.paths, self.duplicate_paths = self._index(
-            types,
-            max_per_type,
-            silent,
-            deduplicate_graph_ids,
-        )
+        if relative_paths is None:
+            self.paths, self.duplicate_paths = self._index(
+                types,
+                max_per_type,
+                silent,
+                deduplicate_graph_ids,
+            )
+        else:
+            self.paths = [self.root / path for path in relative_paths]
+            self.duplicate_paths = []
         self.targets, self.metadata = self._load_index()
 
     def _load_index(self) -> tuple[torch.Tensor | None, list[dict]]:

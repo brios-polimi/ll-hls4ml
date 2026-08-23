@@ -10,6 +10,36 @@ from ll_hls4ml.io.schema import LABEL_KEYS
 
 
 class HeteroGraphDatasetTests(unittest.TestCase):
+    def test_indexes_manifest_paths_without_tensor_files(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            relative_paths = [
+                "conv2d/archive_1/first.pt",
+                "exemplar/archive_1/second.pt",
+            ]
+            labels = {
+                "label_keys": LABEL_KEYS,
+                "labels": {
+                    path: [float(index)] * len(LABEL_KEYS)
+                    for index, path in enumerate(relative_paths)
+                },
+                "metadata": {
+                    path: {"graph_id": Path(path).stem}
+                    for path in relative_paths
+                },
+            }
+            (root / "labels.json").write_text(json.dumps(labels))
+
+            dataset = HeteroGraphDataset(root, relative_paths=relative_paths)
+
+            self.assertEqual(len(dataset), 2)
+            self.assertFalse(any(path.exists() for path in dataset.paths))
+            self.assertEqual(dataset.type_of(0), "conv2d")
+            self.assertEqual(dataset.metadata[1]["graph_id"], "second")
+            torch.testing.assert_close(
+                dataset.targets[1], torch.ones(len(LABEL_KEYS))
+            )
+
     def test_deduplicates_graph_ids_across_archives(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
