@@ -913,8 +913,8 @@ encoding, and pragma injection are all research variables that may change.
 - Split counts: `{json.dumps(family_counts, sort_keys=True)}`
 - Seed: {config["seed"]}
 - Device: {config["device"]}
-- ll-hls4ml state: `{json.dumps(config["ll_hls4ml_git"])}` 
-- hls4ml_pipeline state: `{json.dumps(config["pipeline_git"])}` 
+- hls-surrogate-lab state: `{json.dumps(config["ll_hls4ml_git"])}`
+- wa-hls4ml-ingest state: `{json.dumps(config["pipeline_git"])}`
 
 The synthetic train, validation, and test memberships come from the dataset's
 official split labels. Exemplar is never used for fitting or model selection and
@@ -1033,7 +1033,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    os.environ.setdefault("MPLCONFIGDIR", "/tmp/ll-hls4ml-matplotlib")
+    os.environ.setdefault("MPLCONFIGDIR", "/tmp/hls-surrogate-lab-matplotlib")
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -1065,7 +1065,7 @@ def main() -> None:
         "device": "cuda" if torch.cuda.is_available() else "cpu",
         "torch_version": torch.__version__,
         "ll_hls4ml_git": _git_state(_REPO_ROOT),
-        "pipeline_git": _git_state(_REPO_ROOT.parent / "hls4ml_pipeline"),
+        "pipeline_git": _git_state(_REPO_ROOT.parent / "wa-hls4ml-ingest"),
         "pragma_audit_skipped": args.skip_pragma_audit,
         "plots_skipped": args.skip_plots,
     }

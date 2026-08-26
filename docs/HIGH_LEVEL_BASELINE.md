@@ -3,7 +3,7 @@
 This benchmark tests whether a graph of high-level neural-network layers and
 hls4ml configuration parameters is a stronger surrogate input than the LLVM CDFG.
 It uses the input schema from `../wa_hls4ml_models/GNN`, but deliberately keeps
-the ll-hls4ml experiment contract wherever that is necessary for a valid matched
+the hls-surrogate-lab experiment contract wherever that is necessary for a valid matched
 comparison.
 
 ## Deliberate pipeline changes
@@ -16,8 +16,8 @@ comparison.
    come directly from the saved 25/50/100/200% CDFG `split_manifest.json` files.
    The original wa-hls4ml split of a record is not reused.
 3. **Target identity:** targets come from `../data/tensors/labels.json` in
-   ll-hls4ml order: LUT, FF, DSP, BRAM, cycles, II. This is essential because the
-   current upstream GNN converter reads `hls_resource_report`, while ll-hls4ml
+   hls-surrogate-lab order: LUT, FF, DSP, BRAM, cycles, II. This is essential because the
+   current upstream GNN converter reads `hls_resource_report`, while hls-surrogate-lab
    predicts post-logic-synthesis `resource_report` values.
 4. **Feature conversion:** the upstream 18-column `ModelProcessor` is used for
    layer features. Its downstream preprocessing is retained: 12 normalized

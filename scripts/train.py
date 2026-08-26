@@ -22,7 +22,7 @@ import torch.nn as nn
 import yaml
 from torch.utils.data import Subset, WeightedRandomSampler
 
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/ll-hls4ml-matplotlib")
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/hls-surrogate-lab-matplotlib")
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
@@ -566,7 +566,7 @@ Single-model wa-hls4ml-style evaluation generated from persisted predictions.
 - Checkpoint cadence: every {resolved_config.get("checkpoint_cadence_epochs", 5)} epoch(s)
 - Split SHA-256: `{resolved_config.get("split_sha256", "not recorded")}`
 - Split sizes: `{json.dumps(sizes, sort_keys=True)}`
-- ll-hls4ml state: `{json.dumps(resolved_config["ll_hls4ml_git"])}`
+- hls-surrogate-lab state: `{json.dumps(resolved_config["ll_hls4ml_git"])}`
 
 ## Evaluation metrics
 

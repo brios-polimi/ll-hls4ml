@@ -1,7 +1,7 @@
 [project]
-name = "ll-hls4ml"
+name = "hls-surrogate-lab"
 version = "0.1.0"
-description = "Surrogate models for HLS resource/latency prediction from CDFG graphs"
+description = "Backend-aware surrogate experiments for HLS resource and timing prediction"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -33,7 +33,7 @@ notebooks = [
     "seaborn",
     "scipy",
 ]
-dev = ["pytest"]
+dev = []
 
 [build-system]
 requires = ["setuptools>=61"]

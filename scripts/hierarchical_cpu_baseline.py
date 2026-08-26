@@ -29,7 +29,7 @@ import torch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/ll-hls4ml-matplotlib")
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/hls-surrogate-lab-matplotlib")
 sys.path.insert(0, str(REPO_ROOT / "src"))
 sys.path.insert(0, str(REPO_ROOT / "scripts"))
 

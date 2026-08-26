@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extend wa-hls4ml paper Tables 4 and 5 with ll-hls4ml runs."""
+"""Extend wa-hls4ml paper Tables 4 and 5 with hls-surrogate-lab runs."""
 
 from __future__ import annotations
 

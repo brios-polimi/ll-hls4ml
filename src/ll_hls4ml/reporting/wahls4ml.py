@@ -467,7 +467,7 @@ def _render_table(
         x_edges[-1] / 2,
         -0.22,
         "Bold = best displayed value within each cohort/metric/target. "
-        "Blue rows are ll-hls4ml runs; N exposes partial-cohort comparisons.",
+        "Blue rows are hls-surrogate-lab runs; N exposes partial-cohort comparisons.",
         ha="center",
         va="center",
         fontsize=8,
@@ -547,7 +547,7 @@ the original run reports and metrics are unchanged.
 
 {run_lines}
 
-## ll-hls4ml run overview
+## hls-surrogate-lab run overview
 
 {chr(10).join(overview_lines)}
 
@@ -569,7 +569,7 @@ also aligned: **All**, all five fully-connected families as **Dense**,
 
 The sample membership and training scale are not identical. The paper models
 were trained on the full 478,220-sample training set and evaluated on all 102,484
-synthetic test samples plus all 887 exemplars. The displayed ll-hls4ml runs use
+synthetic test samples plus all 887 exemplars. The displayed hls-surrogate-lab runs use
 their persisted prediction subsets. The `N` column must therefore accompany any
 shared table; these are benchmark-context comparisons, not paired head-to-head
 evaluations on identical samples.

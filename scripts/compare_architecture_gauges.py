@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/ll-hls4ml-matplotlib")
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/hls-surrogate-lab-matplotlib")
 
 
 def _read_csv(path: Path) -> list[dict]:

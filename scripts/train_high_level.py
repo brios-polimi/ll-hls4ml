@@ -16,7 +16,7 @@ import time
 import numpy as np
 import torch
 
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/ll-hls4ml-matplotlib")
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/hls-surrogate-lab-matplotlib")
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(_REPO_ROOT / "src"))
 sys.path.insert(0, str(_REPO_ROOT / "scripts"))
@@ -183,7 +183,7 @@ def _run_one(args, cache, scale: int, seed: int, device: torch.device):
         "hurdle_prediction_mode": "threshold",
         "source_manifest": str(manifest_path),
         "high_level_cache": str(args.cache),
-        "target_contract": "ll-hls4ml post-logic tensor targets",
+        "target_contract": "hls-surrogate-lab post-logic tensor targets",
         "device": str(device),
         "torch_version": torch.__version__,
         "parameter_count": sum(p.numel() for p in model.parameters()),

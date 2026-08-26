@@ -1,4 +1,4 @@
-"""wa-hls4ml layer/config graphs aligned to ll-hls4ml split manifests."""
+"""wa-hls4ml layer/config graphs aligned to hls-surrogate-lab split manifests."""
 
 from __future__ import annotations
 

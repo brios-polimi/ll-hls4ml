@@ -72,13 +72,16 @@ class Config:
 
 
 def load_config(path: str | Path | None = None) -> Config:
-    """Load config from YAML. ``LL_HLS4ML_DATA_ROOT`` overrides ``data_root``."""
+    """Load config; the new data-root variable takes precedence over legacy."""
     repo_root = _repo_root()
     config_path = Path(path) if path else _DEFAULT_CONFIG
     with config_path.open() as f:
         raw = yaml.safe_load(f)
 
-    if env_data := os.environ.get("LL_HLS4ML_DATA_ROOT"):
+    if env_data := (
+        os.environ.get("HLS_SURROGATE_DATA_ROOT")
+        or os.environ.get("LL_HLS4ML_DATA_ROOT")
+    ):
         raw["data_root"] = env_data
 
     variables = {"data_root": raw["data_root"]}

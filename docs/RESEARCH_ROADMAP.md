@@ -2,12 +2,11 @@
 
 ## Decision summary
 
-Do not merge `hls4ml_pipeline` and `ll-hls4ml` now. Their dependency profiles
-and execution environments are different: graph production requires a specific
-Vitis/LLVM/ProGraML toolchain, while training must remain portable across
-Colab, Kaggle, and local GPUs. Keep the repositories adjacent, but formalize the
-graph handoff and remove the current reverse dependency in which the pipeline
-imports pragma injection from the ML package.
+The workspace is split into `hls-ir-graph`, `wa-hls4ml-ingest`, and
+`hls-surrogate-lab`. Their dependency profiles and state lifecycles differ:
+frontend/graph production needs compiler and ProGraML toolchains, ingestion owns
+the benchmark registry, and training must remain portable across Colab, Kaggle,
+and local GPUs. Keep their handoff artifact-based.
 
 The desired flow is:
 
@@ -33,8 +32,8 @@ is used twice, move the reusable computation into `src/` or a script.
 
 Add `schema_version`, `producer`, and `producer_version` to every graph. Document
 required node, edge, pragma, label, and provenance fields in a small JSON Schema
-or precise Markdown contract. Make pragma injection owned by
-`hls4ml_pipeline`; `ll-hls4ml` should only consume pragma nodes.
+or precise Markdown contract. Pragma and hierarchy enrichment are owned by
+`hls-ir-graph`; `hls-surrogate-lab` only consumes their versioned graph form.
 
 Create a validation command that checks a manifest without rebuilding data:
 file existence, JSON readability, contiguous node IDs, valid edge endpoints,

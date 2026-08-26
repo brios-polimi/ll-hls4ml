@@ -8,16 +8,16 @@ build/
 .ipynb_checkpoints/
 *.egg
 
-# Artifacts (keep directory structure via .gitkeep)
-artifacts/checkpoints/*.pt
-artifacts/exports/
-#artifacts/results/
-artifacts/runs/
-artifacts/vocab/*.json
-.test_artifacts/*
+# Stateful and generated research outputs. Existing local files remain in place.
+artifacts/*
+!artifacts/README.md
+.test_artifacts/
 notebooks/vitis_llvm_ir/*
 
 # Local env
 .venv/
 venv/
 .env
+.coverage
+.mypy_cache/
+.ruff_cache/
