@@ -7,6 +7,10 @@ from ll_hls4ml.data.tensorize import (
     SPATIAL_LEN_OFF,
     TEMPORAL_LEN_OFF,
     LITERAL_OFF,
+    IS_AC_OFF,
+    BITS_OFF,
+    FRAC_OFF,
+    SIGNED_OFF,
     OVERFLOW_OFF,
     QUANT_OFF,
     _json_to_hetero,
@@ -41,6 +45,16 @@ class PragmaTensorizationTests(unittest.TestCase):
         self.assertEqual(embedding[OVERFLOW_OFF + 3], 1)
         self.assertEqual(embedding[QUANT_OFF], 0)
         self.assertEqual(embedding[OVERFLOW_OFF], 0)
+
+    def test_bambu_quoted_ac_fixed_type_is_embedded(self):
+        embedding = type_embedding(
+            '%"ac_fixed<16, 6, true, (ac_q_mode)0, (ac_o_mode)0>"*'
+        )
+        self.assertEqual(embedding[4], 1)
+        self.assertEqual(embedding[IS_AC_OFF], 1)
+        self.assertEqual(embedding[BITS_OFF], 16)
+        self.assertAlmostEqual(embedding[FRAC_OFF], 10 / 16)
+        self.assertEqual(embedding[SIGNED_OFF], 1)
 
     def test_shift_register_length_and_constant_literal_are_retained(self):
         shift = type_embedding(

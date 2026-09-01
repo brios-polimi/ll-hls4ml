@@ -411,6 +411,7 @@ def _json_to_hetero(
     from torch_geometric.data import HeteroData
 
     data = HeteroData()
+    data.type_embedding_schema_version = TYPE_EMBEDDING_SCHEMA_VERSION
     inst_map = {}
     var_map = {}
     const_map = {}
@@ -696,10 +697,13 @@ def _json_to_hetero(
 STREAM_RE = re.compile(
     r'^(?:%"class\.)?hls::stream<\s*(.+),\s*(\d+)\s*>"?$'
 )
+# Bambu's nested fifo is the channel's payload holder, not a distinct numeric
+# format. Neither spelling specifies a realized FIFO depth.
+AC_CHANNEL_RE = re.compile(r'^ac_channel<\s*(.+)\s*>\s*(?:::fifo)?$')
 
 # nnet::array<ap_fixed<20, 10, AP_TRN, AP_WRAP, 0>
 NNET_ARRAY_RE = re.compile(
-    r'^(?:%"struct\.)?nnet::array<\s*(.*),\s*(\d+)>"?'
+    r'^(?:%"struct\.)?nnet::array<\s*(.*),\s*(\d+)[uUlL]*\s*>"?'
 )
 
 # %"class.ap_shift_reg<ap_ufixed<4, 1, AP_RND_CONV, AP_SAT>, 9>"*
@@ -728,22 +732,31 @@ AP_INT_RE = re.compile(
 # ap_fixed_base<8, 1, true, AP_TRN, AP_WRAP, 0>
 # ap_fixed<14, 1, AP_TRN, AP_WRAP, 0>
 # ap_fixed_base<8, 1, true> # DEFAULTS implied
+# Require whole enum tokens: with optional trailing groups, RND must not match
+# the prefix of RND_CONV, nor SAT the prefix of SAT_ZERO.
 AP_FIXED_RE = re.compile(
     r'^(?:%"struct\.)?ap_(u)?fixed(?:_base)?<'
-    r'(\d+),\s*(\d+)(?:,\s*(true|false))?'
-    r'(?:,\s*AP_(RND|RND_ZERO|RND_MIN_INF|RND_INF|RND_CONV|TRN|TRN_ZERO))?'
-    r'(?:,\s*AP_(SAT|SAT_ZERO|SAT_SYM|WRAP|WRAP_SM))?'
+    r'(\d+),\s*(-?\d+)(?:,\s*(true|false))?'
+    r'(?:,\s*AP_(RND|RND_ZERO|RND_MIN_INF|RND_INF|RND_CONV|TRN|TRN_ZERO)\b)?'
+    r'(?:,\s*AP_(SAT|SAT_ZERO|SAT_SYM|WRAP|WRAP_SM)\b)?'
 )
 
-# iv<1, false, 32, true>
-# iv_base<1, false, 32, true>
+# iv/iv_base<N, C, W, S>: C is a storage implementation flag, NOT signedness.
+# iv_conv<N, S, LTE64, C, W> uses a different parameter order. Preserve the
+# semantic W/S from each declared template, not storage bytes or limb counts.
 AC_INT_RE = re.compile(
-    r"iv(?:_base)?<\d+,\s*(true|false),\s*(\d+)"
+    r"^(?:ac_private::)?iv(?:_base)?<\d+,\s*(?:true|false),\s*(?P<bits>\d+),\s*(?P<signed>true|false)>"
+)
+AC_INT_CONV_RE = re.compile(
+    r"^(?:ac_private::)?iv_conv<\d+,\s*(?P<signed>true|false),\s*(?:true|false),\s*(?:true|false),\s*(?P<bits>\d+)>"
+)
+AC_PUBLIC_INT_RE = re.compile(
+    r"^ac_int<(?P<bits>\d+),\s*(?P<signed>true|false)>"
 )
 
 # ac_fixed<34, 14, true, (ac_q_mode)0, (ac_o_mode)0>
 AC_FIXED_RE = re.compile(
-    r"ac_fixed<(\d+),\s*(\d+),\s*(true|false),\s*\(ac_q_mode\)(\d+),\s*\(ac_o_mode\)(\d+)"
+    r"ac_fixed<(\d+),\s*(-?\d+),\s*(true|false),\s*\(ac_q_mode\)(\d+),\s*\(ac_o_mode\)(\d+)"
 )
 
 # af_range_ref<18, 8, true, AP_RND, AP_SAT, 0>
@@ -753,10 +766,15 @@ AF_RANGE_REF_RE = re.compile(
     r'^(?:%"struct\.)?af_range_ref<'
     r'(\d+),\s*(\d+),\s*(true|false),\s*'
     r'AP_(RND|RND_ZERO|RND_MIN_INF|RND_INF|RND_CONV|TRN|TRN_ZERO),\s*'
-    r'AP_(SAT|SAT_ZERO|SAT_SYM|WRAP|WRAP_SM)'
+    r'AP_(SAT|SAT_ZERO|SAT_SYM|WRAP|WRAP_SM)\b'
 )
 
 
+# Feature positions encode behavior, not the libraries' enum ordinals. Keep the
+# existing AP positions for compatibility: RND rounds to nearest with ties
+# toward +infinity; RND_ZERO/MIN_INF/INF break ties toward zero/-infinity/away
+# from zero; RND_CONV breaks ties to even. TRN truncates toward -infinity and
+# TRN_ZERO toward zero. The corresponding AC modes implement the same rules.
 AP_QUANT_MAP = {
     "RND": 0,
     "RND_ZERO": 1,
@@ -774,6 +792,34 @@ AP_OVERFLOW_MAP = {
     "WRAP": 3,
     "WRAP_SM": 4,
 }
+
+# AC spells modes numerically in Clang type names, but its enum order differs
+# from AP's feature order. Direct indexing would conflate AC_TRN with AP_RND
+# and AC_WRAP with AP_SAT. Normalize both libraries to the same semantic slots;
+# their separate is_ap/is_ac features still retain library identity.
+AC_QUANT_MAP = {
+    0: AP_QUANT_MAP["TRN"],          # AC_TRN
+    1: AP_QUANT_MAP["RND"],          # AC_RND
+    2: AP_QUANT_MAP["TRN_ZERO"],     # AC_TRN_ZERO
+    3: AP_QUANT_MAP["RND_ZERO"],     # AC_RND_ZERO
+    4: AP_QUANT_MAP["RND_INF"],      # AC_RND_INF
+    5: AP_QUANT_MAP["RND_MIN_INF"],  # AC_RND_MIN_INF
+    6: AP_QUANT_MAP["RND_CONV"],     # AC_RND_CONV: ties to even
+    7: 7,                          # AC_RND_CONV_ODD: ties to odd; no AP equivalent
+}
+AC_OVERFLOW_MAP = {
+    0: AP_OVERFLOW_MAP["WRAP"],      # AC_WRAP: wrap modulo the destination width
+    1: AP_OVERFLOW_MAP["SAT"],       # AC_SAT: clamp to representable bounds
+    2: AP_OVERFLOW_MAP["SAT_ZERO"],  # AC_SAT_ZERO: replace overflow with zero
+    3: AP_OVERFLOW_MAP["SAT_SYM"],   # AC_SAT_SYM: symmetric saturation
+}
+# AP_WRAP_SM remains a distinct AP-only mode, not an alias for AC_WRAP.
+# Version 1 (including tensors without a version) used raw AC ordinals and
+# could parse AP enum prefixes instead of whole tokens. The shape is unchanged,
+# so record these semantic corrections to make migration visible.
+# Version 3 additionally recognizes debug-qualified AC storage/channel types
+# and corrects iv signedness. The vector dimensions remain unchanged.
+TYPE_EMBEDDING_SCHEMA_VERSION = 3
 
 
 # offsets in embedding
@@ -810,6 +856,27 @@ EMBED_SIZE = sum([
 ])
 
 
+def _unwrap_llvm_named_type(type_str):
+    """Remove LLVM's spelling wrappers from a named semantic type.
+
+    Bambu's debug metadata is recovered as a quoted LLVM named type,
+    for example ``%"ac_fixed<16, 6, true, (ac_q_mode)0, (ac_o_mode)0>"``.
+    ProGraML preserves those wrappers in node text, while the semantic regexes
+    operate on the source-level type spelling.
+    """
+
+    type_str = type_str.strip()
+    if type_str.startswith("%"):
+        type_str = type_str[1:]
+    if len(type_str) >= 2 and type_str.startswith('"') and type_str.endswith('"'):
+        type_str = type_str[1:-1]
+    for prefix in ("struct.", "class."):
+        if type_str.startswith(prefix):
+            type_str = type_str[len(prefix):]
+            break
+    return re.sub(r'\.debug\.\d+$', '', type_str)
+
+
 @lru_cache(maxsize=10000)
 def type_embedding(type_str):
     """
@@ -824,16 +891,16 @@ def type_embedding(type_str):
      n_bits:        integer
      frac_ratio:    float   (fractional bits / total bits)
      signed:        boolean
-     quantize_m:    one-hot AP: RND, RND_ZERO, RND_MIN_INF, RND_INF, RND_CONV, TRN, TRN_ZERO
-                             AC: TRN, RND, TRN_ZERO, RND_ZERO, RND_INF, RND_MIN_INF, RND_CONV, RND_CONV_ODD) TODO: Semantically line-up mappings between ap/ac
-     overflow_m:    one-hot AP: SAT, SAT_ZERO, SAT_SYM, WRAP, WRAP_SM
-                             AC: WRAP, SAT, SAT_ZERO, SAT_SYM)
+     quantize_m:    shared one-hot: RND, RND_ZERO, RND_MIN_INF, RND_INF,
+                   RND_CONV, TRN, TRN_ZERO, RND_CONV_ODD (AC-only)
+     overflow_m:    shared one-hot: SAT, SAT_ZERO, SAT_SYM, WRAP, WRAP_SM (AP-only)
      spatial_length:  float (log2 of spatial array lengths: e.g. [16 x %class.ac_fixed] -> 4.0) (accumulates length additively)
      temporal_length: float (log2 of temporal array lengths)
      ptr_depth:     integer (*** -> 3)
     """
 
     emb = np.zeros(EMBED_SIZE, dtype=np.float32)
+    type_str = str(type_str).strip()
 
     # -----------------
     # pointer handling
@@ -865,11 +932,19 @@ def type_embedding(type_str):
 
         type_str = type_str[separator + 3:-1]
 
+    type_str = _unwrap_llvm_named_type(type_str)
+
 
     stream = STREAM_RE.match(type_str)
     if stream:
         emb[7] = 1   
-        type_str = stream.group(1)      
+        type_str = stream.group(1).strip()
+
+    channel = AC_CHANNEL_RE.match(type_str)
+    if channel:
+        emb[7] = 1
+        emb[IS_AC_OFF] = 1
+        type_str = channel.group(1).strip()
 
 
     nnet_array = NNET_ARRAY_RE.match(type_str)
@@ -961,12 +1036,12 @@ def type_embedding(type_str):
         return emb
 
 
-    m = AC_INT_RE.match(type_str)
+    m = AC_INT_RE.match(type_str) or AC_INT_CONV_RE.match(type_str) or AC_PUBLIC_INT_RE.match(type_str)
     if m:
         emb[3] = 1
         emb[IS_AC_OFF] = 1
-        emb[BITS_OFF] = int(m.group(2))
-        emb[SIGNED_OFF] = (m.group(1) == "true")
+        emb[BITS_OFF] = int(m.group('bits'))
+        emb[SIGNED_OFF] = (m.group('signed') == "true")
 
         return emb
 
@@ -983,8 +1058,13 @@ def type_embedding(type_str):
         emb[FRAC_OFF] = (width - int_bits) / width
         emb[SIGNED_OFF] = (m.group(3) == "true")
 
-        quant = int(m.group(4))
-        overflow = int(m.group(5))
+        try:
+            quant = AC_QUANT_MAP[int(m.group(4))]
+            overflow = AC_OVERFLOW_MAP[int(m.group(5))]
+        except KeyError as exc:
+            # Never let unknown enum ordinals spill into adjacent features or
+            # silently acquire another mode's meaning.
+            raise ValueError(f"Unsupported AC rounding/overflow mode in {type_str!r}") from exc
 
         # one-hot assignments here
         emb[QUANT_OFF + quant] = 1
