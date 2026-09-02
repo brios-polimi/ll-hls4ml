@@ -279,9 +279,7 @@ class PragmaTensorizationTests(unittest.TestCase):
                 },
             ],
             "links": [
-                {"source": 1, "target": 0, "relation": "contains", "position": 0},
                 {"source": 2, "target": 1, "relation": "applies_to", "position": 0},
-                {"source": 3, "target": 1, "relation": "contains", "position": 0},
             ],
         }
 
@@ -299,6 +297,25 @@ class PragmaTensorizationTests(unittest.TestCase):
             data[("block", "contains", "instruction")].edge_index.numpy(),
             np.array([[0], [0]]),
         )
+        np.testing.assert_array_equal(
+            data[("function", "contains", "block")].edge_index.numpy(),
+            np.array([[0], [0]]),
+        )
+
+    def test_rejects_serialized_containment(self):
+        graph = {
+            "nodes": [
+                {"id": 0, "type": 0, "text": "ret", "function": 0, "block": 0},
+                {"id": 1, "type": 4, "text": "llvm.basic_block", "function": 0, "block": 0},
+                {"id": 2, "type": 5, "text": "llvm.function", "function": 0, "block": -1},
+            ],
+            "links": [
+                {"source": 1, "target": 0, "relation": "contains"},
+            ],
+        }
+
+        with self.assertRaisesRegex(ValueError, "outside the canonical schema"):
+            _json_to_hetero(graph, {"ret": 1}, inference_mode=True)
 
 
 if __name__ == "__main__":

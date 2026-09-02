@@ -19,7 +19,7 @@ import tqdm
 from ll_hls4ml.io.schema import (
     DERIVED_DEF_USE_EDGE,
     EDGE_TYPES,
-    EDGE_TYPE_SET,
+    SERIALIZED_EDGE_TYPE_SET,
     EDGE_TYPES_WITH_ATTR,
     BLOCK_FEATURE_SIZE,
     FUNCTION_FEATURE_SIZE,
@@ -420,8 +420,9 @@ def _json_to_hetero(
     function_map = {}
     function_id_map = {}
     node_type_map: dict[int, int] = {}
-    instruction_function_ids = []
+    instruction_hierarchy_ids = []
     block_function_ids = []
+    block_hierarchy_id_map = {}
 
     unknown_types = set()
 
@@ -460,7 +461,12 @@ def _json_to_hetero(
             text_idx = instruction_vocab.get(node_text, 0)
             features["instruction"].append([text_idx])
             inst_map[node_id] = len(inst_map)
-            instruction_function_ids.append(safe_int(n.get("function", -1)))
+            instruction_hierarchy_ids.append(
+                (
+                    safe_int(n.get("function", -1)),
+                    safe_int(n.get("block", -1)),
+                )
+            )
         elif node_type == NODE_VARIABLE:
             type_emb = type_embedding(node_text)
             if type_emb[TYPE_SIZE - 1]:
@@ -480,7 +486,13 @@ def _json_to_hetero(
         elif node_type == NODE_BLOCK:
             features["block"].append(block_embedding(n))
             block_map[node_id] = len(block_map)
-            block_function_ids.append(safe_int(n.get("function", -1)))
+            function_id = safe_int(n.get("function", -1))
+            block_id = safe_int(n.get("block", -1))
+            hierarchy_id = (function_id, block_id)
+            if hierarchy_id in block_hierarchy_id_map:
+                raise ValueError(f"Duplicate block hierarchy ID {hierarchy_id}")
+            block_hierarchy_id_map[hierarchy_id] = block_map[node_id]
+            block_function_ids.append(function_id)
         elif node_type == NODE_FUNCTION:
             features["function"].append(function_embedding(n))
             function_map[node_id] = len(function_map)
@@ -557,7 +569,7 @@ def _json_to_hetero(
             relation,
             NODE_TYPE_NAMES[target_type_id],
         )
-        if edge_type not in EDGE_TYPE_SET:
+        if edge_type not in SERIALIZED_EDGE_TYPE_SET:
             raise ValueError(f"Edge is outside the canonical schema: {edge_type}")
         local_source = local_maps[source_type_id].get(source)
         local_target = local_maps[target_type_id].get(target)
@@ -570,6 +582,34 @@ def _json_to_hetero(
             if position < 0 or (max_pos is not None and position > max_pos):
                 raise ValueError(f"Invalid edge position {position}: {edge}")
             edge_attrs[edge_type].append([position])
+
+    instruction_owner = [
+        function_id_map.get(function_id, -1)
+        for function_id, _block_id in instruction_hierarchy_ids
+    ]
+    block_owner = [
+        function_id_map.get(function_id, -1)
+        for function_id in block_function_ids
+    ]
+    block_by_instruction = [
+        block_hierarchy_id_map.get(hierarchy_id, -1)
+        for hierarchy_id in instruction_hierarchy_ids
+    ]
+    if any(owner < 0 for owner in instruction_owner + block_owner):
+        raise ValueError("Every instruction and block must belong to a function node")
+    if any(block < 0 for block in block_by_instruction):
+        raise ValueError("Every instruction must belong to a block node")
+
+    # Containment is a tensor-only relation derived from node ownership. This
+    # keeps graph JSON compact while retaining the relation for generic models.
+    edge_index[("block", "contains", "instruction")] = [
+        [block, instruction]
+        for instruction, block in enumerate(block_by_instruction)
+    ]
+    edge_index[("function", "contains", "block")] = [
+        [function, block]
+        for block, function in enumerate(block_owner)
+    ]
 
     for et, v in edge_index.items():
         data[et].edge_index = (
@@ -601,38 +641,10 @@ def _json_to_hetero(
         else torch.empty((2, 0), dtype=torch.long)
     )
 
-    instruction_owner = [
-        function_id_map.get(function_id, -1)
-        for function_id in instruction_function_ids
-    ]
-    block_owner = [
-        function_id_map.get(function_id, -1)
-        for function_id in block_function_ids
-    ]
-    if any(owner < 0 for owner in instruction_owner + block_owner):
-        raise ValueError("Every instruction and block must belong to a function node")
-
-    block_by_instruction = {}
-    for block, instruction in edge_index[("block", "contains", "instruction")]:
-        if instruction in block_by_instruction:
-            raise ValueError(f"Instruction {instruction} has multiple block owners")
-        block_by_instruction[instruction] = block
-    function_by_block = {}
-    for function, block in edge_index[("function", "contains", "block")]:
-        if block in function_by_block:
-            raise ValueError(f"Block {block} has multiple function owners")
-        function_by_block[block] = function
-    if len(block_by_instruction) != len(inst_map):
-        raise ValueError("Every instruction requires exactly one contains edge")
-    if len(function_by_block) != len(block_map):
-        raise ValueError("Every block requires exactly one contains edge")
     for instruction, expected_function in enumerate(instruction_owner):
         block = block_by_instruction[instruction]
-        if function_by_block[block] != expected_function:
-            raise ValueError("Instruction metadata disagrees with containment edges")
-    for block, expected_function in enumerate(block_owner):
-        if function_by_block[block] != expected_function:
-            raise ValueError("Block metadata disagrees with containment edges")
+        if block_owner[block] != expected_function:
+            raise ValueError("Instruction and block function metadata disagree")
 
     for relation_edges in (
         edge_index[("instruction", "control", "instruction")],

@@ -103,7 +103,7 @@ class GraphExplorer:
                 str(relation),
                 self.node_type_names.get(int(self.nodes[target].get("type", -1))),
             )
-            if edge_type not in schema.EDGE_TYPE_SET:
+            if edge_type not in schema.SERIALIZED_EDGE_TYPE_SET:
                 raise ValueError(f"Edge is outside the canonical schema: {edge_type}")
             position = int(link.get("position", 0))
             key = (source, str(relation), target, position)

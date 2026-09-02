@@ -93,8 +93,6 @@ class TrainingSmokeTests(unittest.TestCase):
                 {"source": 3, "target": 0, "relation": "applies_to", "position": 0},
                 {"source": 3, "target": 1, "relation": "applies_to", "position": 0},
                 {"source": 3, "target": 4, "relation": "applies_to", "position": 0},
-                {"source": 4, "target": 0, "relation": "contains", "position": 0},
-                {"source": 5, "target": 4, "relation": "contains", "position": 0},
             ],
         }
         labels = [100, 200, 3, 4, 1000, 10]

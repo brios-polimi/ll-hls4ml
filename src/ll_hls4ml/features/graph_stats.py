@@ -17,7 +17,7 @@ from ll_hls4ml.data.tensorize import (
     type_embedding,
 )
 from ll_hls4ml.io.schema import (
-    EDGE_TYPE_SET,
+    SERIALIZED_EDGE_TYPE_SET,
     NODE_BLOCK,
     NODE_CONSTANT,
     NODE_PRAGMA,
@@ -168,7 +168,7 @@ def extract_graph_features(graph_data):
             str(e.get("relation", "")),
             NODE_TYPE_NAMES.get(nodes[target].get("type", -1)),
         )
-        if edge_type not in EDGE_TYPE_SET:
+        if edge_type not in SERIALIZED_EDGE_TYPE_SET:
             raise ValueError(f"Unknown canonical edge type: {edge_type}")
         edge_type_counts[edge_type] += 1
 
@@ -178,7 +178,7 @@ def extract_graph_features(graph_data):
             if num_edges
             else 0.0
         )
-        for source, relation, target in EDGE_TYPE_SET
+        for source, relation, target in SERIALIZED_EDGE_TYPE_SET
     }
 
     density = num_edges / (num_nodes * (num_nodes - 1)) if num_nodes > 1 else 0.0

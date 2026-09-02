@@ -15,8 +15,8 @@ NODE_TYPE_NAMES = {
     NODE_BLOCK: "block",
     NODE_FUNCTION: "function",
 }
-# Canonical JSON relations. Endpoint types carry most semantics; the relation
-# remains explicit for validation and for the few same-endpoint alternatives.
+# Tensor relations. Containment is derived from node ownership during
+# tensorization and is intentionally absent from canonical graph JSON.
 EDGE_TYPES = [
     ("instruction", "control", "instruction"),
     ("instruction", "defines", "variable"),
@@ -33,6 +33,13 @@ EDGE_TYPES = [
     ("function", "contains", "block"),
 ]
 EDGE_TYPE_SET = frozenset(EDGE_TYPES)
+DERIVED_CONTAINMENT_EDGES = frozenset(
+    {
+        ("block", "contains", "instruction"),
+        ("function", "contains", "block"),
+    }
+)
+SERIALIZED_EDGE_TYPE_SET = EDGE_TYPE_SET - DERIVED_CONTAINMENT_EDGES
 RELATION_NAMES = tuple(dict.fromkeys(relation for _, relation, _ in EDGE_TYPES))
 
 # Tensor-only adjacency derived once during preprocessing. It is intentionally
