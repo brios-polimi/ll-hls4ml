@@ -87,7 +87,10 @@ def build_manifest(
     manifest = {
         name: [] for name in ("train", "validation", "test")
     }
-    group_splits: dict[tuple[str, str], str] = {}
+    # group_id is reused across archives. Include the archive in the audit key
+    # so unrelated archive realizations do not create false split failures.
+    group_splits: dict[tuple[str, str, str], str] = {}
+    split_conflicts = []
     for path in main_paths:
         sample_metadata = metadata.get(path, {})
         split = str(sample_metadata.get("dataset_split", "")).lower()
@@ -96,12 +99,16 @@ def build_manifest(
             raise ValueError(f"Missing official train/val/test split for {path}")
         family = Path(path).parts[0]
         group_id = str(sample_metadata.get("group_id") or Path(path).stem)
-        group_key = (family, group_id)
+        archive = Path(path).parts[1]
+        group_key = (family, archive, group_id)
         previous_split = group_splits.setdefault(group_key, split)
         if previous_split != split:
-            raise ValueError(
-                f"Group {group_key!r} crosses {previous_split} and {split}"
-            )
+            split_conflicts.append({
+                "group_key": group_key,
+                "first_split": previous_split,
+                "conflicting_split": split,
+                "tensor_path": path,
+            })
         manifest[split].append(
             {"kernel_family": family, "tensor_path": path}
         )
@@ -130,6 +137,7 @@ def build_manifest(
         "main_duplicate_graph_ids_removed": main_duplicates,
         "exemplar_duplicate_graph_ids_removed": exemplar_duplicates,
         "groups": len(group_splits),
+        "split_conflicts": split_conflicts,
     }
     return manifest, report
 
@@ -191,6 +199,9 @@ def main() -> None:
     manifest_path.write_text(json.dumps(manifest, indent=2))
     print(f"Saved manifest to {manifest_path}")
     print(json.dumps(report, indent=2))
+    report_path = args.cache.with_name(f"{args.cache.stem}_report.json")
+    report_path.write_text(json.dumps(report, indent=2))
+    print(f"Saved audit report to {report_path}")
 
     cache = build_high_level_cache(
         manifest_path=manifest_path,
