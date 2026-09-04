@@ -944,7 +944,7 @@ def type_embedding(type_str):
 
         type_str = type_str[separator + 3:-1]
 
-    type_str = _unwrap_llvm_named_type(type_str)
+    type_str = _unwrap_llvm_named_type(type_str.split(" = type", 1)[0])
 
 
     stream = STREAM_RE.match(type_str)
